@@ -1,0 +1,10 @@
+# Optional dependencies for code navigation scripts.
+# Install with: pip install -r requirements-code-navigation.txt
+#
+# Python navigator: requires pyright (install via npm or pip separately).
+# TypeScript navigator: requires typescript-language-server (install via npm/pnpm).
+#
+# For TypeScript AST-based callee finding (matches Python robustness):
+tree-sitter
+tree-sitter-typescript
+tree-sitter-javascript

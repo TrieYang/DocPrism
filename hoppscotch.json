@@ -1,0 +1,702 @@
+[
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/access-token/access-token.service.ts",
+    "doc": "/**\n   * Typecast a database PersonalAccessToken to a AccessToken model\n   * @param token database PersonalAccessToken\n   * @returns AccessToken model\n   */",
+    "code": "private cast(token: PersonalAccessToken): AccessToken {\n    return <AccessToken>{\n      id: token.id,\n      label: token.label,\n      createdOn: token.createdOn,\n      expiresOn: token.expiresOn,\n      lastUsedOn: token.updatedOn,\n    };\n  }",
+    "old_id": 2,
+    "id": 1
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/access-token/access-token.service.ts",
+    "doc": "/**\n   * Create a Personal Access Token\n   *\n   * @param createAccessTokenDto DTO for creating a Personal Access Token\n   * @param user AuthUser object\n   * @returns Either of the created token or error message\n   */",
+    "code": "async createPAT(createAccessTokenDto: CreateAccessTokenDto, user: AuthUser) {\n    const isTitleValid = isValidLength(\n      createAccessTokenDto.label,\n      this.TITLE_LENGTH,\n    );\n    if (!isTitleValid)\n      return E.left({\n        message: ACCESS_TOKEN_LABEL_SHORT,\n        statusCode: HttpStatus.BAD_REQUEST,\n      });\n\n    if (!this.validateExpirationDate(createAccessTokenDto.expiryInDays))\n      return E.left({\n        message: ACCESS_TOKEN_EXPIRY_INVALID,\n        statusCode: HttpStatus.BAD_REQUEST,\n      });\n\n    const createdPAT = await this.prisma.personalAccessToken.create({\n      data: {\n        userUid: user.uid,\n        label: createAccessTokenDto.label,\n        expiresOn: calculateExpirationDate(createAccessTokenDto.expiryInDays),\n      },\n    });\n\n    const res: CreateAccessTokenResponse = {\n      token: `${this.TOKEN_PREFIX}${createdPAT.token}`,\n      info: this.cast(createdPAT),\n    };\n\n    return E.right(res);\n  }",
+    "old_id": 4,
+    "id": 2
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/access-token/access-token.service.ts",
+    "doc": "/**\n   * Delete a Personal Access Token\n   *\n   * @param accessTokenID ID of the Personal Access Token\n   * @returns Either of true or error message\n   */",
+    "code": "async deletePAT(accessTokenID: string) {\n    try {\n      await this.prisma.personalAccessToken.delete({\n        where: { id: accessTokenID },\n      });\n      return E.right(true);\n    } catch {\n      return E.left({\n        message: ACCESS_TOKEN_NOT_FOUND,\n        statusCode: HttpStatus.NOT_FOUND,\n      });\n    }\n  }",
+    "old_id": 5,
+    "id": 3
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/access-token/access-token.service.ts",
+    "doc": "/**\n   * Get a Personal Access Token\n   *\n   * @param accessToken Personal Access Token\n   * @returns Either of the Personal Access Token or error message\n   */",
+    "code": "async getUserPAT(accessToken: string) {\n    const extractedToken = this.extractUUID(accessToken);\n    if (!extractedToken) return E.left(ACCESS_TOKEN_NOT_FOUND);\n\n    try {\n      const userPAT = await this.prisma.personalAccessToken.findUniqueOrThrow({\n        where: { token: extractedToken },\n        include: { user: true },\n      });\n      return E.right(userPAT);\n    } catch {\n      return E.left(ACCESS_TOKEN_NOT_FOUND);\n    }\n  }",
+    "old_id": 7,
+    "id": 4
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/access-token/access-token.service.ts",
+    "doc": "/**\n   * Update the last used date of a Personal Access Token\n   *\n   * @param token Personal Access Token\n   * @returns Either of the updated Personal Access Token or error message\n   */",
+    "code": "async updateLastUsedForPAT(token: string) {\n    const extractedToken = this.extractUUID(token);\n    if (!extractedToken) return E.left(ACCESS_TOKEN_NOT_FOUND);\n\n    try {\n      const updatedAccessToken = await this.prisma.personalAccessToken.update({\n        where: { token: extractedToken },\n        data: {\n          updatedOn: new Date(),\n        },\n      });\n\n      return E.right(this.cast(updatedAccessToken));\n    } catch {\n      return E.left(ACCESS_TOKEN_NOT_FOUND);\n    }\n  }",
+    "old_id": 8,
+    "id": 5
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/admin/admin.service.ts",
+    "doc": "/**\n   * Fetch all the users in the infra.\n   * @param cursorID Users uid\n   * @param take number of users to fetch\n   * @returns an Either of array of user or error\n   * @deprecated use fetchUsersV2 instead\n   */",
+    "code": "async fetchUsers(cursorID: string, take: number) {\n    const allUsers = await this.userService.fetchAllUsers(cursorID, take);\n    return allUsers;\n  }",
+    "old_id": 9,
+    "id": 6
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/admin/admin.service.ts",
+    "doc": "/**\n   * Revoke infra level user invitations\n   * @param inviteeEmails Invitee's emails\n   * @param adminUid Admin Uid\n   * @returns an Either of boolean or error string\n   */",
+    "code": "async revokeUserInvitations(inviteeEmails: string[]) {\n    const areAllEmailsValid = inviteeEmails.every((email) =>\n      validateEmail(email),\n    );\n    if (!areAllEmailsValid) {\n      return E.left(INVALID_EMAIL);\n    }\n\n    try {\n      await this.prisma.invitedUsers.deleteMany({\n        where: {\n          inviteeEmail: { in: inviteeEmails, mode: 'insensitive' },\n        },\n      });\n      return E.right(true);\n    } catch (error) {\n      return E.left(USER_INVITATION_DELETION_FAILED);\n    }\n  }",
+    "old_id": 11,
+    "id": 7
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/admin/admin.service.ts",
+    "doc": "/**\n   * Fetch the list of invited users by the admin.\n   * @returns an Either of array of `InvitedUser` object or error\n   */",
+    "code": "async fetchInvitedUsers(paginationOption: OffsetPaginationArgs) {\n    const userEmailObjs = await this.prisma.user.findMany({\n      select: {\n        email: true,\n      },\n    });\n\n    const pendingInvitedUsers = await this.prisma.invitedUsers.findMany({\n      take: paginationOption.take,\n      skip: paginationOption.skip,\n      orderBy: {\n        invitedOn: 'desc',\n      },\n      where: {\n        NOT: {\n          inviteeEmail: {\n            in: userEmailObjs.map((user) => user.email),\n            mode: 'insensitive',\n          },\n        },\n      },\n    });\n\n    const users: InvitedUser[] = pendingInvitedUsers.map(\n      (user) => <InvitedUser>{ ...user },\n    );\n\n    return users;\n  }",
+    "old_id": 12,
+    "id": 8
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/admin/admin.service.ts",
+    "doc": "/**\n   * Fetch the count of all the members in a team.\n   * @param teamID team id\n   * @returns a count of team members\n   */",
+    "code": "async membersCountInTeam(teamID: string) {\n    const teamMembersCount =\n      await this.teamService.getCountOfMembersInTeam(teamID);\n    return teamMembersCount;\n  }",
+    "old_id": 14,
+    "id": 9
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/admin/admin.service.ts",
+    "doc": "/**\n   * Fetch the count of all the environments in a team.\n   * @param teamID team id\n   * @returns a count of environments in a team\n   */",
+    "code": "async environmentCountInTeam(teamID: string) {\n    const envCount = await this.teamEnvironmentsService.totalEnvsInTeam(teamID);\n    return envCount;\n  }",
+    "old_id": 17,
+    "id": 10
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/admin/admin.service.ts",
+    "doc": "/**\n   * Fetch all the invitations for a given team.\n   * @param teamID team id\n   * @returns an array team invitations\n   */",
+    "code": "async pendingInvitationCountInTeam(teamID: string) {\n    const invitations =\n      await this.teamInvitationService.getTeamInvitations(teamID);\n\n    return invitations;\n  }",
+    "old_id": 18,
+    "id": 11
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/admin/admin.service.ts",
+    "doc": "/**\n   * Remove the user from a team\n   * @param userUid users uid\n   * @param teamID team id\n   * @returns an Either of boolean or error\n   */",
+    "code": "async removeUserFromTeam(userUid: string, teamID: string) {\n    const removedUser = await this.teamService.leaveTeam(teamID, userUid);\n    if (E.isLeft(removedUser)) return E.left(removedUser.left);\n\n    return E.right(removedUser.right);\n  }",
+    "old_id": 19,
+    "id": 12
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/admin/admin.service.ts",
+    "doc": "/**\n   * Add the user to a team\n   * @param teamID team id\n   * @param userEmail users email\n   * @param role team member role for the user\n   * @returns an Either of boolean or error\n   */",
+    "code": "async addUserToTeam(teamID: string, userEmail: string, role: TeamMemberRole) {\n    if (!validateEmail(userEmail)) return E.left(INVALID_EMAIL);\n\n    const user = await this.userService.findUserByEmail(userEmail);\n    if (O.isNone(user)) return E.left(USER_NOT_FOUND);\n\n    const teamMember = await this.teamService.getTeamMemberTE(\n      teamID,\n      user.value.uid,\n    )();\n    if (E.isLeft(teamMember)) {\n      const addedUser = await this.teamService.addMemberToTeamWithEmail(\n        teamID,\n        userEmail,\n        role,\n      );\n      if (E.isLeft(addedUser)) return E.left(addedUser.left);\n\n      const userInvitation =\n        await this.teamInvitationService.getTeamInviteByEmailAndTeamID(\n          userEmail,\n          teamID,\n        );\n\n      if (E.isRight(userInvitation)) {\n        await this.teamInvitationService.revokeInvitation(\n          userInvitation.right.id,\n        );\n      }\n\n      return E.right(addedUser.right);\n    }\n\n    return E.left(TEAM_INVITE_ALREADY_MEMBER);\n  }",
+    "old_id": 20,
+    "id": 13
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/admin/admin.service.ts",
+    "doc": "/**\n   * Renames a team\n   * @param teamID team ID\n   * @param newName new team name\n   * @returns an Either of `Team` object or error\n   */",
+    "code": "async renameATeam(teamID: string, newName: string) {\n    const renamedTeam = await this.teamService.renameTeam(teamID, newName);\n    if (E.isLeft(renamedTeam)) return E.left(renamedTeam.left);\n\n    return E.right(renamedTeam.right);\n  }",
+    "old_id": 22,
+    "id": 14
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/admin/admin.service.ts",
+    "doc": "/**\n   * Deletes a team\n   * @param teamID team ID\n   * @returns an Either of boolean or error\n   */",
+    "code": "async deleteATeam(teamID: string) {\n    const deleteTeam = await this.teamService.deleteTeam(teamID);\n    if (E.isLeft(deleteTeam)) return E.left(deleteTeam.left);\n\n    return E.right(deleteTeam.right);\n  }",
+    "old_id": 23,
+    "id": 15
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/admin/admin.service.ts",
+    "doc": "/**\n   * Fetch all admin accounts\n   * @returns an array of admin users\n   */",
+    "code": "async fetchAdmins() {\n    const admins = this.userService.fetchAdminUsers();\n    return admins;\n  }",
+    "old_id": 24,
+    "id": 16
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/admin/admin.service.ts",
+    "doc": "/**\n   * Remove a user account by UID\n   * @param userUid User UID\n   * @returns an Either of boolean or error\n   *\n   */",
+    "code": "async removeUserAccount(userUid: string) {\n    const user = await this.userService.findUserById(userUid);\n    if (O.isNone(user)) return E.left(USER_NOT_FOUND);\n\n    if (user.value.isAdmin) return E.left(USER_IS_ADMIN);\n\n    const delUser = await this.userService.deleteUserByUID(user.value)();\n    if (E.isLeft(delUser)) return E.left(delUser.left);\n    return E.right(delUser.right);\n  }",
+    "old_id": 26,
+    "id": 17
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/admin/admin.service.ts",
+    "doc": "/**\n   * Make users to admin\n   * @param userUid User UIDs\n   * @returns an Either of boolean or error\n   */",
+    "code": "async makeUsersAdmin(userUIDs: string[]) {\n    const isUpdated = await this.userService.makeAdmins(userUIDs);\n    if (E.isLeft(isUpdated)) return E.left(isUpdated.left);\n    return E.right(true);\n  }",
+    "old_id": 29,
+    "id": 18
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/admin/admin.service.ts",
+    "doc": "/**\n   * Remove user as admin\n   * @param userUid User UID\n   * @returns an Either of boolean or error\n   * @deprecated use demoteUsersByAdmin instead\n   */",
+    "code": "async removeUserAsAdmin(userUID: string) {\n    const adminUsers = await this.userService.fetchAdminUsers();\n    if (adminUsers.length === 1) return E.left(ONLY_ONE_ADMIN_ACCOUNT);\n\n    const admin = await this.userService.removeUserAsAdmin(userUID);\n    if (E.isLeft(admin)) return E.left(admin.left);\n    return E.right(true);\n  }",
+    "old_id": 30,
+    "id": 19
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/admin/admin.service.ts",
+    "doc": "/**\n   * Revoke a team invite by ID\n   * @param inviteID Team Invite ID\n   * @returns an Either of boolean or error\n   */",
+    "code": "async revokeTeamInviteByID(inviteID: string) {\n    const teamInvite =\n      await this.teamInvitationService.revokeInvitation(inviteID);\n\n    if (E.isLeft(teamInvite)) return E.left(teamInvite.left);\n\n    return E.right(teamInvite.right);\n  }",
+    "old_id": 37,
+    "id": 20
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/admin/admin.service.ts",
+    "doc": "/**\n   * Delete all user history\n   * @returns Boolean on successful deletion\n   */",
+    "code": "async deleteAllUserHistory() {\n    const result = await this.userHistoryService.deleteAllHistories();\n\n    if (E.isLeft(result)) return E.left(result.left);\n    return E.right(result.right);\n  }",
+    "old_id": 39,
+    "id": 21
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/auth/auth.service.ts",
+    "doc": "/**\n   * Generate Id and token for email Magic-Link auth\n   *\n   * @param user User Object\n   * @returns Created VerificationToken token\n   */",
+    "code": "private async generateMagicLinkTokens(user: AuthUser) {\n    const salt = await bcrypt.genSalt(\n      parseInt(this.configService.get('TOKEN_SALT_COMPLEXITY')),\n    );\n    const expiresOn = DateTime.now()\n      .plus({\n        hours: parseInt(this.configService.get('MAGIC_LINK_TOKEN_VALIDITY')),\n      })\n      .toISO()\n      .toString();\n\n    const idToken = await this.prisma.verificationToken.create({\n      data: {\n        deviceIdentifier: salt,\n        userUid: user.uid,\n        expiresOn: expiresOn,\n      },\n    });\n\n    return idToken;\n  }",
+    "old_id": 40,
+    "id": 22
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/auth/auth.service.ts",
+    "doc": "/**\n   * Generate new refresh token for user\n   *\n   * @param userUid User Id\n   * @returns Generated refreshToken\n   */",
+    "code": "private async generateRefreshToken(userUid: string) {\n    const refreshTokenPayload: RefreshTokenPayload = {\n      iss: this.configService.get('VITE_BASE_URL'),\n      sub: userUid,\n      aud: [this.configService.get('VITE_BASE_URL')],\n    };\n\n    const refreshToken = await this.jwtService.sign(refreshTokenPayload, {\n      expiresIn: this.configService.get('REFRESH_TOKEN_VALIDITY'), //7 Days\n    });\n\n    const refreshTokenHash = await argon2.hash(refreshToken);\n\n    const updatedUser = await this.usersService.updateUserRefreshToken(\n      refreshTokenHash,\n      userUid,\n    );\n    if (E.isLeft(updatedUser))\n      return E.left(<RESTError>{\n        message: updatedUser.left,\n        statusCode: HttpStatus.NOT_FOUND,\n      });\n\n    return E.right(refreshToken);\n  }",
+    "old_id": 42,
+    "id": 23
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/auth/auth.service.ts",
+    "doc": "/**\n   * Generate access and refresh token pair\n   *\n   * @param userUid User ID\n   * @returns Either of generated AuthTokens\n   */",
+    "code": "async generateAuthTokens(userUid: string) {\n    const accessTokenPayload: AccessTokenPayload = {\n      iss: this.configService.get('VITE_BASE_URL'),\n      sub: userUid,\n      aud: [this.configService.get('VITE_BASE_URL')],\n    };\n\n    const refreshToken = await this.generateRefreshToken(userUid);\n    if (E.isLeft(refreshToken)) return E.left(refreshToken.left);\n\n    return E.right(<AuthTokens>{\n      access_token: await this.jwtService.sign(accessTokenPayload, {\n        expiresIn: this.configService.get('ACCESS_TOKEN_VALIDITY'), //1 Day\n      }),\n      refresh_token: refreshToken.right,\n    });\n  }",
+    "old_id": 43,
+    "id": 24
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/auth/auth.service.ts",
+    "doc": "/**\n   * Refresh refresh and auth tokens\n   *\n   * @param hashedRefreshToken Hashed refresh token received from client\n   * @param user User Object\n   * @returns Either of generated AuthTokens\n   */",
+    "code": "async refreshAuthTokens(hashedRefreshToken: string, user: AuthUser) {\n    // Check to see user is valid\n    if (!user)\n      return E.left({\n        message: USER_NOT_FOUND,\n        statusCode: HttpStatus.NOT_FOUND,\n      });\n\n    // Check to see if the hashed refresh_token received from the client is the same as the refresh_token saved in the DB\n    const isTokenMatched = await argon2.verify(\n      user.refreshToken,\n      hashedRefreshToken,\n    );\n    if (!isTokenMatched)\n      return E.left({\n        message: INVALID_REFRESH_TOKEN,\n        statusCode: HttpStatus.NOT_FOUND,\n      });\n\n    // if tokens match, generate new pair of auth tokens\n    const generatedAuthTokens = await this.generateAuthTokens(user.uid);\n    if (E.isLeft(generatedAuthTokens))\n      return E.left({\n        message: generatedAuthTokens.left.message,\n        statusCode: generatedAuthTokens.left.statusCode,\n      });\n\n    return E.right(generatedAuthTokens.right);\n  }",
+    "old_id": 46,
+    "id": 25
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/auth/auth.service.ts",
+    "doc": "/**\n   * Verify is signed in User is an admin or not\n   *\n   * @param user User Object\n   * @returns Either of boolean if user is admin or not\n   */",
+    "code": "async verifyAdmin(user: AuthUser) {\n    if (user.isAdmin) return E.right(<IsAdmin>{ isAdmin: true });\n\n    const usersCount = await this.usersService.getUsersCount();\n    if (usersCount === 1) {\n      const elevatedUser = await this.usersService.makeAdmin(user.uid);\n      if (E.isLeft(elevatedUser))\n        return E.left(<RESTError>{\n          message: elevatedUser.left,\n          statusCode: HttpStatus.NOT_FOUND,\n        });\n\n      return E.right(<IsAdmin>{ isAdmin: true });\n    }\n\n    return E.right(<IsAdmin>{ isAdmin: false });\n  }",
+    "old_id": 47,
+    "id": 26
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/infra-config/infra-config.service.ts",
+    "doc": "/**\n   * Update InfraConfigs by name\n   * @param infraConfigs InfraConfigs to update\n   * @returns InfraConfig model\n   */",
+    "code": "async updateMany(infraConfigs: InfraConfigArgs[]) {\n    for (let i = 0; i < infraConfigs.length; i++) {\n      if (this.EXCLUDE_FROM_UPDATE_CONFIGS.includes(infraConfigs[i].name))\n        return E.left(INFRA_CONFIG_OPERATION_NOT_ALLOWED);\n    }\n\n    const isValidate = this.validateEnvValues(infraConfigs);\n    if (E.isLeft(isValidate)) return E.left(isValidate.left);\n\n    try {\n      const dbInfraConfig = await this.prisma.infraConfig.findMany({\n        select: { name: true, isEncrypted: true },\n      });\n\n      await this.prisma.$transaction(async (tx) => {\n        for (let i = 0; i < infraConfigs.length; i++) {\n          const isEncrypted = dbInfraConfig.find(\n            (p) => p.name === infraConfigs[i].name,\n          )?.isEncrypted;\n\n          await tx.infraConfig.update({\n            where: { name: infraConfigs[i].name },\n            data: {\n              value: isEncrypted\n                ? encrypt(infraConfigs[i].value)\n                : infraConfigs[i].value,\n            },\n          });\n        }\n      });\n\n      stopApp();\n\n      return E.right(infraConfigs);\n    } catch (e) {\n      return E.left(INFRA_CONFIG_UPDATE_FAILED);\n    }\n  }",
+    "old_id": 52,
+    "id": 27
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/infra-config/infra-config.service.ts",
+    "doc": "/**\n   * Get InfraConfig by name\n   * @param name Name of the InfraConfig\n   * @returns InfraConfig model\n   */",
+    "code": "async get(name: InfraConfigEnum) {\n    try {\n      const infraConfig = await this.prisma.infraConfig.findUniqueOrThrow({\n        where: { name },\n      });\n\n      return E.right(this.cast(infraConfig));\n    } catch (e) {\n      return E.left(INFRA_CONFIG_NOT_FOUND);\n    }\n  }",
+    "old_id": 56,
+    "id": 28
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/infra-config/infra-config.service.ts",
+    "doc": "/**\n   * Reset all the InfraConfigs to their default values (from .env)\n   */",
+    "code": "async reset() {\n    // These are all the infra-configs that should not be reset\n    const RESET_EXCLUSION_LIST = [\n      InfraConfigEnum.IS_FIRST_TIME_INFRA_SETUP,\n      InfraConfigEnum.ANALYTICS_USER_ID,\n      InfraConfigEnum.ALLOW_ANALYTICS_COLLECTION,\n    ];\n    try {\n      const infraConfigDefaultObjs = await getDefaultInfraConfigs();\n      const updatedInfraConfigDefaultObjs = infraConfigDefaultObjs.filter(\n        (p) => RESET_EXCLUSION_LIST.includes(p.name) === false,\n      );\n\n      await this.prisma.infraConfig.deleteMany({\n        where: {\n          name: {\n            in: updatedInfraConfigDefaultObjs.map((p) => p.name),\n          },\n        },\n      });\n\n      await this.prisma.infraConfig.createMany({\n        data: updatedInfraConfigDefaultObjs,\n      });\n\n      stopApp();\n\n      return E.right(true);\n    } catch (e) {\n      return E.left(INFRA_CONFIG_RESET_FAILED);\n    }\n  }",
+    "old_id": 61,
+    "id": 29
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/infra-token/infra-token.service.ts",
+    "doc": "/**\n   * Create a new infra token\n   * @param label label of the token\n   * @param expiryInDays expiry duration of the token\n   * @param admin admin who created the token\n   * @returns Either of error message or CreateInfraTokenResponse\n   */",
+    "code": "async create(label: string, expiryInDays: number, admin: Admin) {\n    if (!isValidLength(label, this.TITLE_LENGTH)) {\n      return E.left(INFRA_TOKEN_LABEL_SHORT);\n    }\n\n    if (!this.validateExpirationDate(expiryInDays ?? null)) {\n      return E.left(INFRA_TOKEN_EXPIRY_INVALID);\n    }\n\n    const createdInfraToken = await this.prisma.infraToken.create({\n      data: {\n        creatorUid: admin.uid,\n        label,\n        expiresOn: calculateExpirationDate(expiryInDays ?? null) ?? undefined,\n      },\n    });\n\n    const res: CreateInfraTokenResponse = {\n      token: createdInfraToken.token,\n      info: this.cast(createdInfraToken),\n    };\n\n    return E.right(res);\n  }",
+    "old_id": 64,
+    "id": 30
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/shortcode/shortcode.service.ts",
+    "doc": "/**\n   * Generate a shortcode\n   *\n   * @returns generated shortcode\n   */",
+    "code": "private generateShortCodeID(): string {\n    let result = '';\n    for (let i = 0; i < SHORT_CODE_LENGTH; i++) {\n      result +=\n        SHORT_CODE_CHARS[Math.floor(Math.random() * SHORT_CODE_CHARS.length)];\n    }\n    return result;\n  }",
+    "old_id": 69,
+    "id": 31
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/shortcode/shortcode.service.ts",
+    "doc": "/**\n   * Check to see if ShortCode is already present in DB\n   *\n   * @returns Shortcode\n   */",
+    "code": "private async generateUniqueShortCodeID() {\n    while (true) {\n      const code = this.generateShortCodeID();\n\n      const data = await this.getShortCode(code);\n\n      if (E.isLeft(data)) return E.right(code);\n    }\n  }",
+    "old_id": 70,
+    "id": 32
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/shortcode/shortcode.service.ts",
+    "doc": "/**\n   * Fetch details regarding a ShortCode\n   *\n   * @param shortcode ShortCode\n   * @returns Either of ShortCode details or error\n   */",
+    "code": "async getShortCode(shortcode: string) {\n    try {\n      const shortcodeInfo = await this.prisma.shortcode.findFirstOrThrow({\n        where: { id: shortcode },\n      });\n      return E.right(this.cast(shortcodeInfo));\n    } catch (error) {\n      return E.left(SHORTCODE_NOT_FOUND);\n    }\n  }",
+    "old_id": 71,
+    "id": 33
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team/team.service.ts",
+    "doc": "/**\n   * Fetch all the teams in the `Team` table based on cursor\n   * @param cursorID string of teamID or undefined\n   * @param take number of items to query\n   * @returns an array of `Team` object\n   */",
+    "code": "async fetchAllTeams(cursorID: string, take: number) {\n    const options = {\n      skip: cursorID ? 1 : 0,\n      take: take,\n      cursor: cursorID ? { id: cursorID } : undefined,\n    };\n\n    const fetchedTeams = await this.prisma.team.findMany(options);\n    return fetchedTeams;\n  }",
+    "old_id": 77,
+    "id": 34
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team/team.service.ts",
+    "doc": "/**\n   * Fetch list of all the Teams in the DB\n   *\n   * @returns number of teams in the org\n   */",
+    "code": "async getTeamsCount() {\n    const teamsCount = await this.prisma.team.count();\n    return teamsCount;\n  }",
+    "old_id": 78,
+    "id": 35
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team-collection/team-collection.service.ts",
+    "doc": "/**\n   * Generate a JSON containing all the contents of collections and requests of a team\n   *\n   * @param teamID The Team ID\n   * @returns A JSON string containing all the contents of collections and requests of a team\n   */",
+    "code": "async exportCollectionsToJSON(teamID: string) {\n    const rootCollections = await this.prisma.teamCollection.findMany({\n      where: {\n        teamID,\n        parentID: null,\n      },\n    });\n\n    const rootCollectionObjects = [];\n    for (const coll of rootCollections) {\n      const result = await this.exportCollectionToJSONObject(teamID, coll.id);\n      if (E.isLeft(result)) return E.left(result.left);\n\n      rootCollectionObjects.push(result.right);\n    }\n\n    return E.right(JSON.stringify(rootCollectionObjects));\n  }",
+    "old_id": 79,
+    "id": 36
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team-collection/team-collection.service.ts",
+    "doc": "/**\n   * Returns the count of root collections present for a given teamID\n   * * The count returned is highest OrderIndex + 1\n   *\n   * @param teamID The Team ID\n   * @returns Number of Root Collections\n   */",
+    "code": "private async getRootCollectionsCount(teamID: string) {\n    const rootCollectionCount = await this.prisma.teamCollection.findMany({\n      where: { teamID, parentID: null },\n      orderBy: {\n        orderIndex: 'desc',\n      },\n    });\n    if (!rootCollectionCount.length) return 0;\n    return rootCollectionCount[0].orderIndex;\n  }",
+    "old_id": 86,
+    "id": 37
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team-collection/team-collection.service.ts",
+    "doc": "/**\n   * Delete a TeamCollection from the DB\n   *\n   * @param collectionID The Collection Id\n   * @returns The deleted TeamCollection\n   */",
+    "code": "private async removeTeamCollection(collectionID: string) {\n    try {\n      const deletedTeamCollection = await this.prisma.teamCollection.delete({\n        where: {\n          id: collectionID,\n        },\n      });\n\n      return E.right(deletedTeamCollection);\n    } catch (error) {\n      return E.left(TEAM_COLL_NOT_FOUND);\n    }\n  }",
+    "old_id": 88,
+    "id": 38
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team-collection/team-collection.service.ts",
+    "doc": "/**\n   * Delete child collection and requests of a TeamCollection\n   *\n   * @param collectionID The Collection Id\n   * @returns A Boolean of deletion status\n   */",
+    "code": "private async deleteCollectionData(collection: DBTeamCollection) {\n    // Get all child collections in collectionID\n    const childCollectionList = await this.prisma.teamCollection.findMany({\n      where: {\n        parentID: collection.id,\n      },\n    });\n\n    // Delete child collections\n    await Promise.all(\n      childCollectionList.map((coll) => this.deleteCollection(coll.id)),\n    );\n\n    // Delete all requests in collectionID\n    await this.prisma.teamRequest.deleteMany({\n      where: {\n        collectionID: collection.id,\n      },\n    });\n\n    // Delete collection from TeamCollection table\n    const deletedTeamCollection = await this.removeTeamCollection(\n      collection.id,\n    );\n    if (E.isLeft(deletedTeamCollection))\n      return E.left(deletedTeamCollection.left);\n\n    this.pubsub.publish(\n      `team_coll/${deletedTeamCollection.right.teamID}/coll_removed`,\n      deletedTeamCollection.right.id,\n    );\n\n    return E.right(deletedTeamCollection.right);\n  }",
+    "old_id": 89,
+    "id": 39
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team-collection/team-collection.service.ts",
+    "doc": "/**\n   * Delete a TeamCollection\n   *\n   * @param collectionID The Collection Id\n   * @returns An Either of Boolean of deletion status\n   */",
+    "code": "async deleteCollection(collectionID: string) {\n    const collection = await this.getCollection(collectionID);\n    if (E.isLeft(collection)) return E.left(collection.left);\n\n    // Delete all child collections and requests in the collection\n    const collectionData = await this.deleteCollectionData(collection.right);\n    if (E.isLeft(collectionData)) return E.left(collectionData.left);\n\n    // Update orderIndexes in TeamCollection table for user\n    await this.updateOrderIndex(\n      collectionData.right.parentID,\n      { gt: collectionData.right.orderIndex },\n      { decrement: 1 },\n    );\n\n    return E.right(true);\n  }",
+    "old_id": 90,
+    "id": 40
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team-collection/team-collection.service.ts",
+    "doc": "/**\n   * Move TeamCollection into root or another collection\n   *\n   * @param collectionID The ID of collection being moved\n   * @param destCollectionID The ID of collection the target collection is being moved into or move target collection to root\n   * @returns An Either of the moved TeamCollection\n   */",
+    "code": "async moveCollection(collectionID: string, destCollectionID: string | null) {\n    // Get collection details of collectionID\n    const collection = await this.getCollection(collectionID);\n    if (E.isLeft(collection)) return E.left(collection.left);\n\n    // destCollectionID == null i.e move collection to root\n    if (!destCollectionID) {\n      if (!collection.right.parentID) {\n        // collection is a root collection\n        // Throw error if collection is already a root collection\n        return E.left(TEAM_COL_ALREADY_ROOT);\n      }\n      // Move child collection into root and update orderIndexes for root teamCollections\n      await this.updateOrderIndex(\n        collection.right.parentID,\n        { gt: collection.right.orderIndex },\n        { decrement: 1 },\n      );\n\n      // Change parent from child to root i.e child collection becomes a root collection\n      const updatedCollection = await this.changeParent(collection.right, null);\n      if (E.isLeft(updatedCollection)) return E.left(updatedCollection.left);\n\n      this.pubsub.publish(\n        `team_coll/${collection.right.teamID}/coll_moved`,\n        updatedCollection.right,\n      );\n\n      return E.right(updatedCollection.right);\n    }\n\n    // destCollectionID != null i.e move into another collection\n    if (collectionID === destCollectionID) {\n      // Throw error if collectionID and destCollectionID are the same\n      return E.left(TEAM_COLL_DEST_SAME);\n    }\n\n    // Get collection details of destCollectionID\n    const destCollection = await this.getCollection(destCollectionID);\n    if (E.isLeft(destCollection)) return E.left(TEAM_COLL_NOT_FOUND);\n\n    // Check if collection and destCollection belong to the same user account\n    if (collection.right.teamID !== destCollection.right.teamID) {\n      return E.left(TEAM_COLL_NOT_SAME_TEAM);\n    }\n\n    // Check if collection is present on the parent tree for destCollection\n    const checkIfParent = await this.isParent(\n      collection.right,\n      destCollection.right,\n    );\n    if (O.isNone(checkIfParent)) {\n      return E.left(TEAM_COLL_IS_PARENT_COLL);\n    }\n\n    // Move root/child collection into another child collection and update orderIndexes of the previous parent\n    await this.updateOrderIndex(\n      collection.right.parentID,\n      { gt: collection.right.orderIndex },\n      { decrement: 1 },\n    );\n\n    // Change parent from null to teamCollection i.e collection becomes a child collection\n    const updatedCollection = await this.changeParent(\n      collection.right,\n      destCollection.right.id,\n    );\n    if (E.isLeft(updatedCollection)) return E.left(updatedCollection.left);\n\n    this.pubsub.publish(\n      `team_coll/${collection.right.teamID}/coll_moved`,\n      updatedCollection.right,\n    );\n\n    return E.right(updatedCollection.right);\n  }",
+    "old_id": 91,
+    "id": 41
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team-collection/team-collection.service.ts",
+    "doc": "/**\n   * Generate the parent tree from the collections\n   *\n   * @param parentCollections The parent collections\n   * @returns The parent tree of the parent collections\n   */",
+    "code": "private generateParentTree(parentCollections: ParentTreeQueryReturnType[]) {\n    function findChildren(id: string): CollectionSearchNode[] {\n      const collection = parentCollections.filter((item) => item.id === id)[0];\n      if (collection.parentID == null) {\n        return <CollectionSearchNode[]>[\n          {\n            id: collection.id,\n            title: collection.title,\n            type: 'collection' as const,\n            path: [],\n          },\n        ];\n      }\n\n      const res = <CollectionSearchNode[]>[\n        {\n          id: collection.id,\n          title: collection.title,\n          type: 'collection' as const,\n          path: findChildren(collection.parentID),\n        },\n      ];\n      return res;\n    }\n\n    if (parentCollections.length > 0) {\n      if (parentCollections[0].parentID == null) {\n        return <CollectionSearchNode[]>[\n          {\n            id: parentCollections[0].id,\n            title: parentCollections[0].title,\n            type: 'collection',\n            path: [],\n          },\n        ];\n      }\n\n      return <CollectionSearchNode[]>[\n        {\n          id: parentCollections[0].id,\n          title: parentCollections[0].title,\n          type: 'collection',\n          path: findChildren(parentCollections[0].parentID),\n        },\n      ];\n    }\n\n    return <CollectionSearchNode[]>[];\n  }",
+    "old_id": 97,
+    "id": 42
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team-collection/team-collection.service.ts",
+    "doc": "/**\n   * Get all requests in a collection\n   *\n   * @param collectionID The Collection ID\n   * @returns A list of all requests in the collection\n   */",
+    "code": "private async getAllRequestsInCollection(collectionID: string) {\n    const dbTeamRequests = await this.prisma.teamRequest.findMany({\n      where: {\n        collectionID: collectionID,\n      },\n      orderBy: {\n        orderIndex: 'asc',\n      },\n    });\n\n    const teamRequests = dbTeamRequests.map((tr) => {\n      return <TeamRequest>{\n        id: tr.id,\n        collectionID: tr.collectionID,\n        teamID: tr.teamID,\n        title: tr.title,\n        request: JSON.stringify(tr.request),\n      };\n    });\n\n    return teamRequests;\n  }",
+    "old_id": 99,
+    "id": 43
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team-environments/team-environments.service.ts",
+    "doc": "/**\n   * Update a TeamEnvironment.\n   *\n   * @param id TeamEnvironment ID\n   * @param name TeamEnvironment name\n   * @param variables JSONified string of contents of new TeamEnvironment\n   * @returns Either of a TeamEnvironment or error message\n   */",
+    "code": "async updateTeamEnvironment(id: string, name: string, variables: string) {\n    try {\n      const isTitleValid = isValidLength(name, this.TITLE_LENGTH);\n      if (!isTitleValid) return E.left(TEAM_ENVIRONMENT_SHORT_NAME);\n\n      const result = await this.prisma.teamEnvironment.update({\n        where: { id: id },\n        data: {\n          name,\n          variables: JSON.parse(variables),\n        },\n      });\n\n      const updatedTeamEnvironment = this.cast(result);\n\n      this.pubsub.publish(\n        `team_environment/${updatedTeamEnvironment.teamID}/updated`,\n        updatedTeamEnvironment,\n      );\n\n      return E.right(updatedTeamEnvironment);\n    } catch (error) {\n      return E.left(TEAM_ENVIRONMENT_NOT_FOUND);\n    }\n  }",
+    "old_id": 107,
+    "id": 44
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team-invitation/team-invitation.service.ts",
+    "doc": "/**\n   * Cast a DBTeamInvitation to a TeamInvitation\n   * @param dbTeamInvitation database TeamInvitation\n   * @returns TeamInvitation model\n   */",
+    "code": "cast(dbTeamInvitation: DBTeamInvitation): TeamInvitation {\n    return {\n      ...dbTeamInvitation,\n      inviteeRole: TeamMemberRole[dbTeamInvitation.inviteeRole],\n    };\n  }",
+    "old_id": 113,
+    "id": 45
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team-invitation/team-invitation.service.ts",
+    "doc": "/**\n   * Accept a team invitation\n   * @param inviteID invite id\n   * @param acceptedBy user who accepted the invitation\n   * @returns an Either of team member or error message\n   */",
+    "code": "async acceptInvitation(inviteID: string, acceptedBy: AuthUser) {\n    // check if the invite exists\n    const invitation = await this.getInvitation(inviteID);\n    if (O.isNone(invitation)) return E.left(TEAM_INVITE_NO_INVITE_FOUND);\n\n    // make sure the user is not already a member of the team\n    const teamMemberInvitee = await this.teamService.getTeamMember(\n      invitation.value.teamID,\n      acceptedBy.uid,\n    );\n    if (teamMemberInvitee) return E.left(TEAM_INVITE_ALREADY_MEMBER);\n\n    // make sure the user is the same as the invitee\n    if (\n      acceptedBy.email.toLowerCase() !==\n      invitation.value.inviteeEmail.toLowerCase()\n    )\n      return E.left(TEAM_INVITE_EMAIL_DO_NOT_MATCH);\n\n    // add the user to the team\n    let teamMember: TeamMember;\n    try {\n      teamMember = await this.teamService.addMemberToTeam(\n        invitation.value.teamID,\n        acceptedBy.uid,\n        invitation.value.inviteeRole,\n      );\n    } catch (e) {\n      return E.left(TEAM_INVITE_ALREADY_MEMBER);\n    }\n\n    // delete the invite\n    await this.revokeInvitation(inviteID);\n\n    return E.right(teamMember);\n  }",
+    "old_id": 117,
+    "id": 46
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team-request/team-request.service.ts",
+    "doc": "/**\n   * A helper function to cast the Prisma TeamRequest model to the TeamRequest model\n   * @param tr TeamRequest model from Prisma\n   */",
+    "code": "private cast(tr: DbTeamRequest) {\n    return {\n      id: tr.id,\n      collectionID: tr.collectionID,\n      teamID: tr.teamID,\n      title: tr.title,\n      request: JSON.stringify(tr.request),\n    };\n  }",
+    "old_id": 119,
+    "id": 47
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team-request/team-request.service.ts",
+    "doc": "/**\n   * Update team request\n   * @param requestID Request ID, which is updating\n   * @param title Title of the request\n   * @param request Request body of the request\n   */",
+    "code": "async updateTeamRequest(requestID: string, title: string, request: string) {\n    try {\n      const updateInput: Prisma.TeamRequestUpdateInput = { title };\n      if (request) {\n        const jsonReq = stringToJson(request);\n        if (E.isLeft(jsonReq)) return E.left(jsonReq.left);\n        updateInput.request = jsonReq.right;\n      }\n\n      const updatedTeamReq = await this.prisma.teamRequest.update({\n        where: { id: requestID },\n        data: updateInput,\n      });\n\n      const teamRequest: TeamRequest = this.cast(updatedTeamReq);\n\n      this.pubsub.publish(\n        `team_req/${teamRequest.teamID}/req_updated`,\n        teamRequest,\n      );\n\n      return E.right(teamRequest);\n    } catch (e) {\n      return E.left(TEAM_REQ_NOT_FOUND);\n    }\n  }",
+    "old_id": 120,
+    "id": 48
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team-request/team-request.service.ts",
+    "doc": "/**\n   * Fetch team request by ID\n   * @param reqID Request ID to fetch\n   */",
+    "code": "async getRequest(reqID: string) {\n    try {\n      const teamRequest = await this.prisma.teamRequest.findUnique({\n        where: { id: reqID },\n      });\n      return O.some(this.cast(teamRequest));\n    } catch (e) {\n      return O.none;\n    }\n  }",
+    "old_id": 122,
+    "id": 49
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team-request/team-request.service.ts",
+    "doc": "/**\n   * Fetch team collection by team request\n   * @param teamRequest Team Request to fetch\n   */",
+    "code": "async getCollectionOfRequest(req: TeamRequest) {\n    const teamCollection = await this.teamCollectionService.getCollection(\n      req.collectionID,\n    );\n    if (E.isLeft(teamCollection)) return E.left(TEAM_INVALID_COLL_ID);\n    return E.right(teamCollection.right);\n  }",
+    "old_id": 124,
+    "id": 50
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team-request/team-request.service.ts",
+    "doc": "/**\n   * Fetch team by team request ID\n   * @param reqID Team Request ID to fetch\n   */",
+    "code": "async getTeamOfRequestFromID(reqID: string) {\n    const teamRequest = await this.prisma.teamRequest.findUnique({\n      where: { id: reqID },\n      include: { team: true },\n    });\n    if (!teamRequest?.team) return O.none;\n    return O.some(teamRequest.team);\n  }",
+    "old_id": 125,
+    "id": 51
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team-request/team-request.service.ts",
+    "doc": "/**\n   * Return count of total requests in a team\n   * @param teamID team ID\n   */",
+    "code": "async totalRequestsInATeam(teamID: string) {\n    const requestsCount = await this.prisma.teamRequest.count({\n      where: {\n        teamID: teamID,\n      },\n    });\n\n    return requestsCount;\n  }",
+    "old_id": 127,
+    "id": 52
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/team-request/team-request.service.ts",
+    "doc": "/**\n   * Fetch list of all the Team Requests in DB\n   *\n   * @returns number of Team Requests in the DB\n   */",
+    "code": "async getTeamRequestsCount() {\n    const teamRequestsCount = this.prisma.teamRequest.count();\n    return teamRequestsCount;\n  }",
+    "old_id": 128,
+    "id": 53
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user/user.service.ts",
+    "doc": "/**\n   * Converts a prisma user object to a user object\n   *\n   * @param dbUser Prisma User object\n   * @returns  User object\n   */",
+    "code": "convertDbUserToUser(dbUser: DbUser): User {\n    const dbCurrentRESTSession = dbUser.currentRESTSession;\n    const dbCurrentGQLSession = dbUser.currentGQLSession;\n\n    return {\n      ...dbUser,\n      currentRESTSession: dbCurrentRESTSession\n        ? JSON.stringify(dbCurrentRESTSession)\n        : null,\n      currentGQLSession: dbCurrentGQLSession\n        ? JSON.stringify(dbCurrentGQLSession)\n        : null,\n    };\n  }",
+    "old_id": 129,
+    "id": 54
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user/user.service.ts",
+    "doc": "/**\n   * Find User with given ID\n   *\n   * @param userUid User ID\n   * @returns Option of found User\n   */",
+    "code": "async findUserById(userUid: string): Promise<O.None | O.Some<AuthUser>> {\n    try {\n      const user = await this.prisma.user.findUniqueOrThrow({\n        where: {\n          uid: userUid,\n        },\n      });\n      return O.some(user);\n    } catch (error) {\n      return O.none;\n    }\n  }",
+    "old_id": 131,
+    "id": 55
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user/user.service.ts",
+    "doc": "/**\n   * Find users with given IDs\n   * @param userUIDs User IDs\n   * @returns Array of found Users\n   */",
+    "code": "async findUsersByIds(userUIDs: string[]): Promise<AuthUser[]> {\n    const users = await this.prisma.user.findMany({\n      where: {\n        uid: { in: userUIDs },\n      },\n    });\n    return users;\n  }",
+    "old_id": 132,
+    "id": 56
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user/user.service.ts",
+    "doc": "/**\n   * Update a user's displayName\n   * @param userUID User UID\n   * @param displayName User's displayName\n   * @returns a Either of User or error\n   */",
+    "code": "async updateUserDisplayName(userUID: string, displayName: string) {\n    if (!displayName || displayName.length === 0) {\n      return E.left(USER_SHORT_DISPLAY_NAME);\n    }\n\n    try {\n      const dbUpdatedUser = await this.prisma.user.update({\n        where: { uid: userUID },\n        data: { displayName },\n      });\n\n      const updatedUser = this.convertDbUserToUser(dbUpdatedUser);\n\n      // Publish subscription for user updates\n      await this.pubsub.publish(`user/${updatedUser.uid}/updated`, updatedUser);\n\n      return E.right(updatedUser);\n    } catch (error) {\n      return E.left(USER_NOT_FOUND);\n    }\n  }",
+    "old_id": 136,
+    "id": 57
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user/user.service.ts",
+    "doc": "/**\n   * Validate and parse currentRESTSession and currentGQLSession\n   * @param sessionData string of the session\n   * @returns a Either of JSON object or error\n   */",
+    "code": "async validateSession(sessionData: string) {\n    const jsonSession = stringToJson(sessionData);\n    if (E.isLeft(jsonSession)) return E.left(jsonSession.left);\n\n    return E.right(jsonSession.right);\n  }",
+    "old_id": 139,
+    "id": 58
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user/user.service.ts",
+    "doc": "/**\n   * Change a user to an admin by toggling isAdmin param to true\n   * @param userUID user UID\n   * @returns a Either of `User` object or error\n   */",
+    "code": "async makeAdmin(userUID: string) {\n    try {\n      const elevatedUser = await this.prisma.user.update({\n        where: {\n          uid: userUID,\n        },\n        data: {\n          isAdmin: true,\n        },\n      });\n      return E.right(elevatedUser);\n    } catch (error) {\n      return E.left(USER_NOT_FOUND);\n    }\n  }",
+    "old_id": 142,
+    "id": 59
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user/user.service.ts",
+    "doc": "/**\n   * Change users to admins by toggling isAdmin param to true\n   * @param userUID user UIDs\n   * @returns a Either of true or error\n   */",
+    "code": "async makeAdmins(userUIDs: string[]) {\n    try {\n      await this.prisma.user.updateMany({\n        where: { uid: { in: userUIDs } },\n        data: { isAdmin: true },\n      });\n      return E.right(true);\n    } catch (error) {\n      return E.left(USER_UPDATE_FAILED);\n    }\n  }",
+    "old_id": 143,
+    "id": 60
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user/user.service.ts",
+    "doc": "/**\n   * Deletes a user account by UID\n   * @param uid User UID\n   * @returns an Either of string  or boolean\n   */",
+    "code": "async deleteUserAccount(uid: string) {\n    try {\n      await this.prisma.user.delete({\n        where: {\n          uid: uid,\n        },\n      });\n      return E.right(true);\n    } catch (e) {\n      return E.left(USER_NOT_FOUND);\n    }\n  }",
+    "old_id": 145,
+    "id": 61
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user/user.service.ts",
+    "doc": "/**\n   * Change users from an admin by toggling isAdmin param to false\n   * @param userUIDs user UIDs\n   * @returns a Either of true or error\n   */",
+    "code": "async removeUsersAsAdmin(userUIDs: string[]) {\n    const data = await this.prisma.user.updateMany({\n      where: { uid: { in: userUIDs } },\n      data: { isAdmin: false },\n    });\n\n    if (data.count === 0) {\n      return E.left(USERS_NOT_FOUND);\n    }\n\n    return E.right(true);\n  }",
+    "old_id": 149,
+    "id": 62
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user-collection/user-collection.service.ts",
+    "doc": "/**\n   * Typecast a database UserCollection to a UserCollection model\n   * @param userCollection database UserCollection\n   * @returns UserCollection model\n   */",
+    "code": "private cast(collection: UserCollection) {\n    const data = transformCollectionData(collection.data);\n\n    return <UserCollectionModel>{\n      id: collection.id,\n      title: collection.title,\n      type: collection.type,\n      parentID: collection.parentID,\n      userID: collection.userUid,\n      data,\n    };\n  }",
+    "old_id": 150,
+    "id": 63
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user-collection/user-collection.service.ts",
+    "doc": "/**\n   * Returns the count of child collections present for a given collectionID\n   * * The count returned is highest OrderIndex + 1\n   *\n   * @param collectionID The Collection ID\n   * @returns Number of Child Collections\n   */",
+    "code": "private async getChildCollectionsCount(collectionID: string) {\n    const childCollectionCount = await this.prisma.userCollection.findMany({\n      where: { parentID: collectionID },\n      orderBy: {\n        orderIndex: 'desc',\n      },\n    });\n    if (!childCollectionCount.length) return 0;\n    return childCollectionCount[0].orderIndex;\n  }",
+    "old_id": 151,
+    "id": 64
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user-collection/user-collection.service.ts",
+    "doc": "/**\n   * Check to see if Collection belongs to User\n   *\n   * @param collectionID The collection ID\n   * @param userID The User ID\n   * @returns An Option of a Boolean\n   */",
+    "code": "private async isOwnerCheck(collectionID: string, userID: string) {\n    try {\n      await this.prisma.userCollection.findFirstOrThrow({\n        where: {\n          id: collectionID,\n          userUid: userID,\n        },\n      });\n\n      return O.some(true);\n    } catch (error) {\n      return O.none;\n    }\n  }",
+    "old_id": 153,
+    "id": 65
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user-collection/user-collection.service.ts",
+    "doc": "/**\n   * Get User of given Collection ID\n   *\n   * @param collectionID The collection ID\n   * @returns User of given Collection ID\n   */",
+    "code": "async getUserOfCollection(collectionID: string) {\n    try {\n      const userCollection = await this.prisma.userCollection.findUniqueOrThrow(\n        {\n          where: {\n            id: collectionID,\n          },\n          include: {\n            user: true,\n          },\n        },\n      );\n      return E.right(userCollection.user);\n    } catch (error) {\n      return E.left(USER_NOT_FOUND);\n    }\n  }",
+    "old_id": 154,
+    "id": 66
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user-collection/user-collection.service.ts",
+    "doc": "/**\n   * Delete child collection and requests of a UserCollection\n   *\n   * @param collectionID The Collection Id\n   * @returns A Boolean of deletion status\n   */",
+    "code": "private async deleteCollectionData(collection: UserCollection) {\n    // Get all child collections in collectionID\n    const childCollectionList = await this.prisma.userCollection.findMany({\n      where: {\n        parentID: collection.id,\n      },\n    });\n\n    // Delete child collections\n    await Promise.all(\n      childCollectionList.map((coll) =>\n        this.deleteUserCollection(coll.id, coll.userUid),\n      ),\n    );\n\n    // Delete all requests in collectionID\n    await this.prisma.userRequest.deleteMany({\n      where: {\n        collectionID: collection.id,\n      },\n    });\n\n    // Update orderIndexes in userCollection table for user\n    await this.updateOrderIndex(\n      collection.parentID,\n      { gt: collection.orderIndex },\n      { decrement: 1 },\n    );\n\n    // Delete collection from UserCollection table\n    const deletedUserCollection = await this.removeUserCollection(\n      collection.id,\n    );\n    if (E.isLeft(deletedUserCollection))\n      return E.left(deletedUserCollection.left);\n\n    this.pubsub.publish(\n      `user_coll/${deletedUserCollection.right.userUid}/deleted`,\n      {\n        id: deletedUserCollection.right.id,\n        type: ReqType[deletedUserCollection.right.type],\n      },\n    );\n\n    return E.right(true);\n  }",
+    "old_id": 158,
+    "id": 67
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user-collection/user-collection.service.ts",
+    "doc": "/**\n   * Find the number of child collections present in collectionID\n   *\n   * @param collectionID The Collection ID\n   * @returns Number of collections\n   */",
+    "code": "getCollectionCount(collectionID: string): Promise<number> {\n    return this.prisma.userCollection.count({\n      where: { parentID: collectionID },\n    });\n  }",
+    "old_id": 160,
+    "id": 68
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user-environment/user-environments.service.ts",
+    "doc": "/**\n   * Deletes all existing personal user environments\n   * @param uid user uid\n   * @returns a count of environments deleted\n   */",
+    "code": "async deleteUserEnvironments(uid: string) {\n    const deletedEnvironments = await this.prisma.userEnvironment.deleteMany({\n      where: {\n        userUid: uid,\n        isGlobal: false,\n      },\n    });\n\n    // Publish subscription for multiple environment deletions\n    await this.pubsub.publish(\n      `user_environment/${uid}/deleted_many`,\n      deletedEnvironments.count,\n    );\n\n    return deletedEnvironments.count;\n  }",
+    "old_id": 165,
+    "id": 69
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user-environment/user-environments.service.ts",
+    "doc": "/**\n   * Removes all existing variables in a users global environment\n   * @param uid users uid\n   * @param id environment id\n   * @returns an `` of environments deleted\n   */",
+    "code": "async clearGlobalEnvironments(uid: string, id: string) {\n    const globalEnvExists = await this.checkForExistingGlobalEnv(uid);\n    if (O.isNone(globalEnvExists))\n      return E.left(USER_ENVIRONMENT_GLOBAL_ENV_DOES_NOT_EXISTS);\n\n    const env = globalEnvExists.value;\n    if (env.id === id) {\n      try {\n        const updatedEnvironment = await this.prisma.userEnvironment.update({\n          where: { id: id },\n          data: {\n            variables: [],\n          },\n        });\n        const updatedUserEnvironment: UserEnvironment = {\n          userUid: updatedEnvironment.userUid,\n          id: updatedEnvironment.id,\n          name: updatedEnvironment.name,\n          variables: JSON.stringify(updatedEnvironment.variables),\n          isGlobal: updatedEnvironment.isGlobal,\n        };\n\n        // Publish subscription for environment update\n        await this.pubsub.publish(\n          `user_environment/${updatedUserEnvironment.userUid}/updated`,\n          updatedUserEnvironment,\n        );\n        return E.right(updatedUserEnvironment);\n      } catch (e) {\n        return E.left(USER_ENVIRONMENT_UPDATE_FAILED);\n      }\n    } else return E.left(USER_ENVIRONMENT_IS_NOT_GLOBAL);\n  }",
+    "old_id": 166,
+    "id": 70
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user-history/user-history.service.ts",
+    "doc": "/**\n   * Toggles star status of a user history\n   * @param uid Users uid\n   * @param id id of the request in the history\n   * @returns an Either of updated `UserHistory` or Error\n   */",
+    "code": "async toggleHistoryStarStatus(uid: string, id: string) {\n    const userHistory = await this.fetchUserHistoryByID(id);\n    if (O.isNone(userHistory)) {\n      return E.left(USER_HISTORY_NOT_FOUND);\n    }\n\n    try {\n      const updatedHistory = await this.prisma.userHistory.update({\n        where: {\n          id: id,\n        },\n        data: {\n          isStarred: !userHistory.value.isStarred,\n        },\n      });\n\n      const updatedUserHistory = <UserHistory>{\n        ...updatedHistory,\n        request: JSON.stringify(updatedHistory.request),\n        responseMetadata: JSON.stringify(updatedHistory.responseMetadata),\n      };\n\n      // Publish updated user history subscription\n      await this.pubsub.publish(\n        `user_history/${updatedUserHistory.userUid}/updated`,\n        updatedUserHistory,\n      );\n      return E.right(updatedUserHistory);\n    } catch (e) {\n      return E.left(USER_HISTORY_NOT_FOUND);\n    }\n  }",
+    "old_id": 168,
+    "id": 71
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user-history/user-history.service.ts",
+    "doc": "/**\n   * Delete all user history from DB\n   * @returns a boolean\n   */",
+    "code": "async deleteAllHistories() {\n    try {\n      await this.prisma.userHistory.deleteMany();\n    } catch (error) {\n      return E.left(USER_HISTORY_DELETION_FAILED);\n    }\n\n    this.pubsub.publish('user_history/all/deleted', true);\n    return E.right(true);\n  }",
+    "old_id": 171,
+    "id": 72
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user-history/user-history.service.ts",
+    "doc": "/**\n   * Fetch a user history based on history ID.\n   * @param id User History ID\n   * @returns an `UserHistory` object\n   */",
+    "code": "async fetchUserHistoryByID(id: string) {\n    const userHistory = await this.prisma.userHistory.findFirst({\n      where: {\n        id: id,\n      },\n    });\n    if (userHistory == null) return O.none;\n\n    return O.some(userHistory);\n  }",
+    "old_id": 172,
+    "id": 73
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user-history/user-history.service.ts",
+    "doc": "/**\n   * Takes a request type argument as string and validates against `ReqType`\n   * @param reqType request type to be validated i.e. REST or GraphQL\n   * @returns an either of `ReqType` or error\n   */",
+    "code": "validateReqType(reqType: string) {\n    if (reqType == ReqType.REST) return E.right(ReqType.REST);\n    else if (reqType == ReqType.GQL) return E.right(ReqType.GQL);\n    return E.left(USER_HISTORY_INVALID_REQ_TYPE);\n  }",
+    "old_id": 173,
+    "id": 74
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-backend/src/user-settings/user-settings.service.ts",
+    "doc": "/**\n   * Update user setting for a given user\n   * @param user User object\n   * @param properties stringified user settings\n   * @returns Promise of an Either of `UserSettings` or error\n   */",
+    "code": "async updateUserSettings(user: AuthUser, properties: string) {\n    if (!properties) return E.left(USER_SETTINGS_NULL_SETTINGS);\n\n    const jsonProperties = stringToJson(properties);\n    if (E.isLeft(jsonProperties)) return E.left(jsonProperties.left);\n\n    try {\n      const updatedUserSettings = await this.prisma.userSettings.update({\n        where: { userUid: user.uid },\n        data: {\n          properties: jsonProperties.right,\n        },\n      });\n\n      const settings = this.castToUserSettings(updatedUserSettings);\n\n      // Publish subscription for user settings update\n      await this.pubsub.publish(`user_settings/${user.uid}/updated`, settings);\n\n      return E.right(settings);\n    } catch (e) {\n      return E.left(USER_SETTINGS_NOT_FOUND);\n    }\n  }",
+    "old_id": 178,
+    "id": 75
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/helpers/graphql/explorer.ts",
+    "doc": "/**\n   * Removes the last item from the navigation stack\n   * Won't remove the root item\n   */",
+    "code": "function pop() {\n    if (navStack.value.length > 1) {\n      navStack.value.pop()\n    }\n  }",
+    "old_id": 183,
+    "id": 76
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/helpers/graphql/explorer.ts",
+    "doc": "/**\n   * Resets the navigation stack to initial state\n   */",
+    "code": "function reset() {\n    navStack.value =\n      navStack.value.length === 1 ? navStack.value : [initialNavStackItem]\n  }",
+    "old_id": 184,
+    "id": 77
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/helpers/teams/TeamCollectionAdapter.ts",
+    "doc": "/**\n   * Unsubscribes from the subscriptions\n   * NOTE: Once this is called, no new updates to the tree will be detected\n   */",
+    "code": "unsubscribeSubscriptions() {\n    this.teamCollectionAdded$?.unsubscribe()\n    this.teamCollectionUpdated$?.unsubscribe()\n    this.teamCollectionRemoved$?.unsubscribe()\n    this.teamRequestAdded$?.unsubscribe()\n    this.teamRequestDeleted$?.unsubscribe()\n    this.teamRequestUpdated$?.unsubscribe()\n    this.teamRequestMoved$?.unsubscribe()\n    this.teamCollectionMoved$?.unsubscribe()\n    this.teamRequestOrderUpdated$?.unsubscribe()\n    this.teamCollectionOrderUpdated$?.unsubscribe()\n\n    this.teamCollectionAddedSub?.unsubscribe()\n    this.teamCollectionUpdatedSub?.unsubscribe()\n    this.teamCollectionRemovedSub?.unsubscribe()\n    this.teamRequestAddedSub?.unsubscribe()\n    this.teamRequestDeletedSub?.unsubscribe()\n    this.teamRequestUpdatedSub?.unsubscribe()\n    this.teamRequestMovedSub?.unsubscribe()\n    this.teamCollectionMovedSub?.unsubscribe()\n    this.teamRequestOrderUpdatedSub?.unsubscribe()\n    this.teamCollectionOrderUpdatedSub?.unsubscribe()\n  }",
+    "old_id": 189,
+    "id": 78
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/helpers/teams/TeamCollectionAdapter.ts",
+    "doc": "/**\n   * Removes a request from the tree\n   *\n   * @param {string} requestID - ID of the request to remove\n   */",
+    "code": "private removeRequest(requestID: string) {\n    const tree = this.collections$.value\n\n    // Find request in tree, don't attempt if no collection or no requests (expansion?)\n    const coll = findCollWithReqIDInTree(tree, requestID)\n    if (!coll || !coll.requests) return\n\n    // Remove the collection\n    remove(coll.requests, (req) => req.id === requestID)\n\n    // Remove from entityIDs set\n    this.entityIDs.delete(`request-${requestID}`)\n\n    // Publish new tree\n    this.collections$.next(tree)\n  }",
+    "old_id": 192,
+    "id": 79
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/helpers/teams/TeamCollectionAdapter.ts",
+    "doc": "/**\n   * Moves a request from one collection to another\n   *\n   * @param {string} request - The request to move\n   */",
+    "code": "private async moveRequest(request: TeamRequest) {\n    const tree = this.collections$.value\n\n    // Remove the request from the current collection\n    this.removeRequest(request.id)\n\n    const currentRequest = request.request\n\n    if (currentRequest === null || currentRequest === undefined) return\n\n    // Find request in tree, don't attempt if no collection or no requests is found\n    const collection = findCollInTree(tree, request.collectionID)\n    if (!collection) return // Ignore add request\n\n    // Collection is not expanded\n    if (!collection.requests) return\n\n    this.addRequest({\n      id: request.id,\n      collectionID: request.collectionID,\n      request: translateToNewRequest(request.request),\n      title: request.title,\n    })\n  }",
+    "old_id": 193,
+    "id": 80
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/helpers/teams/TeamCollectionAdapter.ts",
+    "doc": "/**\n   * Expands a collection on the tree\n   *\n   * When a collection is loaded initially in the adapter, children and requests are not loaded (they will be set to null)\n   * Upon expansion those two fields will be populated\n   *\n   * @param {string} collectionID - The ID of the collection to expand\n   */",
+    "code": "async expandCollection(collectionID: string): Promise<void> {\n    // TODO: While expanding one collection, block (or queue) the expansion of the other, to avoid race conditions\n    const tree = this.collections$.value\n\n    const collection = findCollInTree(tree, collectionID)\n\n    if (!collection) return\n\n    if (collection.children !== null) return\n\n    this.loadingCollections$.next([\n      ...this.loadingCollections$.getValue(),\n      collectionID,\n    ])\n\n    try {\n      const [collections, requests] = await Promise.all([\n        this.getCollectionChildren(collection),\n        this.getCollectionRequests(collection),\n      ])\n\n      collection.children = collections\n      collection.requests = requests\n\n      // Add to the entity ids set\n      collections.forEach((coll) => this.entityIDs.add(`collection-${coll.id}`))\n      requests.forEach((req) => this.entityIDs.add(`request-${req.id}`))\n\n      this.collections$.next(tree)\n    } finally {\n      this.loadingCollections$.next(\n        this.loadingCollections$.getValue().filter((x) => x !== collectionID)\n      )\n    }\n  }",
+    "old_id": 194,
+    "id": 81
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/helpers/teams/TeamCollectionAdapter.ts",
+    "doc": "/**\n   * Used to obtain the inherited auth and headers for a given folder path, used for both REST and GraphQL team collections\n   * @param folderPath the path of the folder to cascade the auth from\n   * @returns the inherited auth and headers for the given folder path\n   */",
+    "code": "public cascadeParentCollectionForHeaderAuth(folderPath: string) {\n    let auth: HoppInheritedProperty[\"auth\"] = {\n      parentID: folderPath ?? \"\",\n      parentName: \"\",\n      inheritedAuth: {\n        authType: \"none\",\n        authActive: true,\n      },\n    }\n    const headers: HoppInheritedProperty[\"headers\"] = []\n\n    if (!folderPath) return { auth, headers }\n\n    const path = folderPath.split(\"/\")\n\n    // Check if the path is empty or invalid\n    if (!path || path.length === 0) {\n      console.error(\"Invalid path:\", folderPath)\n      return { auth, headers }\n    }\n\n    // Loop through the path and get the last parent folder with authType other than 'inherit'\n    for (let i = 0; i < path.length; i++) {\n      const parentFolder = findCollInTree(this.collections$.value, path[i])\n\n      // Check if parentFolder is undefined or null\n      if (!parentFolder) {\n        console.error(\"Parent folder not found for path:\", path)\n        return { auth, headers }\n      }\n\n      const data: {\n        auth: HoppRESTAuth\n        headers: HoppRESTHeader[]\n      } = parentFolder.data\n        ? JSON.parse(parentFolder.data)\n        : {\n            auth: null,\n            headers: null,\n          }\n\n      if (!data.auth) {\n        data.auth = {\n          authType: \"inherit\",\n          authActive: true,\n        }\n        auth.parentID = path.slice(0, i + 1).join(\"/\")\n        auth.parentName = parentFolder.title\n      }\n\n      if (!data.headers) data.headers = []\n\n      const parentFolderAuth = data.auth\n      const parentFolderHeaders = data.headers\n\n      if (\n        parentFolderAuth?.authType === \"inherit\" &&\n        path.slice(0, i + 1).length === 1\n      ) {\n        auth = {\n          parentID: path.slice(0, i + 1).join(\"/\"),\n          parentName: parentFolder.title,\n          inheritedAuth: auth.inheritedAuth,\n        }\n      }\n\n      if (parentFolderAuth?.authType !== \"inherit\") {\n        auth = {\n          parentID: path.slice(0, i + 1).join(\"/\"),\n          parentName: parentFolder.title,\n          inheritedAuth: parentFolderAuth,\n        }\n      }\n\n      // Update headers, overwriting duplicates by key\n      if (parentFolderHeaders) {\n        const activeHeaders = parentFolderHeaders.filter((h) => h.active)\n        activeHeaders.forEach((header) => {\n          const index = headers.findIndex(\n            (h) => h.inheritedHeader?.key === header.key\n          )\n          const currentPath = path.slice(0, i + 1).join(\"/\")\n          if (index !== -1) {\n            // Replace the existing header with the same key\n            headers[index] = {\n              parentID: currentPath,\n              parentName: parentFolder.title,\n              inheritedHeader: header,\n            }\n          } else {\n            headers.push({\n              parentID: currentPath,\n              parentName: parentFolder.title,\n              inheritedHeader: header,\n            })\n          }\n        })\n      }\n    }\n\n    return { auth, headers }\n  }",
+    "old_id": 195,
+    "id": 82
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/modules/router.ts",
+    "doc": "/**\n * Says whether a given route looks like an initial route which\n * is loaded as the first route.\n *\n * NOTE: This function assumes Vue Router represents that initial route\n * in the way we expect (fullPath == \"/\" and name == undefined). If this\n * function breaks later on, most probs vue-router updated its semantics\n * and we have to correct this function.\n */",
+    "code": "function isInitialRoute(route: RouteLocationNormalized) {\n  return route.fullPath === \"/\" && route.name === undefined\n}",
+    "old_id": 196,
+    "id": 83
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/services/context-menu/index.ts",
+    "doc": "/**\n   * Registers a menu with the context menu service\n   * @param menu The menu to register\n   */",
+    "code": "public registerMenu(menu: ContextMenu) {\n    this.menus.set(menu.menuID, menu)\n  }",
+    "old_id": 197,
+    "id": 84
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/services/context-menu/menu/parameter.menu.ts",
+    "doc": "/**\n   * Adds the parameters from the input to the current request\n   * parameters and updates the endpoint if a new URL was provided\n   * @param text The input to extract the parameters from\n   */",
+    "code": "private addParameter(text: string) {\n    const { params, newURL } = this.extractParams(text)\n\n    const queryParams = []\n    for (const [key, value] of Object.entries(params)) {\n      queryParams.push({ key, value, active: true })\n    }\n\n    const tabService = getService(RESTTabService)\n\n    if (tabService.currentActiveTab.value.document.type === \"test-runner\")\n      return\n\n    const currentActiveRequest =\n      tabService.currentActiveTab.value.document.type === \"request\"\n        ? tabService.currentActiveTab.value.document.request\n        : tabService.currentActiveTab.value.document.response.originalRequest\n\n    // add the parameters to the current request parameters\n    currentActiveRequest.params = [\n      ...currentActiveRequest.params,\n      ...queryParams.map((param) => ({ ...param, description: \"\" })),\n    ]\n\n    if (newURL) {\n      currentActiveRequest.endpoint = newURL\n    } else {\n      // remove the parameter from the URL\n      const textRegex = new RegExp(`\\\\b${text.replace(/\\?/g, \"\")}\\\\b`, \"gi\")\n      const sanitizedWord = currentActiveRequest.endpoint\n      const newURL = sanitizedWord.replace(textRegex, \"\")\n      currentActiveRequest.endpoint = newURL\n    }\n  }",
+    "old_id": 200,
+    "id": 85
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/services/context-menu/menu/url.menu.ts",
+    "doc": "/**\n * Used to check if a string is a valid URL\n * @param url The string to check\n * @returns Whether the string is a valid URL\n */",
+    "code": "function isValidURL(url: string) {\n  try {\n    // Try to create a URL object\n    // this will fail for endpoints like \"localhost:3000\", ie without a protocol\n    new URL(url)\n    return true\n  } catch (error) {\n    // Fallback to regular expression check\n    const pattern = /^(https?:\\/\\/)?([\\w.-]+)(\\.[\\w.-]+)+([/?].*)?$/\n    return pattern.test(url)\n  }\n}",
+    "old_id": 201,
+    "id": 86
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/services/context-menu/menu/url.menu.ts",
+    "doc": "/**\n   * Opens a new tab with the provided URL\n   * @param url The URL to open\n   */",
+    "code": "private openNewTab(url: string) {\n    //create a new request object\n    const request = {\n      ...getDefaultRESTRequest(),\n      endpoint: url,\n    }\n\n    this.restTab.createNewTab({\n      type: \"request\",\n      request: request,\n      isDirty: false,\n    })\n  }",
+    "old_id": 202,
+    "id": 87
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/services/interceptor.service.ts",
+    "doc": "/**\n   * Runs a request through the currently selected interceptor.\n   * @param req The request to run\n   * @throws If no interceptor is selected\n   */",
+    "code": "public runRequest(req: AxiosRequestConfig): RequestRunResult {\n    if (!this.currentInterceptorID.value) {\n      throw new Error(\"No interceptor selected\")\n    }\n\n    const interceptor =\n      this.interceptors.get(this.currentInterceptorID.value) ??\n      throwError(\n        \"Current Interceptor ID is not found in the list of registered interceptors\"\n      )\n\n    return interceptor.runRequest(req)\n  }",
+    "old_id": 205,
+    "id": 88
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/services/persistence/index.ts",
+    "doc": "/**\n   * Sets a value in persistence\n   * @deprecated Use set<T>() instead which provides automatic serialization and type safety.\n   * With set<T>(), there's no need to use JSON.stringify on the value before passing it.\n   * @param key The key to set\n   * @param value The value to set as string\n   */",
+    "code": "public async setLocalConfig(key: string, value: string): Promise<void> {\n    await Store.set(STORE_NAMESPACE, key, value)\n  }",
+    "old_id": 207,
+    "id": 89
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/services/persistence/index.ts",
+    "doc": "/**\n   * Clear config value from persistence\n   * @deprecated Use remove() instead which provides proper error handling and type safety.\n   * @param key The key to remove\n   */",
+    "code": "public async removeLocalConfig(key: string): Promise<void> {\n    await Store.remove(STORE_NAMESPACE, key)\n  }",
+    "old_id": 208,
+    "id": 90
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/services/secret-environment.service.ts",
+    "doc": "/**\n   * Add a new secret environment.\n   * @param id ID of the environment\n   * @param secretVars List of secret variables\n   */",
+    "code": "public addSecretEnvironment(id: string, secretVars: SecretVariable[]) {\n    this.secretEnvironments.set(id, secretVars)\n  }",
+    "old_id": 209,
+    "id": 91
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/services/secret-environment.service.ts",
+    "doc": "/**\n   * Get a secret environment.\n   * @param id ID of the environment\n   */",
+    "code": "public getSecretEnvironment(id: string) {\n    return this.secretEnvironments.get(id)\n  }",
+    "old_id": 210,
+    "id": 92
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/services/secret-environment.service.ts",
+    "doc": "/**\n   * Get a secret environment variable.\n   * @param id ID of the environment\n   * @param varIndex Index of the variable in the environment\n   */",
+    "code": "public getSecretEnvironmentVariable(id: string, varIndex: number) {\n    const secretVars = this.getSecretEnvironment(id)\n    return secretVars?.find((secretVar) => secretVar.varIndex === varIndex)\n  }",
+    "old_id": 211,
+    "id": 93
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/services/secret-environment.service.ts",
+    "doc": "/**\n   * Delete a secret environment variable.\n   * @param id ID of the environment\n   * @param varIndex Index of the variable in the environment\n   */",
+    "code": "public removeSecretEnvironmentVariable(id: string, varIndex: number) {\n    const secretVars = this.getSecretEnvironment(id)\n    const newSecretVars = secretVars?.filter(\n      (secretVar) => secretVar.varIndex !== varIndex\n    )\n    this.secretEnvironments.set(id, newSecretVars || [])\n  }",
+    "old_id": 214,
+    "id": 94
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/services/secret-environment.service.ts",
+    "doc": "/**\n   *\n   * @param id ID of the environment\n   * @param key Key of the variable to check the value exists\n   * @returns true if the key has a secret value\n   */",
+    "code": "public hasSecretValue(id: string, key: string) {\n    return (\n      this.secretEnvironments.has(id) &&\n      this.secretEnvironments\n        .get(id)!\n        .some((secretVar) => secretVar.key === key && secretVar.value !== \"\")\n    )\n  }",
+    "old_id": 216,
+    "id": 95
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/services/spotlight/searchers/base/static.searcher.ts",
+    "doc": "/**\n   * Sets the documents to search against.\n   * NOTE: We generally expect this function to only be called once and we expect\n   * the documents to not change generally. You can pass a reactive object, if you want to toggle\n   * states if you want to.\n   * @param docs The documents to search against, this is an object, with the key being the document ID\n   */",
+    "code": "protected setDocuments(docs: Record<string, Doc>) {\n    this._documents = docs\n\n    this.addDocsToSearchIndex()\n  }",
+    "old_id": 221,
+    "id": 96
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-common/src/services/workspace.service.ts",
+    "doc": "/**\n   * Acquires a team list adapter that is managed by the workspace service.\n   * The team list adapter is associated with a Vue Scope and will be disposed\n   * when the scope is disposed.\n   * @param pollDuration The duration between polls in milliseconds. If null, the team list adapter will not poll.\n   */",
+    "code": "public acquireTeamListAdapter(pollDuration: number | null) {\n    const lockID = this.teamListAdapterLockTicker++\n\n    this.teamListAdapterLocks.set(lockID, pollDuration)\n\n    tryOnScopeDispose(() => {\n      this.teamListAdapterLocks.delete(lockID)\n    })\n\n    return this.managedTeamListAdapter\n  }",
+    "old_id": 224,
+    "id": 97
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-selfhost-desktop/src/interop.ts",
+    "doc": "/**\n * Initializes the interop startup process.\n *\n * This function invokes a Tauri command to perform necessary startup operations.\n * It's a bridge, specifically calling `interop_startup_init` function defined in\n * `src-tauri/src/interop/startup/init.rs`.\n *\n * @returns A promise that resolves when the startup initialization is complete.\n * @throws Will throw an error if the Tauri command fails for any reason.\n */",
+    "code": "async function interopStartupInit(): Promise<void> {\n    return invoke<void>(\"interop_startup_init\");\n}",
+    "old_id": 225,
+    "id": 98
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-selfhost-desktop/src/platform/auth.ts",
+    "doc": "/**\n   * it is not possible for us to know if the current cookie is expired because we cannot access http-only cookies from js\n   * hence just returning if the currentUser$ has a value associated with it\n   */",
+    "code": "willBackendHaveAuthError() {\n    return !currentUser$.value\n  }",
+    "old_id": 226,
+    "id": 99
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/packages/hoppscotch-selfhost-desktop/src/platform/auth.ts",
+    "doc": "/**\n   * we cannot access our auth cookies from javascript, so leaving this as null\n   */",
+    "code": "getDevOptsBackendIDToken() {\n    return null\n  }",
+    "old_id": 227,
+    "id": 100
+  }
+]

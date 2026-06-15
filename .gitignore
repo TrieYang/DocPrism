@@ -1,0 +1,24 @@
+# Vendored evaluation repos (clone separately; too large for this repo)
+hoppscotch/
+n8n/
+x64dbg_gui/
+
+# Dependencies & caches
+node_modules/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+
+# IDE / local
+.cursor/
+.DS_Store
+*.swp
+*.swo
+
+# Large binaries / papers (optional local assets)
+paper.pdf
+
+# Logs
+*.log

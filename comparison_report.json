@@ -1,0 +1,857 @@
+{
+  "summary": {
+    "results_file": "/Users/trieyang/Desktop/DocPrism/hoppscotch_eval_results.json",
+    "limit": null,
+    "total_rows": 554,
+    "compared": 554,
+    "match": 498,
+    "mismatch": 56,
+    "no_tool_source": 0,
+    "no_navigation_position": 0,
+    "no_definition_from_lsp": 4,
+    "resolve_errors": 0
+  },
+  "mismatches": [
+    {
+      "sample_id": 2,
+      "callee_index": 0,
+      "tested_function": "createPAT",
+      "callee_preview": "E.left({\n        message: ACCESS_TOKEN_LABEL_SHORT,\n        statusCode: HttpStatus.BAD_REQUEST,\n      })",
+      "position": {
+        "line0": 74,
+        "col0": 15
+      },
+      "definition_uri_first": null,
+      "tool_norm_len": 256,
+      "ide_norm_len": 0,
+      "tool_preview": "/**\n * Constructs a new `Either` holding a `Left` value. This usually represents a failure, due to the right-bias of this\n * structure.\n *\n * @category constructors\n * @since 2.0.0\n */\nexport declare const left: <E = never, A = never>(e: E) => Either<E, A>",
+      "ide_preview": ""
+    },
+    {
+      "sample_id": 2,
+      "callee_index": 8,
+      "tested_function": "createPAT",
+      "callee_preview": "this.TITLE_LENGTH",
+      "position": {
+        "line0": 71,
+        "col0": 11
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/access-token/access-token.service.ts",
+      "tool_norm_len": 75,
+      "ide_norm_len": 17,
+      "tool_preview": "constructor(private readonly prisma: PrismaService) {}\n\n  TITLE_LENGTH = 3;",
+      "ide_preview": "TITLE_LENGTH = 3;"
+    },
+    {
+      "sample_id": 2,
+      "callee_index": 9,
+      "tested_function": "createPAT",
+      "callee_preview": "HttpStatus.BAD_REQUEST",
+      "position": {
+        "line0": 76,
+        "col0": 31
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/node_modules/.pnpm/%40nestjs%2Bcommon%4011.1.1_class-transformer%400.5.1_class-validator%400.14.2_reflect-metadata%400.2.2_rxjs%407.8.2/node_modules/%40nestjs/common/enums/http-status.enum.d.ts",
+      "tool_norm_len": 48,
+      "ide_norm_len": 18,
+      "tool_preview": "PERMANENT_REDIRECT = 308,\n    BAD_REQUEST = 400,",
+      "ide_preview": "BAD_REQUEST = 400,"
+    },
+    {
+      "sample_id": 2,
+      "callee_index": 12,
+      "tested_function": "createPAT",
+      "callee_preview": "this.TOKEN_PREFIX",
+      "position": {
+        "line0": 57,
+        "col0": 31
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/access-token/access-token.service.ts",
+      "tool_norm_len": 65,
+      "ide_norm_len": 22,
+      "tool_preview": "VALID_TOKEN_DURATIONS = [7, 30, 60, 90];\n  TOKEN_PREFIX = 'pat-';",
+      "ide_preview": "TOKEN_PREFIX = 'pat-';"
+    },
+    {
+      "sample_id": 3,
+      "callee_index": 5,
+      "tested_function": "deletePAT",
+      "callee_preview": "HttpStatus.NOT_FOUND",
+      "position": {
+        "line0": 116,
+        "col0": 31
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/node_modules/.pnpm/%40nestjs%2Bcommon%4011.1.1_class-transformer%400.5.1_class-validator%400.14.2_reflect-metadata%400.2.2_rxjs%407.8.2/node_modules/%40nestjs/common/enums/http-status.enum.d.ts",
+      "tool_norm_len": 37,
+      "ide_norm_len": 16,
+      "tool_preview": "FORBIDDEN = 403,\n    NOT_FOUND = 404,",
+      "ide_preview": "NOT_FOUND = 404,"
+    },
+    {
+      "sample_id": 7,
+      "callee_index": 4,
+      "tested_function": "revokeUserInvitations",
+      "callee_preview": "validateEmail(email)",
+      "position": {
+        "line0": 165,
+        "col0": 6
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/utils.ts",
+      "tool_norm_len": 450,
+      "ide_norm_len": 251,
+      "tool_preview": "/**\n * Checks to see if the email is valid or not\n * @param email The email\n * @see https://emailregex.com/ for information on email regex\n * @returns A Boolean depending on the format of the email\n */\nexport const validateEmail = (email: string) => {\n  return new RegExp(\n    /^(([^<>()\\[\\]\\\\.,;:\\s@\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\"]+)*)|(\".+\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA\u2026",
+      "ide_preview": "/**\n * Checks to see if the email is valid or not\n * @param email The email\n * @see https://emailregex.com/ for information on email regex\n * @returns A Boolean depending on the format of the email\n */\nexport const validateEmail = (email: string) => {"
+    },
+    {
+      "sample_id": 13,
+      "callee_index": 14,
+      "tested_function": "addUserToTeam",
+      "callee_preview": "validateEmail(userEmail)",
+      "position": {
+        "line0": 327,
+        "col0": 9
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/utils.ts",
+      "tool_norm_len": 450,
+      "ide_norm_len": 251,
+      "tool_preview": "/**\n * Checks to see if the email is valid or not\n * @param email The email\n * @see https://emailregex.com/ for information on email regex\n * @returns A Boolean depending on the format of the email\n */\nexport const validateEmail = (email: string) => {\n  return new RegExp(\n    /^(([^<>()\\[\\]\\\\.,;:\\s@\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\"]+)*)|(\".+\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA\u2026",
+      "ide_preview": "/**\n * Checks to see if the email is valid or not\n * @param email The email\n * @see https://emailregex.com/ for information on email regex\n * @returns A Boolean depending on the format of the email\n */\nexport const validateEmail = (email: string) => {"
+    },
+    {
+      "sample_id": 23,
+      "callee_index": 1,
+      "tested_function": "generateRefreshToken",
+      "callee_preview": "this.jwtService.sign(refreshTokenPayload, {\n      expiresIn: this.configService.get('REFRESH_TOKEN_VALIDITY'), //7 Days\n\u2026",
+      "position": {
+        "line0": 107,
+        "col0": 47
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/node_modules/.pnpm/%40nestjs%2Bjwt%4011.0.0_%40nestjs%2Bcommon%4011.1.1_class-transformer%400.5.1_class-validator%400.14.2_61ebb541c64dd4afa81c37c3cd2a2e7f/node_modules/%40nestjs/jwt/dist/jwt.service.d.ts",
+      "tool_norm_len": 155,
+      "ide_norm_len": 65,
+      "tool_preview": "sign(payload: string, options?: Omit<JwtSignOptions, keyof jwt.SignOptions>): string;\n    sign(payload: Buffer | object, options?: JwtSignOptions): string;",
+      "ide_preview": "sign(payload: Buffer | object, options?: JwtSignOptions): string;"
+    },
+    {
+      "sample_id": 23,
+      "callee_index": 3,
+      "tested_function": "generateRefreshToken",
+      "callee_preview": "argon2.hash(refreshToken)",
+      "position": {
+        "line0": 111,
+        "col0": 42
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/node_modules/.pnpm/argon2%400.43.0/node_modules/argon2/argon2.cjs",
+      "tool_norm_len": 374,
+      "ide_norm_len": 2208,
+      "tool_preview": "/**\n * Hashes a password with Argon2, producing a raw hash\n *\n * @overload\n * @param {Buffer | string} password The plaintext password to be hashed\n * @param {Options & { raw: true }} options The parameters for Argon2\n * @returns {Promise<Buffer>} The raw hash generated from `password`\n */\nexport function hash(password: Buffer | string, options: Options & {\n    raw: true;",
+      "ide_preview": "/**\n * @typedef {Object} Options\n * @property {number} [hashLength=32]\n * @property {number} [timeCost=3]\n * @property {number} [memoryCost=65536]\n * @property {number} [parallelism=4]\n * @property {keyof typeof names} [type=argon2id]\n * @property {number} [version=19]\n * @property {Buffer} [salt]\n * @property {Buffer} [associatedData]\n * @property {Buffer} [secret]\n */\n\n/**\n * Hashes a password w\u2026"
+    },
+    {
+      "sample_id": 23,
+      "callee_index": 11,
+      "tested_function": "generateRefreshToken",
+      "callee_preview": "HttpStatus.NOT_FOUND",
+      "position": {
+        "line0": 120,
+        "col0": 31
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/node_modules/.pnpm/%40nestjs%2Bcommon%4011.1.1_class-transformer%400.5.1_class-validator%400.14.2_reflect-metadata%400.2.2_rxjs%407.8.2/node_modules/%40nestjs/common/enums/http-status.enum.d.ts",
+      "tool_norm_len": 37,
+      "ide_norm_len": 16,
+      "tool_preview": "FORBIDDEN = 403,\n    NOT_FOUND = 404,",
+      "ide_preview": "NOT_FOUND = 404,"
+    },
+    {
+      "sample_id": 24,
+      "callee_index": 5,
+      "tested_function": "generateAuthTokens",
+      "callee_preview": "this.jwtService.sign(accessTokenPayload, {\n        expiresIn: this.configService.get('ACCESS_TOKEN_VALIDITY'), //1 Day\n \u2026",
+      "position": {
+        "line0": 143,
+        "col0": 42
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/node_modules/.pnpm/%40nestjs%2Bjwt%4011.0.0_%40nestjs%2Bcommon%4011.1.1_class-transformer%400.5.1_class-validator%400.14.2_61ebb541c64dd4afa81c37c3cd2a2e7f/node_modules/%40nestjs/jwt/dist/jwt.service.d.ts",
+      "tool_norm_len": 155,
+      "ide_norm_len": 65,
+      "tool_preview": "sign(payload: string, options?: Omit<JwtSignOptions, keyof jwt.SignOptions>): string;\n    sign(payload: Buffer | object, options?: JwtSignOptions): string;",
+      "ide_preview": "sign(payload: Buffer | object, options?: JwtSignOptions): string;"
+    },
+    {
+      "sample_id": 25,
+      "callee_index": 1,
+      "tested_function": "refreshAuthTokens",
+      "callee_preview": "argon2.verify(\n      user.refreshToken,\n      hashedRefreshToken,\n    )",
+      "position": {
+        "line0": 341,
+        "col0": 40
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/node_modules/.pnpm/argon2%400.43.0/node_modules/argon2/argon2.cjs",
+      "tool_norm_len": 485,
+      "ide_norm_len": 957,
+      "tool_preview": "/**\n * @param {string} digest The digest to be checked\n * @param {Buffer | string} password The plaintext password to be verified\n * @param {Object} [options] The current parameters for Argon2\n * @param {Buffer} [options.secret]\n * @returns {Promise<boolean>} `true` if the digest parameters matches the hash generated from `password`, otherwise `false`\n */\nexport function verify(digest: string, pas\u2026",
+      "ide_preview": "/**\n * @param {string} digest The digest to be checked\n * @param {Buffer | string} password The plaintext password to be verified\n * @param {Object} [options] The current parameters for Argon2\n * @param {Buffer} [options.secret]\n * @returns {Promise<boolean>} `true` if the digest parameters matches the hash generated from `password`, otherwise `false`\n */\nasync function verify(digest, password, op\u2026"
+    },
+    {
+      "sample_id": 25,
+      "callee_index": 7,
+      "tested_function": "refreshAuthTokens",
+      "callee_preview": "HttpStatus.NOT_FOUND",
+      "position": {
+        "line0": 120,
+        "col0": 31
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/node_modules/.pnpm/%40nestjs%2Bcommon%4011.1.1_class-transformer%400.5.1_class-validator%400.14.2_reflect-metadata%400.2.2_rxjs%407.8.2/node_modules/%40nestjs/common/enums/http-status.enum.d.ts",
+      "tool_norm_len": 37,
+      "ide_norm_len": 16,
+      "tool_preview": "FORBIDDEN = 403,\n    NOT_FOUND = 404,",
+      "ide_preview": "NOT_FOUND = 404,"
+    },
+    {
+      "sample_id": 26,
+      "callee_index": 7,
+      "tested_function": "verifyAdmin",
+      "callee_preview": "HttpStatus.NOT_FOUND",
+      "position": {
+        "line0": 120,
+        "col0": 31
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/node_modules/.pnpm/%40nestjs%2Bcommon%4011.1.1_class-transformer%400.5.1_class-validator%400.14.2_reflect-metadata%400.2.2_rxjs%407.8.2/node_modules/%40nestjs/common/enums/http-status.enum.d.ts",
+      "tool_norm_len": 37,
+      "ide_norm_len": 16,
+      "tool_preview": "FORBIDDEN = 403,\n    NOT_FOUND = 404,",
+      "ide_preview": "NOT_FOUND = 404,"
+    },
+    {
+      "sample_id": 27,
+      "callee_index": 6,
+      "tested_function": "updateMany",
+      "callee_preview": "this.prisma.$transaction(async (tx) => {\n        for (let i = 0; i < infraConfigs.length; i++) {\n          const isEncry\u2026",
+      "position": {
+        "line0": 226,
+        "col0": 24
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/node_modules/.pnpm/%40prisma%2Bclient%406.8.2_prisma%406.8.2_typescript%405.8.3__typescript%405.8.3/node_modules/.prisma/client/index.d.ts",
+      "tool_norm_len": 1192,
+      "ide_norm_len": 221,
+      "tool_preview": "/**\n   * Performs a raw query and returns the `SELECT` data.\n   * Susceptible to SQL injections, see documentation.\n   * @example\n   * ```\n   * const result = await prisma.$queryRawUnsafe('SELECT * FROM User WHERE id = $1 OR email = $2;', 1, 'user@email.com')\n   * ```\n   *\n   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).\n   \u2026",
+      "ide_preview": "$transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => $Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<R>"
+    },
+    {
+      "sample_id": 27,
+      "callee_index": 9,
+      "tested_function": "updateMany",
+      "callee_preview": "transaction(async (tx) => {\n        for (let i = 0; i < infraConfigs.length; i++) {\n          const isEncrypted = dbInfr\u2026",
+      "position": {
+        "line0": 226,
+        "col0": 25
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/node_modules/.pnpm/%40prisma%2Bclient%406.8.2_prisma%406.8.2_typescript%405.8.3__typescript%405.8.3/node_modules/.prisma/client/index.d.ts",
+      "tool_norm_len": 1234642,
+      "ide_norm_len": 221,
+      "tool_preview": "/**\n   * Allows the running of a sequence of read/write operations that are guaranteed to either succeed or fail as a whole.\n   * @example\n   * ```\n   * const [george, bob, alice] = await prisma.$transaction([\n   *   prisma.user.create({ data: { name: 'George' } }),\n   *   prisma.user.create({ data: { name: 'Bob' } }),\n   *   prisma.user.create({ data: { name: 'Alice' } }),\n   * ])\n   * ```\n   *\n \u2026",
+      "ide_preview": "$transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => $Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<R>"
+    },
+    {
+      "sample_id": 27,
+      "callee_index": 12,
+      "tested_function": "updateMany",
+      "callee_preview": "this.EXCLUDE_FROM_UPDATE_CONFIGS",
+      "position": {
+        "line0": 214,
+        "col0": 15
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/infra-config/infra-config.service.ts",
+      "tool_norm_len": 433,
+      "ide_norm_len": 149,
+      "tool_preview": ") {}\n\n  // Following fields are not updatable by `infraConfigs` Mutation. Use dedicated mutations for these fields instead.\n  EXCLUDE_FROM_UPDATE_CONFIGS = [\n    InfraConfigEnum.VITE_ALLOWED_AUTH_PROVIDERS,\n    InfraConfigEnum.ALLOW_ANALYTICS_COLLECTION,\n    InfraConfigEnum.ANALYTICS_USER_ID,\n    InfraConfigEnum.IS_FIRST_TIME_INFRA_SETUP,\n    InfraConfigEnum.MAILER_SMTP_ENABLE,\n    InfraConfigEnum\u2026",
+      "ide_preview": "// Following fields are not updatable by `infraConfigs` Mutation. Use dedicated mutations for these fields instead.\n  EXCLUDE_FROM_UPDATE_CONFIGS = ["
+    },
+    {
+      "sample_id": 29,
+      "callee_index": 6,
+      "tested_function": "reset",
+      "callee_preview": "InfraConfigEnum.IS_FIRST_TIME_INFRA_SETUP",
+      "position": {
+        "line0": 50,
+        "col0": 20
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/types/InfraConfig.ts",
+      "tool_norm_len": 99,
+      "ide_norm_len": 56,
+      "tool_preview": "ANALYTICS_USER_ID = 'ANALYTICS_USER_ID',\n  IS_FIRST_TIME_INFRA_SETUP = 'IS_FIRST_TIME_INFRA_SETUP',",
+      "ide_preview": "IS_FIRST_TIME_INFRA_SETUP = 'IS_FIRST_TIME_INFRA_SETUP',"
+    },
+    {
+      "sample_id": 29,
+      "callee_index": 7,
+      "tested_function": "reset",
+      "callee_preview": "InfraConfigEnum.ANALYTICS_USER_ID",
+      "position": {
+        "line0": 49,
+        "col0": 20
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/types/InfraConfig.ts",
+      "tool_norm_len": 101,
+      "ide_norm_len": 40,
+      "tool_preview": "ALLOW_ANALYTICS_COLLECTION = 'ALLOW_ANALYTICS_COLLECTION',\n  ANALYTICS_USER_ID = 'ANALYTICS_USER_ID',",
+      "ide_preview": "ANALYTICS_USER_ID = 'ANALYTICS_USER_ID',"
+    },
+    {
+      "sample_id": 29,
+      "callee_index": 8,
+      "tested_function": "reset",
+      "callee_preview": "InfraConfigEnum.ALLOW_ANALYTICS_COLLECTION",
+      "position": {
+        "line0": 48,
+        "col0": 20
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/types/InfraConfig.ts",
+      "tool_norm_len": 122,
+      "ide_norm_len": 58,
+      "tool_preview": "VITE_ALLOWED_AUTH_PROVIDERS = 'VITE_ALLOWED_AUTH_PROVIDERS',\n\n  ALLOW_ANALYTICS_COLLECTION = 'ALLOW_ANALYTICS_COLLECTION',",
+      "ide_preview": "ALLOW_ANALYTICS_COLLECTION = 'ALLOW_ANALYTICS_COLLECTION',"
+    },
+    {
+      "sample_id": 30,
+      "callee_index": 8,
+      "tested_function": "create",
+      "callee_preview": "this.TITLE_LENGTH",
+      "position": {
+        "line0": 77,
+        "col0": 35
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/infra-token/infra-token.service.ts",
+      "tool_norm_len": 25,
+      "ide_norm_len": 17,
+      "tool_preview": ") {}\n\n  TITLE_LENGTH = 3;",
+      "ide_preview": "TITLE_LENGTH = 3;"
+    },
+    {
+      "sample_id": 31,
+      "callee_index": 2,
+      "tested_function": "generateShortCodeID",
+      "callee_preview": "SHORT_CODE_CHARS.length",
+      "position": {
+        "line0": 73,
+        "col0": 69
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/node_modules/typescript/lib/lib.es5.d.ts",
+      "tool_norm_len": 172,
+      "ide_norm_len": 120,
+      "tool_preview": "/** Removes the leading and trailing white space and line terminator characters from a string. */\n/** Returns the length of a String object. */\n    readonly length: number;",
+      "ide_preview": "/** Returns the length of a String object. */\n/** Returns the length of a String object. */\n    readonly length: number;"
+    },
+    {
+      "sample_id": 39,
+      "callee_index": 12,
+      "tested_function": "deleteCollectionData",
+      "callee_preview": "this.pubsub",
+      "position": {
+        "line0": 228,
+        "col0": 11
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/team-collection/team-collection.service.ts",
+      "tool_norm_len": 28,
+      "ide_norm_len": 39,
+      "tool_preview": "private pubsub: LocalPubSub;",
+      "ide_preview": "private readonly pubsub: PubSubService,"
+    },
+    {
+      "sample_id": 41,
+      "callee_index": 21,
+      "tested_function": "moveCollection",
+      "callee_preview": "this.pubsub",
+      "position": {
+        "line0": 228,
+        "col0": 11
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/team-collection/team-collection.service.ts",
+      "tool_norm_len": 28,
+      "ide_norm_len": 39,
+      "tool_preview": "private pubsub: LocalPubSub;",
+      "ide_preview": "private readonly pubsub: PubSubService,"
+    },
+    {
+      "sample_id": 44,
+      "callee_index": 8,
+      "tested_function": "updateTeamEnvironment",
+      "callee_preview": "this.TITLE_LENGTH",
+      "position": {
+        "line0": 71,
+        "col0": 50
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/team-environments/team-environments.service.ts",
+      "tool_norm_len": 25,
+      "ide_norm_len": 17,
+      "tool_preview": ") {}\n\n  TITLE_LENGTH = 3;",
+      "ide_preview": "TITLE_LENGTH = 3;"
+    },
+    {
+      "sample_id": 44,
+      "callee_index": 11,
+      "tested_function": "updateTeamEnvironment",
+      "callee_preview": "this.pubsub",
+      "position": {
+        "line0": 84,
+        "col0": 9
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/team-environments/team-environments.service.ts",
+      "tool_norm_len": 28,
+      "ide_norm_len": 39,
+      "tool_preview": "private pubsub: LocalPubSub;",
+      "ide_preview": "private readonly pubsub: PubSubService,"
+    },
+    {
+      "sample_id": 48,
+      "callee_index": 8,
+      "tested_function": "updateTeamRequest",
+      "callee_preview": "Prisma.TeamRequestUpdateInput",
+      "position": {
+        "line0": 49,
+        "col0": 32
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/node_modules/.pnpm/%40prisma%2Bclient%406.8.2_prisma%406.8.2_typescript%405.8.3__typescript%405.8.3/node_modules/.prisma/client/index.d.ts",
+      "tool_norm_len": 529,
+      "ide_norm_len": 38,
+      "tool_preview": "}\n\n  export type TeamRequestUpdateInput = {\n    id?: StringFieldUpdateOperationsInput | string\n    title?: StringFieldUpdateOperationsInput | string\n    request?: JsonNullValueInput | InputJsonValue\n    orderIndex?: IntFieldUpdateOperationsInput | number\n    createdOn?: DateTimeFieldUpdateOperationsInput | Date | string\n    updatedOn?: DateTimeFieldUpdateOperationsInput | Date | string\n    collect\u2026",
+      "ide_preview": "export type TeamRequestUpdateInput = {"
+    },
+    {
+      "sample_id": 48,
+      "callee_index": 10,
+      "tested_function": "updateTeamRequest",
+      "callee_preview": "this.pubsub",
+      "position": {
+        "line0": 63,
+        "col0": 11
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/team-request/team-request.service.ts",
+      "tool_norm_len": 28,
+      "ide_norm_len": 39,
+      "tool_preview": "private pubsub: LocalPubSub;",
+      "ide_preview": "private readonly pubsub: PubSubService,"
+    },
+    {
+      "sample_id": 67,
+      "callee_index": 13,
+      "tested_function": "deleteCollectionData",
+      "callee_preview": "this.pubsub",
+      "position": {
+        "line0": 286,
+        "col0": 15
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/user-collection/user-collection.service.ts",
+      "tool_norm_len": 28,
+      "ide_norm_len": 39,
+      "tool_preview": "private pubsub: LocalPubSub;",
+      "ide_preview": "private readonly pubsub: PubSubService,"
+    },
+    {
+      "sample_id": 69,
+      "callee_index": 4,
+      "tested_function": "deleteUserEnvironments",
+      "callee_preview": "this.pubsub",
+      "position": {
+        "line0": 118,
+        "col0": 15
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/user-environment/user-environments.service.ts",
+      "tool_norm_len": 28,
+      "ide_norm_len": 39,
+      "tool_preview": "private pubsub: LocalPubSub;",
+      "ide_preview": "private readonly pubsub: PubSubService,"
+    },
+    {
+      "sample_id": 70,
+      "callee_index": 11,
+      "tested_function": "clearGlobalEnvironments",
+      "callee_preview": "this.pubsub",
+      "position": {
+        "line0": 118,
+        "col0": 15
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/user-environment/user-environments.service.ts",
+      "tool_norm_len": 28,
+      "ide_norm_len": 39,
+      "tool_preview": "private pubsub: LocalPubSub;",
+      "ide_preview": "private readonly pubsub: PubSubService,"
+    },
+    {
+      "sample_id": 71,
+      "callee_index": 9,
+      "tested_function": "toggleHistoryStarStatus",
+      "callee_preview": "this.pubsub",
+      "position": {
+        "line0": 86,
+        "col0": 15
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/user-history/user-history.service.ts",
+      "tool_norm_len": 28,
+      "ide_norm_len": 39,
+      "tool_preview": "private pubsub: LocalPubSub;",
+      "ide_preview": "private readonly pubsub: PubSubService,"
+    },
+    {
+      "sample_id": 72,
+      "callee_index": 6,
+      "tested_function": "deleteAllHistories",
+      "callee_preview": "this.pubsub",
+      "position": {
+        "line0": 86,
+        "col0": 15
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/user-history/user-history.service.ts",
+      "tool_norm_len": 28,
+      "ide_norm_len": 39,
+      "tool_preview": "private pubsub: LocalPubSub;",
+      "ide_preview": "private readonly pubsub: PubSubService,"
+    },
+    {
+      "sample_id": 74,
+      "callee_index": 3,
+      "tested_function": "validateReqType",
+      "callee_preview": "ReqType.REST",
+      "position": {
+        "line0": 228,
+        "col0": 27
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/types/RequestTypes.ts",
+      "tool_norm_len": 38,
+      "ide_norm_len": 14,
+      "tool_preview": "export enum ReqType {\n  REST = 'REST',",
+      "ide_preview": "REST = 'REST',"
+    },
+    {
+      "sample_id": 74,
+      "callee_index": 4,
+      "tested_function": "validateReqType",
+      "callee_preview": "ReqType.GQL",
+      "position": {
+        "line0": 229,
+        "col0": 32
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/types/RequestTypes.ts",
+      "tool_norm_len": 29,
+      "ide_norm_len": 12,
+      "tool_preview": "REST = 'REST',\n  GQL = 'GQL',",
+      "ide_preview": "GQL = 'GQL',"
+    },
+    {
+      "sample_id": 75,
+      "callee_index": 11,
+      "tested_function": "updateUserSettings",
+      "callee_preview": "this.pubsub",
+      "position": {
+        "line0": 71,
+        "col0": 17
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-backend/src/user-settings/user-settings.service.ts",
+      "tool_norm_len": 28,
+      "ide_norm_len": 39,
+      "tool_preview": "private pubsub: LocalPubSub;",
+      "ide_preview": "private readonly pubsub: PubSubService,"
+    },
+    {
+      "sample_id": 76,
+      "callee_index": 0,
+      "tested_function": "pop",
+      "callee_preview": "navStack.value.pop()",
+      "position": {
+        "line0": 83,
+        "col0": 21
+      },
+      "definition_uri_first": null,
+      "tool_norm_len": 182,
+      "ide_norm_len": 0,
+      "tool_preview": "/**\n     * Removes the last element from an array and returns it.\n     * If the array is empty, undefined is returned and the array is not modified.\n     */\n    pop(): T | undefined;",
+      "ide_preview": ""
+    },
+    {
+      "sample_id": 76,
+      "callee_index": 1,
+      "tested_function": "pop",
+      "callee_preview": "navStack.value",
+      "position": {
+        "line0": 60,
+        "col0": 30
+      },
+      "definition_uri_first": null,
+      "tool_norm_len": 4108,
+      "ide_norm_len": 0,
+      "tool_preview": "get value(): T;\n    set value(_: S);\n    /**\n     * Type differentiator only.\n     * We need this to be in public d.ts but don't want it to show up in IDE\n     * autocomplete, so we use a private Symbol instead.\n     */\n    [RefSymbol]: true;\n}\n/**\n * Checks if a value is a ref object.\n *\n * @param r - The value to inspect.\n * @see {@link https://vuejs.org/api/reactivity-utilities.html#isref}\n */\n\u2026",
+      "ide_preview": ""
+    },
+    {
+      "sample_id": 78,
+      "callee_index": 0,
+      "tested_function": "unsubscribeSubscriptions",
+      "callee_preview": "this.teamCollectionAdded$",
+      "position": {
+        "line0": 234,
+        "col0": 9
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-common/src/helpers/teams/TeamCollectionAdapter.ts",
+      "tool_norm_len": 263,
+      "ide_norm_len": 49,
+      "tool_preview": "/**\n   * Stores the entity (collection/request/folder) ids of all the loaded entities.\n   * Used for preventing duplication of data which definitely is not possible (duplication due to network problems etc.)\n   */\nprivate teamCollectionAdded$: Subscription | null",
+      "ide_preview": "private teamCollectionAdded$: Subscription | null"
+    },
+    {
+      "sample_id": 81,
+      "callee_index": 0,
+      "tested_function": "expandCollection",
+      "callee_preview": "this.loadingCollections$.next([\n      ...this.loadingCollections$.getValue(),\n      collectionID,\n    ])",
+      "position": {
+        "line0": 1010,
+        "col0": 29
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/node_modules/.pnpm/rxjs%407.8.1/node_modules/rxjs/src/internal/BehaviorSubject.ts",
+      "tool_norm_len": 69,
+      "ide_norm_len": 61,
+      "tool_preview": "next(value: T): void;\n}\n//# sourceMappingURL=BehaviorSubject.d.ts.map",
+      "ide_preview": "next(value: T): void {\n    super.next((this._value = value));"
+    },
+    {
+      "sample_id": 81,
+      "callee_index": 1,
+      "tested_function": "expandCollection",
+      "callee_preview": "this.loadingCollections$.getValue()",
+      "position": {
+        "line0": 343,
+        "col0": 34
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/node_modules/.pnpm/rxjs%407.8.1/node_modules/rxjs/src/internal/BehaviorSubject.ts",
+      "tool_norm_len": 14,
+      "ide_norm_len": 164,
+      "tool_preview": "getValue(): T;",
+      "ide_preview": "getValue(): T {\n    const { hasError, thrownError, _value } = this;\n    if (hasError) {\n      throw thrownError;\n    }\n    this._throwIfClosed();\n    return _value;"
+    },
+    {
+      "sample_id": 81,
+      "callee_index": 9,
+      "tested_function": "expandCollection",
+      "callee_preview": "this.collections$.next(tree)",
+      "position": {
+        "line0": 336,
+        "col0": 22
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/node_modules/.pnpm/rxjs%407.8.1/node_modules/rxjs/src/internal/BehaviorSubject.ts",
+      "tool_norm_len": 69,
+      "ide_norm_len": 61,
+      "tool_preview": "next(value: T): void;\n}\n//# sourceMappingURL=BehaviorSubject.d.ts.map",
+      "ide_preview": "next(value: T): void {\n    super.next((this._value = value));"
+    },
+    {
+      "sample_id": 81,
+      "callee_index": 10,
+      "tested_function": "expandCollection",
+      "callee_preview": "this.loadingCollections$.next(\n        this.loadingCollections$.getValue().filter((x) => x !== collectionID)\n      )",
+      "position": {
+        "line0": 1030,
+        "col0": 31
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/node_modules/.pnpm/rxjs%407.8.1/node_modules/rxjs/src/internal/BehaviorSubject.ts",
+      "tool_norm_len": 69,
+      "ide_norm_len": 61,
+      "tool_preview": "next(value: T): void;\n}\n//# sourceMappingURL=BehaviorSubject.d.ts.map",
+      "ide_preview": "next(value: T): void {\n    super.next((this._value = value));"
+    },
+    {
+      "sample_id": 81,
+      "callee_index": 13,
+      "tested_function": "expandCollection",
+      "callee_preview": "this.loadingCollections$",
+      "position": {
+        "line0": 230,
+        "col0": 9
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-common/src/helpers/teams/TeamCollectionAdapter.ts",
+      "tool_norm_len": 118,
+      "ide_norm_len": 188,
+      "tool_preview": "// Stream to the list of collections/folders that are being loaded in\n  loadingCollections$: BehaviorSubject<string[]>",
+      "ide_preview": "// Stream to the list of collections/folders that are being loaded in\n// Stream to the list of collections/folders that are being loaded in\n  loadingCollections$: BehaviorSubject<string[]>"
+    },
+    {
+      "sample_id": 81,
+      "callee_index": 14,
+      "tested_function": "expandCollection",
+      "callee_preview": "this.entityIDs",
+      "position": {
+        "line0": 232,
+        "col0": 9
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-common/src/helpers/teams/TeamCollectionAdapter.ts",
+      "tool_norm_len": 318,
+      "ide_norm_len": 462,
+      "tool_preview": "// Stream to the list of collections/folders that are being loaded in\n/**\n   * Stores the entity (collection/request/folder) ids of all the loaded entities.\n   * Used for preventing duplication of data which definitely is not possible (duplication due to network problems etc.)\n   */\n  private entityIDs: Set<EntityID>",
+      "ide_preview": "/**\n   * Stores the entity (collection/request/folder) ids of all the loaded entities.\n   * Used for preventing duplication of data which definitely is not possible (duplication due to network problems etc.)\n   */\n/**\n   * Stores the entity (collection/request/folder) ids of all the loaded entities.\n   * Used for preventing duplication of data which definitely is not possible (duplication due to n\u2026"
+    },
+    {
+      "sample_id": 82,
+      "callee_index": 0,
+      "tested_function": "cascadeParentCollectionForHeaderAuth",
+      "callee_preview": "console.error(\"Invalid path:\", folderPath)",
+      "position": {
+        "line0": 1058,
+        "col0": 14
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/node_modules/typescript/lib/lib.dom.d.ts",
+      "tool_norm_len": 1249,
+      "ide_norm_len": 245,
+      "tool_preview": "/**\n             * Prints to `stderr` with newline. Multiple arguments can be passed, with the\n             * first used as the primary message and all additional used as substitution\n             * values similar to [`printf(3)`](http://man7.org/linux/man-pages/man3/printf.3.html)\n             * (the arguments are all passed to [`util.format()`](https://nodejs.org/docs/latest-v22.x/api/util.html#\u2026",
+      "ide_preview": "/**\n     * The **`console.error()`** static method outputs a message to the console at the 'error' log level.\n     *\n     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/error_static)\n     */\n    error(...data: any[]): void;"
+    },
+    {
+      "sample_id": 82,
+      "callee_index": 1,
+      "tested_function": "cascadeParentCollectionForHeaderAuth",
+      "callee_preview": "console.error(\"Parent folder not found for path:\", path)",
+      "position": {
+        "line0": 1068,
+        "col0": 16
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/node_modules/typescript/lib/lib.dom.d.ts",
+      "tool_norm_len": 1249,
+      "ide_norm_len": 245,
+      "tool_preview": "/**\n             * Prints to `stderr` with newline. Multiple arguments can be passed, with the\n             * first used as the primary message and all additional used as substitution\n             * values similar to [`printf(3)`](http://man7.org/linux/man-pages/man3/printf.3.html)\n             * (the arguments are all passed to [`util.format()`](https://nodejs.org/docs/latest-v22.x/api/util.html#\u2026",
+      "ide_preview": "/**\n     * The **`console.error()`** static method outputs a message to the console at the 'error' log level.\n     *\n     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/error_static)\n     */\n    error(...data: any[]): void;"
+    },
+    {
+      "sample_id": 85,
+      "callee_index": 4,
+      "tested_function": "addParameter",
+      "callee_preview": "value.document",
+      "position": {
+        "line0": 91,
+        "col0": 42
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-common/src/services/tab/index.ts",
+      "tool_norm_len": 101,
+      "ide_norm_len": 105,
+      "tool_preview": "/** The unique identifier of the tab. */\n/** The document associated with the tab. */\n  document: Doc",
+      "ide_preview": "/** The document associated with the tab. */\n/** The document associated with the tab. */\n  document: Doc"
+    },
+    {
+      "sample_id": 86,
+      "callee_index": 0,
+      "tested_function": "isValidURL",
+      "callee_preview": "URL(url)",
+      "position": {
+        "line0": 22,
+        "col0": 8
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/node_modules/typescript/lib/lib.dom.d.ts",
+      "tool_norm_len": 5398,
+      "ide_norm_len": 3636,
+      "tool_preview": "/**\n         * Iterates over each name-value pair in the query and invokes the given function.\n         *\n         * ```js\n         * const myURL = new URL('https://example.org/?a=b&#x26;c=d');\n         * myURL.searchParams.forEach((value, name, searchParams) => {\n         *   console.log(name, value, myURL.searchParams === searchParams);\n         * });\n         * // Prints:\n         * //   a b tr\u2026",
+      "ide_preview": "/**\n * The **`URL`** interface is used to parse, construct, normalize, and encode URL.\n *\n * [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL)\n */\ninterface URL {\n    /**\n     * The **`hash`** property of the URL interface is a string containing a `'#'` followed by the fragment identifier of the URL.\n     *\n     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/hash)\n \u2026"
+    },
+    {
+      "sample_id": 87,
+      "callee_index": 1,
+      "tested_function": "openNewTab",
+      "callee_preview": "this.restTab",
+      "position": {
+        "line0": 56,
+        "col0": 9
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-common/src/services/context-menu/menu/url.menu.ts",
+      "tool_norm_len": 115,
+      "ide_norm_len": 52,
+      "tool_preview": "private readonly contextMenu = this.bind(ContextMenuService)\n  private readonly restTab = this.bind(RESTTabService)",
+      "ide_preview": "private readonly restTab = this.bind(RESTTabService)"
+    },
+    {
+      "sample_id": 88,
+      "callee_index": 2,
+      "tested_function": "runRequest",
+      "callee_preview": "throwError(\n        \"Current Interceptor ID is not found in the list of registered interceptors\"\n      )",
+      "position": {
+        "line0": 254,
+        "col0": 6
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-common/src/helpers/functional/error.ts",
+      "tool_norm_len": 84,
+      "ide_norm_len": 55,
+      "tool_preview": "export const throwError = (message: string): never => {\n  throw new Error(message)\n}",
+      "ide_preview": "export const throwError = (message: string): never => {"
+    },
+    {
+      "sample_id": 88,
+      "callee_index": 3,
+      "tested_function": "runRequest",
+      "callee_preview": "this.currentInterceptorID",
+      "position": {
+        "line0": 203,
+        "col0": 13
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-common/src/services/interceptor.service.ts",
+      "tool_norm_len": 206,
+      "ide_norm_len": 345,
+      "tool_preview": "/**\n   * The ID of the currently selected interceptor.\n   * If `null`, there are no interceptors registered or none can be selected.\n   */\n  public currentInterceptorID: Ref<string | null> = refWithControl(",
+      "ide_preview": "/**\n   * The ID of the currently selected interceptor.\n   * If `null`, there are no interceptors registered or none can be selected.\n   */\n/**\n   * The ID of the currently selected interceptor.\n   * If `null`, there are no interceptors registered or none can be selected.\n   */\n  public currentInterceptorID: Ref<string | null> = refWithControl("
+    },
+    {
+      "sample_id": 97,
+      "callee_index": 3,
+      "tested_function": "acquireTeamListAdapter",
+      "callee_preview": "this.teamListAdapterLockTicker",
+      "position": {
+        "line0": 134,
+        "col0": 24
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-common/src/services/workspace.service.ts",
+      "tool_norm_len": 149,
+      "ide_norm_len": 73,
+      "tool_preview": "private teamListAdapterLocks = reactive(new Map<number, number | null>())\n  private teamListAdapterLockTicker = 0 // Used to generate unique lock IDs",
+      "ide_preview": "private teamListAdapterLockTicker = 0 // Used to generate unique lock IDs"
+    },
+    {
+      "sample_id": 97,
+      "callee_index": 4,
+      "tested_function": "acquireTeamListAdapter",
+      "callee_preview": "this.teamListAdapterLocks",
+      "position": {
+        "line0": 57,
+        "col0": 26
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-common/src/services/workspace.service.ts",
+      "tool_norm_len": 209,
+      "ide_norm_len": 73,
+      "tool_preview": "/**\n   * A readonly reference to the currently selected workspace\n   */\n  public currentWorkspace = readonly(this._currentWorkspace)\n\n  private teamListAdapterLocks = reactive(new Map<number, number | null>())",
+      "ide_preview": "private teamListAdapterLocks = reactive(new Map<number, number | null>())"
+    },
+    {
+      "sample_id": 97,
+      "callee_index": 5,
+      "tested_function": "acquireTeamListAdapter",
+      "callee_preview": "this.managedTeamListAdapter",
+      "position": {
+        "line0": 67,
+        "col0": 26
+      },
+      "definition_uri_first": "file:///Users/trieyang/Desktop/DocPrism/hoppscotch/packages/hoppscotch-common/src/services/workspace.service.ts",
+      "tool_norm_len": 141,
+      "ide_norm_len": 65,
+      "tool_preview": "private teamListAdapterLockTicker = 0 // Used to generate unique lock IDs\n  private managedTeamListAdapter = new TeamListAdapter(true, false)",
+      "ide_preview": "private managedTeamListAdapter = new TeamListAdapter(true, false)"
+    },
+    {
+      "sample_id": 99,
+      "callee_index": 0,
+      "tested_function": "willBackendHaveAuthError",
+      "callee_preview": "currentUser$.value",
+      "position": {
+        "line0": 218,
+        "col0": 37
+      },
+      "definition_uri_first": null,
+      "tool_norm_len": 15,
+      "ide_norm_len": 0,
+      "tool_preview": "get value(): T;",
+      "ide_preview": ""
+    }
+  ],
+  "errors": []
+}

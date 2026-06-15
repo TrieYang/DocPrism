@@ -1,0 +1,78 @@
+Running code_navigation_TypeScript on hoppscotch.json evaluation set...
+Repo root: /Users/trieyang/Desktop/DocPrism/hoppscotch
+
+======================================================================
+SUMMARY
+======================================================================
+Process pool:   max_workers=2 (override: --workers or HOPPSCOTCH_CODE_NAV_EVAL_WORKERS)
+Runtime:        353.64s
+Samples skipped (no extractable callees): 6
+Samples (ids):    94
+Callee rows:      554 total, 554 ok, 0 failed
+Row pass rate:    100.0%
+Samples all ok:   94 / 94 (every callee row succeeded for that sample)
+
+--- OK rows (first 30) ---
+  sample=2 idx=0 fn=createPAT -> node_modules/.pnpm/fp-ts@2.16.10/node_modules/fp-ts/lib/Either.d.ts
+    callee: 'E.left({\n        message: ACCESS_TOKEN_LABEL_SHORT,\n        …'
+  sample=2 idx=1 fn=createPAT -> packages/hoppscotch-backend/src/access-token/access-token.service.ts
+    callee: 'this.validateExpirationDate(createAccessTokenDto.expiryInDay…'
+  sample=2 idx=2 fn=createPAT -> node_modules/.pnpm/fp-ts@2.16.10/node_modules/fp-ts/lib/Either.d.ts
+    callee: 'E.left({\n        message: ACCESS_TOKEN_EXPIRY_INVALID,\n     …'
+  sample=2 idx=3 fn=createPAT -> node_modules/.pnpm/@prisma+client@6.8.2_prisma@6.8.2_typescript@5.8.3__typescript@5.8.3/node_modules/.prisma/client/index.d.ts
+    callee: 'this.prisma.personalAccessToken.create({\n      data: {\n     …'
+  sample=2 idx=4 fn=createPAT -> packages/hoppscotch-backend/src/access-token/access-token.service.ts
+    callee: 'this.cast(createdPAT)'
+  sample=2 idx=5 fn=createPAT -> node_modules/.pnpm/fp-ts@2.16.10/node_modules/fp-ts/lib/Either.d.ts
+    callee: 'E.right(res)'
+  sample=2 idx=6 fn=createPAT -> packages/hoppscotch-backend/src/utils.ts
+    callee: 'isValidLength(\n      createAccessTokenDto.label,\n      this.…'
+  sample=2 idx=7 fn=createPAT -> packages/hoppscotch-backend/src/utils.ts
+    callee: 'calculateExpirationDate(createAccessTokenDto.expiryInDays)'
+  sample=2 idx=8 fn=createPAT -> packages/hoppscotch-backend/src/access-token/access-token.service.ts
+    callee: 'this.TITLE_LENGTH'
+  sample=2 idx=9 fn=createPAT -> node_modules/.pnpm/@nestjs+common@11.1.1_class-transformer@0.5.1_class-validator@0.14.2_reflect-metadata@0.2.2_rxjs@7.8.2/node_modules/@nestjs/common/enums/http-status.enum.d.ts
+    callee: 'HttpStatus.BAD_REQUEST'
+  sample=2 idx=10 fn=createPAT -> packages/hoppscotch-backend/src/access-token/access-token.service.ts
+    callee: 'this.prisma'
+  sample=2 idx=11 fn=createPAT -> node_modules/.pnpm/@prisma+client@6.8.2_prisma@6.8.2_typescript@5.8.3__typescript@5.8.3/node_modules/.prisma/client/index.d.ts
+    callee: 'personalAccessToken.create'
+  sample=2 idx=12 fn=createPAT -> packages/hoppscotch-backend/src/access-token/access-token.service.ts
+    callee: 'this.TOKEN_PREFIX'
+  sample=3 idx=0 fn=deletePAT -> node_modules/.pnpm/@prisma+client@6.8.2_prisma@6.8.2_typescript@5.8.3__typescript@5.8.3/node_modules/.prisma/client/index.d.ts
+    callee: 'this.prisma.personalAccessToken.delete({\n        where: { id…'
+  sample=3 idx=1 fn=deletePAT -> node_modules/.pnpm/fp-ts@2.16.10/node_modules/fp-ts/lib/Either.d.ts
+    callee: 'E.right(true)'
+  sample=3 idx=2 fn=deletePAT -> node_modules/.pnpm/fp-ts@2.16.10/node_modules/fp-ts/lib/Either.d.ts
+    callee: 'E.left({\n        message: ACCESS_TOKEN_NOT_FOUND,\n        st…'
+  sample=3 idx=3 fn=deletePAT -> packages/hoppscotch-backend/src/access-token/access-token.service.ts
+    callee: 'this.prisma'
+  sample=3 idx=4 fn=deletePAT -> node_modules/.pnpm/@prisma+client@6.8.2_prisma@6.8.2_typescript@5.8.3__typescript@5.8.3/node_modules/.prisma/client/index.d.ts
+    callee: 'personalAccessToken.delete'
+  sample=3 idx=5 fn=deletePAT -> node_modules/.pnpm/@nestjs+common@11.1.1_class-transformer@0.5.1_class-validator@0.14.2_reflect-metadata@0.2.2_rxjs@7.8.2/node_modules/@nestjs/common/enums/http-status.enum.d.ts
+    callee: 'HttpStatus.NOT_FOUND'
+  sample=4 idx=0 fn=getUserPAT -> packages/hoppscotch-backend/src/access-token/access-token.service.ts
+    callee: 'this.extractUUID(accessToken)'
+  sample=4 idx=1 fn=getUserPAT -> node_modules/.pnpm/fp-ts@2.16.10/node_modules/fp-ts/lib/Either.d.ts
+    callee: 'E.left(ACCESS_TOKEN_NOT_FOUND)'
+  sample=4 idx=2 fn=getUserPAT -> node_modules/.pnpm/@prisma+client@6.8.2_prisma@6.8.2_typescript@5.8.3__typescript@5.8.3/node_modules/.prisma/client/index.d.ts
+    callee: 'this.prisma.personalAccessToken.findUniqueOrThrow({\n        …'
+  sample=4 idx=3 fn=getUserPAT -> node_modules/.pnpm/fp-ts@2.16.10/node_modules/fp-ts/lib/Either.d.ts
+    callee: 'E.right(userPAT)'
+  sample=4 idx=4 fn=getUserPAT -> packages/hoppscotch-backend/src/access-token/access-token.service.ts
+    callee: 'this.prisma'
+  sample=4 idx=5 fn=getUserPAT -> node_modules/.pnpm/@prisma+client@6.8.2_prisma@6.8.2_typescript@5.8.3__typescript@5.8.3/node_modules/.prisma/client/index.d.ts
+    callee: 'personalAccessToken.findUniqueOrThrow'
+  sample=5 idx=0 fn=updateLastUsedForPAT -> packages/hoppscotch-backend/src/access-token/access-token.service.ts
+    callee: 'this.extractUUID(token)'
+  sample=5 idx=1 fn=updateLastUsedForPAT -> node_modules/.pnpm/fp-ts@2.16.10/node_modules/fp-ts/lib/Either.d.ts
+    callee: 'E.left(ACCESS_TOKEN_NOT_FOUND)'
+  sample=5 idx=2 fn=updateLastUsedForPAT -> node_modules/.pnpm/@prisma+client@6.8.2_prisma@6.8.2_typescript@5.8.3__typescript@5.8.3/node_modules/.prisma/client/index.d.ts
+    callee: 'this.prisma.personalAccessToken.update({\n        where: { to…'
+  sample=5 idx=3 fn=updateLastUsedForPAT -> node_modules/.pnpm/fp-ts@2.16.10/node_modules/fp-ts/lib/Either.d.ts
+    callee: 'E.right(this.cast(updatedAccessToken))'
+  sample=5 idx=4 fn=updateLastUsedForPAT -> packages/hoppscotch-backend/src/access-token/access-token.service.ts
+    callee: 'this.cast(updatedAccessToken)'
+  ... and 524 more ok rows
+
+Full results written to: /Users/trieyang/Desktop/DocPrism/hoppscotch_navigation_results.json
