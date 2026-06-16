@@ -1,5 +1,6 @@
 # Vendored evaluation repos (clone separately; too large for this repo)
 nest/
+puppeteer/
 x64dbg_gui/
 
 # Dependencies & caches

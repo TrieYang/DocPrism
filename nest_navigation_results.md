@@ -4,7 +4,7 @@ Generated from `code_navigation_TypeScript.resolve_from_snippet` on samples in `
 
 ## Summary
 
-- Runtime: 47.21s
+- Runtime: 42.5s
 - Samples with at least one callee: 88
 - Callee rows evaluated: 209 (205 ok, 4 failed)
 - Samples skipped (no extractable callees): 6
@@ -1738,8 +1738,7 @@ this.settleFn()
 - **Range:** line 7, col 52
 
 ```typescript
-  private readonly settledPromise: Promise<unknown>;
-  private settleFn!: (err?: unknown) => void;
+private settleFn!: (err?: unknown) => void;
 ```
 
 ---

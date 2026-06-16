@@ -482,16 +482,18 @@ def _extract_ts_property_definition(
 ) -> Optional[str]:
     if not symbol_name:
         return None
-    # Constructor params / fields: `private readonly logger: Logger`, `public x?: T`, or `name: T`.
+    # Constructor params / fields: `private readonly logger: Logger`, `public x?: T`,
+    # `name!: T` (definite assignment), or `name: T`.
+    _field_type_suffix = r"\s*(?:!|\?)?\s*:"
     prop_re = re.compile(
         r"^\s*(?:(?:public|private|protected|static|abstract|override|declare|readonly)\s+)*"
         + re.escape(symbol_name)
-        + r"\s*\??\s*:"
+        + _field_type_suffix
     )
     ctor_param_re = re.compile(
         r"\b(?:public|private|protected)\s+(?:readonly\s+)?"
         + re.escape(symbol_name)
-        + r"\s*\??\s*:"
+        + _field_type_suffix
     )
     field_init_re = re.compile(
         r"^\s*(?:(?:public|private|protected|static|readonly)\s+)*"

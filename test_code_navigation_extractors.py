@@ -100,6 +100,17 @@ class TestClassFieldExtraction(unittest.TestCase):
         snippet = _extract_ts_property_definition(self.LINES, "TITLE_LENGTH", 3)
         self.assertEqual(snippet, "TITLE_LENGTH = 3;")
 
+    def test_definite_assignment_field(self):
+        lines = [
+            "export class SettlementSignal {",
+            "  private readonly settledPromise: Promise<unknown>;",
+            "  private settleFn!: (err?: unknown) => void;",
+            "  private completed = false;",
+            "}",
+        ]
+        snippet = _extract_ts_property_definition(lines, "settleFn", 2)
+        self.assertEqual(snippet, "private settleFn!: (err?: unknown) => void;")
+
 
 class TestPrismaTransactionTrim(unittest.TestCase):
     PRISMA_LINES = [
