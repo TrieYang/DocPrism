@@ -4,7 +4,7 @@ Generated from `code_navigation_TypeScript.resolve_from_snippet` on samples in `
 
 ## Summary
 
-- Runtime: 55.08s
+- Runtime: 47.21s
 - Samples with at least one callee: 88
 - Callee rows evaluated: 209 (205 ok, 4 failed)
 - Samples skipped (no extractable callees): 6
@@ -31,7 +31,7 @@ this.options
 
 - **Path:** `packages/common/exceptions/http.exception.ts`
 - **Range:** line 69, col 21
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 private readonly options?: HttpExceptionOptions,
@@ -58,7 +58,7 @@ this.cause
 
 - **Path:** `packages/common/exceptions/http.exception.ts`
 - **Range:** line 31, col 9
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -89,7 +89,7 @@ this.options
 
 - **Path:** `packages/common/module-utils/configurable-module.builder.ts`
 - **Range:** line 69, col 23
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 protected readonly options: ConfigurableModuleBuilderOptions = {},
@@ -116,7 +116,7 @@ this.validators
 
 - **Path:** `packages/common/pipes/file/parse-file.pipe.ts`
 - **Range:** line 21, col 19
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   private readonly validators: FileValidator[];
@@ -144,7 +144,7 @@ this.exceptionFactory(VALIDATION_ERROR_MESSAGE)
 
 - **Path:** `packages/common/pipes/parse-array.pipe.ts`
 - **Range:** line 56, col 12
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   protected exceptionFactory: (error: string) => any;
@@ -198,7 +198,7 @@ this.isExpectedTypePrimitive()
 
 - **Path:** `packages/common/pipes/parse-array.pipe.ts`
 - **Range:** line 156, col 12
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   protected isExpectedTypePrimitive(): boolean {
@@ -261,7 +261,7 @@ this.validatePrimitive(item, index)
 
 - **Path:** `packages/common/pipes/parse-array.pipe.ts`
 - **Range:** line 160, col 12
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   protected validatePrimitive(originalValue: any, index?: number) {
@@ -455,7 +455,7 @@ isNil(value)
 
 - **Path:** `packages/common/utils/shared.utils.ts`
 - **Range:** line 47, col 13
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 export const isNil = (val: any): val is null | undefined =>
@@ -483,7 +483,7 @@ isString(value)
 
 - **Path:** `packages/common/utils/shared.utils.ts`
 - **Range:** line 44, col 13
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 export const isString = (val: any): val is string => typeof val === 'string';
@@ -510,7 +510,7 @@ this.options
 
 - **Path:** `packages/common/pipes/parse-array.pipe.ts`
 - **Range:** line 58, col 45
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 constructor(@Optional() protected readonly options: ParseArrayOptions = {}) {
@@ -537,7 +537,7 @@ this.validationPipe
 
 - **Path:** `packages/common/pipes/parse-array.pipe.ts`
 - **Range:** line 55, col 21
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   protected readonly validationPipe: ValidationPipe;
@@ -564,7 +564,7 @@ this.isEnum(value)
 
 - **Path:** `packages/common/pipes/parse-enum.pipe.ts`
 - **Range:** line 78, col 12
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   protected isEnum(value: T): boolean {
@@ -596,7 +596,7 @@ this.exceptionFactory(...)
 
 - **Path:** `packages/common/pipes/parse-enum.pipe.ts`
 - **Range:** line 40, col 12
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   protected exceptionFactory: (error: string) => any;
@@ -623,7 +623,7 @@ this.options
 
 - **Path:** `packages/common/pipes/parse-enum.pipe.ts`
 - **Range:** line 43, col 35
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 @Optional() protected readonly options?: ParseEnumPipeOptions,
@@ -650,7 +650,7 @@ this.isNumeric(value)
 
 - **Path:** `packages/common/pipes/parse-float.pipe.ts`
 - **Range:** line 75, col 12
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -687,7 +687,7 @@ this.exceptionFactory(...)
 
 - **Path:** `packages/common/pipes/parse-float.pipe.ts`
 - **Range:** line 40, col 12
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   protected exceptionFactory: (error: string) => any;
@@ -745,7 +745,7 @@ this.options
 
 - **Path:** `packages/common/pipes/parse-float.pipe.ts`
 - **Range:** line 42, col 45
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 options = options || {};
@@ -833,7 +833,7 @@ this.isNumeric(value)
 
 - **Path:** `packages/common/pipes/parse-int.pipe.ts`
 - **Range:** line 79, col 12
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -870,7 +870,7 @@ this.exceptionFactory(...)
 
 - **Path:** `packages/common/pipes/parse-int.pipe.ts`
 - **Range:** line 44, col 12
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   protected exceptionFactory: (error: string) => any;
@@ -930,7 +930,7 @@ this.options
 
 - **Path:** `packages/common/pipes/parse-int.pipe.ts`
 - **Range:** line 46, col 45
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 options = options || {};
@@ -957,7 +957,7 @@ this.options
 
 - **Path:** `packages/common/services/console-logger.service.ts`
 - **Range:** line 119, col 12
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -988,7 +988,7 @@ this.context
 
 - **Path:** `packages/common/services/console-logger.service.ts`
 - **Range:** line 123, col 12
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -1018,7 +1018,7 @@ this.originalContext
 
 - **Path:** `packages/common/services/console-logger.service.ts`
 - **Range:** line 127, col 12
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -1080,7 +1080,7 @@ item.methodRef(...(item.arguments as [string]))
 
 - **Path:** `packages/common/services/logger.service.ts`
 - **Range:** line 64, col 2
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -1111,7 +1111,7 @@ this.isBufferAttached
 
 - **Path:** `packages/common/services/logger.service.ts`
 - **Range:** line 91, col 17
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   private static isBufferAttached: boolean;
@@ -1164,7 +1164,7 @@ item.arguments
 
 - **Path:** `packages/common/services/logger.service.ts`
 - **Range:** line 69, col 2
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -1194,7 +1194,7 @@ DiscoverableMetaHostCollection.addClassMetaHostLink(...)
 
 - **Path:** `packages/core/discovery/discoverable-meta-host-collection.ts`
 - **Range:** line 33, col 16
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -1231,7 +1231,7 @@ uid(21)
 
 - **Path:** `node_modules/uid/dist/index.js`
 - **Range:** line 3, col 9
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 function uid(len) {
@@ -1267,7 +1267,7 @@ SetMetadata(metadataKey, opts ?? {})
 
 - **Path:** `packages/common/decorators/core/set-metadata.decorator.ts`
 - **Range:** line 21, col 13
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -1354,7 +1354,7 @@ this.includeWhitelisted(options.include!)
 
 - **Path:** `packages/core/discovery/discovery-service.ts`
 - **Range:** line 160, col 10
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   private includeWhitelisted(include: Function[]): Module[] {
@@ -1386,7 +1386,7 @@ this.modulesContainer
 
 - **Path:** `packages/core/discovery/discovery-service.ts`
 - **Range:** line 50, col 31
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   constructor(private readonly modulesContainer: ModulesContainer) {}
@@ -1413,7 +1413,7 @@ createContextId()
 
 - **Path:** `packages/core/helpers/context-id-factory.ts`
 - **Range:** line 4, col 16
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 export function createContextId(): ContextId {
@@ -1450,7 +1450,7 @@ this.strategy
 
 - **Path:** `packages/core/helpers/context-id-factory.ts`
 - **Range:** line 43, col 17
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   private static strategy?: ContextIdStrategy;
@@ -1478,7 +1478,7 @@ this._httpAdapter
 
 - **Path:** `packages/core/helpers/http-adapter-host.ts`
 - **Range:** line 18, col 10
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   private _httpAdapter?: T;
@@ -1515,7 +1515,7 @@ this._listen$.next()
 
 - **Path:** `node_modules/rxjs/src/internal/Subject.ts`
 - **Range:** line 58, col 2
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   next(value: T) {
@@ -1554,7 +1554,7 @@ this._listen$.complete()
 
 - **Path:** `node_modules/rxjs/src/internal/Subject.ts`
 - **Range:** line 86, col 2
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   complete() {
@@ -1646,7 +1646,7 @@ iterate(instances)
 
 - **Path:** `node_modules/iterare/lib/iterate.js`
 - **Range:** line 207, col 9
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -1678,7 +1678,7 @@ isFunction((instance as OnModuleInit).onModuleInit)
 
 - **Path:** `packages/common/utils/shared.utils.ts`
 - **Range:** line 42, col 13
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 export const isFunction = (val: any): val is Function =>
@@ -1707,7 +1707,7 @@ isUndefined((value as OptionalFactoryDependency).token)
 
 - **Path:** `packages/common/utils/shared.utils.ts`
 - **Range:** line 0, col 13
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 export const isUndefined = (obj: any): obj is undefined =>
@@ -1790,7 +1790,7 @@ this.settledPromise
 
 - **Path:** `packages/core/injector/settlement-signal.ts`
 - **Range:** line 7, col 19
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   private readonly settledPromise: Promise<unknown>;
@@ -1902,7 +1902,7 @@ this.container.registerRequestProvider(request, contextId)
 
 - **Path:** `packages/core/injector/container.ts`
 - **Range:** line 351, col 9
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   public registerRequestProvider<T = any>(request: T, contextId: ContextId) {
@@ -1935,7 +1935,7 @@ this.container
 
 - **Path:** `packages/core/nest-application-context.ts`
 - **Range:** line 67, col 23
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 protected readonly container: NestContainer,
@@ -2103,7 +2103,7 @@ this.initializationPromise
 
 - **Path:** `packages/core/nest-application-context.ts`
 - **Range:** line 57, col 10
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   private initializationPromise?: Promise<void>;
@@ -2274,7 +2274,7 @@ this.unsubscribeFromProcessSignals()
 
 - **Path:** `packages/core/nest-application-context.ts`
 - **Range:** line 391, col 12
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -2311,7 +2311,7 @@ Logger.overrideLogger(logger)
 
 - **Path:** `packages/common/services/logger.service.ts`
 - **Range:** line 311, col 9
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   static overrideLogger(logger: LoggerService | LogLevel[] | boolean) {
@@ -2354,7 +2354,7 @@ this.flushLogs()
 
 - **Path:** `packages/core/nest-application-context.ts`
 - **Range:** line 301, col 9
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -2414,7 +2414,7 @@ Logger.flush()
 
 - **Path:** `packages/common/services/logger.service.ts`
 - **Range:** line 283, col 9
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -2481,7 +2481,7 @@ isEmpty(signals)
 
 - **Path:** `packages/common/utils/shared.utils.ts`
 - **Range:** line 49, col 13
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 export const isEmpty = (array: any): boolean => !(array && array.length > 0);
@@ -2617,7 +2617,7 @@ this.shutdownCleanupRef
 
 - **Path:** `packages/core/nest-application-context.ts`
 - **Range:** line 54, col 10
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   private shutdownCleanupRef?: (...args: unknown[]) => unknown;
@@ -2671,7 +2671,7 @@ this.getModulesToTriggerHooksOn()
 
 - **Path:** `packages/core/nest-application-context.ts`
 - **Range:** line 472, col 10
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   private getModulesToTriggerHooksOn(): Module[] {
@@ -2712,7 +2712,7 @@ callModuleInitHook(module)
 
 - **Path:** `packages/core/hooks/on-module-init.hook.ts`
 - **Range:** line 36, col 22
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -2772,7 +2772,7 @@ callModuleDestroyHook(module)
 
 - **Path:** `packages/core/hooks/on-module-destroy.hook.ts`
 - **Range:** line 40, col 22
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -2832,7 +2832,7 @@ callModuleBootstrapHook(module)
 
 - **Path:** `packages/core/hooks/on-app-bootstrap.hook.ts`
 - **Range:** line 42, col 22
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -2891,7 +2891,7 @@ callAppShutdownHook(module, signal)
 
 - **Path:** `packages/core/hooks/on-app-shutdown.hook.ts`
 - **Range:** line 44, col 22
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -2954,7 +2954,7 @@ callBeforeAppShutdownHook(module, signal)
 
 - **Path:** `packages/core/hooks/before-app-shutdown.hook.ts`
 - **Range:** line 48, col 22
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -3014,7 +3014,7 @@ clc.yellow(description)
 
 - **Path:** `packages/common/utils/cli-colors.util.ts`
 - **Range:** line 3, col 49
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `preferred_implementation_over_declaration_kept=2`
 
 ```typescript
 export const yellow = colorIfAllowed(
@@ -3043,7 +3043,7 @@ clc.magentaBright(...)
 
 - **Path:** `packages/common/utils/cli-colors.util.ts`
 - **Range:** line 3, col 49
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `preferred_implementation_over_declaration_kept=2`
 
 ```typescript
 magentaBright: colorIfAllowed((text: string) => `\x1B[95m${text}\x1B[39m`),
@@ -3070,7 +3070,7 @@ clc.bold(fnSignatureWithName)
 
 - **Path:** `packages/common/utils/cli-colors.util.ts`
 - **Range:** line 3, col 49
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `preferred_implementation_over_declaration_kept=2`
 
 ```typescript
 bold: colorIfAllowed((text: string) => `\x1B[1m${text}\x1B[0m`),
@@ -3097,7 +3097,7 @@ this.fnDefinition
 
 - **Path:** `packages/core/repl/repl-function.ts`
 - **Range:** line 10, col 18
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /** Metadata that describes the built-in function itself. */
@@ -3125,7 +3125,7 @@ this.isRequestOrTransient(wrapper.scope!)
 
 - **Path:** `packages/core/scanner.ts`
 - **Range:** line 751, col 10
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   private isRequestOrTransient(scope: Scope): boolean {
@@ -3154,7 +3154,7 @@ this.container.getModules()
 
 - **Path:** `packages/core/injector/container.ts`
 - **Range:** line 217, col 9
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   public getModules(): ModulesContainer {
@@ -3213,7 +3213,7 @@ controllerOrEntryProvider.addEnhancerMetadata(instanceWrapper!)
 
 - **Path:** `packages/core/injector/instance-wrapper.ts`
 - **Range:** line 216, col 9
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   public addEnhancerMetadata(wrapper: InstanceWrapper) {
@@ -3245,7 +3245,7 @@ this.applicationProvidersApplyMap
 
 - **Path:** `packages/core/scanner.ts`
 - **Range:** line 75, col 19
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 private readonly applicationProvidersApplyMap: ApplicationProviderWrapper[] =
@@ -3272,7 +3272,7 @@ wrapper.scope
 
 - **Path:** `packages/core/scanner.ts`
 - **Range:** line 63, col 2
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   scope?: Scope;
@@ -3299,7 +3299,7 @@ this.container
 
 - **Path:** `packages/core/scanner.ts`
 - **Range:** line 79, col 21
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 private readonly container: NestContainer,
@@ -3356,7 +3356,7 @@ moduleRef.controllers
 
 - **Path:** `packages/core/injector/module.ts`
 - **Range:** line 126, col 6
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   get controllers(): Map<InjectionToken, InstanceWrapper<Controller>> {
@@ -3385,7 +3385,7 @@ moduleRef.entryProviders
 
 - **Path:** `packages/core/injector/module.ts`
 - **Range:** line 130, col 6
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   get entryProviders(): Array<InstanceWrapper<Injectable>> {
@@ -3417,7 +3417,7 @@ Reflect.getMetadata(INJECTABLE_WATERMARK, metatype)
 
 - **Path:** `node_modules/reflect-metadata/Reflect.js`
 - **Range:** line 364, col 17
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -3495,7 +3495,7 @@ this.args
 
 - **Path:** `packages/microservices/ctx-host/base-rpc.context.ts`
 - **Range:** line 4, col 33
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   constructor(protected readonly args: T) {}
@@ -3523,7 +3523,7 @@ this.serverInstance
 
 - **Path:** `packages/microservices/nest-microservice.ts`
 - **Range:** line 47, col 10
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   private serverInstance: Server;
@@ -3550,7 +3550,7 @@ this.applicationConfig.setIoAdapter(adapter)
 
 - **Path:** `packages/core/application-config.ts`
 - **Range:** line 47, col 9
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   public setIoAdapter(ioAdapter: WebSocketAdapter) {
@@ -3580,7 +3580,7 @@ this.applicationConfig
 
 - **Path:** `packages/microservices/nest-microservice.ts`
 - **Range:** line 62, col 21
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 private readonly applicationConfig: ApplicationConfig,
@@ -3607,7 +3607,7 @@ this.applicationConfig.useGlobalFilters(...filters)
 
 - **Path:** `packages/core/application-config.ts`
 - **Range:** line 71, col 9
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   public useGlobalFilters(...filters: ExceptionFilter[]) {
@@ -3637,7 +3637,7 @@ this.graphInspector.insertOrphanedEnhancer(...)
 
 - **Path:** `packages/core/inspector/graph-inspector.ts`
 - **Range:** line 85, col 9
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   public insertOrphanedEnhancer(entry: OrphanedEnhancerDefinition) {
@@ -3670,7 +3670,7 @@ this.graphInspector
 
 - **Path:** `packages/microservices/nest-microservice.ts`
 - **Range:** line 61, col 21
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 private readonly graphInspector: GraphInspector,
@@ -3697,7 +3697,7 @@ this.applicationConfig.useGlobalPipes(...pipes)
 
 - **Path:** `packages/core/application-config.ts`
 - **Range:** line 59, col 9
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   public useGlobalPipes(...pipes: PipeTransform<any>[]) {
@@ -3726,7 +3726,7 @@ this.applicationConfig.useGlobalInterceptors(...interceptors)
 
 - **Path:** `packages/core/application-config.ts`
 - **Range:** line 87, col 9
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   public useGlobalInterceptors(...interceptors: NestInterceptor[]) {
@@ -3755,7 +3755,7 @@ this.assertNotInPreviewMode('listen')
 
 - **Path:** `packages/core/nest-application-context.ts`
 - **Range:** line 464, col 12
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   protected assertNotInPreviewMode(methodName: string) {
@@ -3881,7 +3881,7 @@ this.logger.log(MESSAGES.MICROSERVICE_READY)
 
 - **Path:** `packages/common/services/logger.service.ts`
 - **Range:** line 152, col 2
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 
@@ -3939,7 +3939,7 @@ this.microserviceConfig
 
 - **Path:** `packages/microservices/nest-microservice.ts`
 - **Range:** line 43, col 10
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 private microserviceConfig: Exclude<
@@ -3992,7 +3992,7 @@ MESSAGES.MICROSERVICE_READY
 
 - **Path:** `packages/core/constants.ts`
 - **Range:** line 5, col 2
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 MICROSERVICE_READY: `Nest microservice successfully started`,
@@ -4019,7 +4019,7 @@ this.serverInstance.close()
 
 - **Path:** `packages/microservices/server/server.ts`
 - **Range:** line 99, col 18
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   /**
@@ -4049,7 +4049,7 @@ this.setIsTerminated(true)
 
 - **Path:** `packages/microservices/nest-microservice.ts`
 - **Range:** line 267, col 9
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -4167,7 +4167,7 @@ this.serverInstance.on(event as string, callback)
 
 - **Path:** `packages/microservices/server/server.ts`
 - **Range:** line 81, col 18
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -4229,7 +4229,7 @@ this.serverInstance.unwrap()
 
 - **Path:** `packages/microservices/server/server.ts`
 - **Range:** line 89, col 18
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   /**
@@ -4260,7 +4260,7 @@ this.collectDeepServices('', grpcPkg, services)
 
 - **Path:** `packages/microservices/server/server-grpc.ts`
 - **Range:** line 590, col 10
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -4336,7 +4336,7 @@ this.getMessageHandler(...)
 
 - **Path:** `packages/microservices/server/server-grpc.ts`
 - **Range:** line 191, col 9
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   public getMessageHandler(
@@ -4377,7 +4377,7 @@ GrpcMethodStreamingType.NO_STREAMING
 
 - **Path:** `packages/microservices/decorators/message-pattern.decorator.ts`
 - **Range:** line 22, col 2
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 NO_STREAMING = 'no_stream',
@@ -4404,7 +4404,7 @@ GrpcMethodStreamingType.RX_STREAMING
 
 - **Path:** `packages/microservices/decorators/message-pattern.decorator.ts`
 - **Range:** line 23, col 2
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 RX_STREAMING = 'rx_stream',
@@ -4431,7 +4431,7 @@ this.normalizePattern(validPattern)
 
 - **Path:** `packages/microservices/server/server.ts`
 - **Range:** line 292, col 12
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
   protected normalizePattern(pattern: MsPattern): string {
@@ -4490,25 +4490,42 @@ clean()
 
 ### Resolved definition
 
-- **Path:** `tools/gulp/tasks/clean.ts`
-- **Range:** line 2, col 12
-- **Selection:** `go_to_source_definition_primary`
+- **Path:** `node_modules/gulp-clean/index.js`
+- **Range:** line 6, col 0
+- **Selection:** `definition_via_node_module_import`
 
 ```typescript
-  ).pipe(clean());
-}
+module.exports = function (options) {
+  return through2.obj(function (file, enc, cb) {
+    // Paths are resolved by gulp
+    var filepath = file.path;
+    var cwd = file.cwd;
+    var relative = path.relative(cwd, filepath);
 
-/**
- * Cleans empty dirs
- */
-function cleanDirs(done: () => void) {
-  deleteEmpty.sync(`${source}/`);
-  done();
-}
-
-task('clean:output', cleanOutput);
-task('clean:dirs', cleanDirs);
-task('clean:bundle', series('clean:output', 'clean:dirs'));
+    // Prevent mistakes with paths
+    if (!(relative.substr(0, 2) === '..') && relative !== '' || (options ? (options.force && typeof options.force === 'boolean') : false)) {
+      rimraf(filepath, function (error) {
+        if (error) {
+          this.emit('error', new utils.PluginError('gulp-clean', 'Unable to delete "' + filepath + '" file (' + error.message + ').'));
+        }
+        this.push(file);
+        cb();
+      }.bind(this));
+    } else if (relative === '') {
+      var msgCurrent = 'Cannot delete current working directory. (' + filepath + '). Use option force.';
+      utils.log('gulp-clean: ' + msgCurrent);
+      this.emit('error', new utils.PluginError('gulp-clean', msgCurrent));
+      this.push(file);
+      cb();
+    } else {
+      var msgOutside = 'Cannot delete files outside the current working directory. (' + filepath + '). Use option force.';
+      utils.log('gulp-clean: ' + msgOutside);
+      this.emit('error', new utils.PluginError('gulp-clean', msgOutside));
+      this.push(file);
+      cb();
+    }
+  });
+};
 ```
 
 ---
@@ -4627,7 +4644,7 @@ getDirs(samplePath)
 
 - **Path:** `tools/gulp/util/task-helpers.ts`
 - **Range:** line 11, col 16
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 export function getDirs(base: string) {
@@ -4656,7 +4673,7 @@ containsPackageJson(sampleDir)
 
 - **Path:** `tools/gulp/util/task-helpers.ts`
 - **Range:** line 20, col 16
-- **Selection:** `go_to_source_definition_primary`
+- **Selection:** `dropped_import_export_sites_kept=1`
 
 ```typescript
 /**
@@ -4712,4 +4729,3 @@ join(dir, '/node_modules/@nestjs')
 - **Error:** No candidates found by anchor inside tested_function (or file if range unknown).
 
 ---
-

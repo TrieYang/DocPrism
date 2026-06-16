@@ -977,6 +977,13 @@ def _read_definition_source(
                 return body
             return _prepend_jsdoc(body, body_line)
 
+        if p.suffix.lower() in (".js", ".cjs", ".mjs", ".jsx"):
+            cjs_snippet, cjs_start = _extract_commonjs_default_export_body(
+                lines, loc.start_line
+            )
+            if cjs_snippet and cjs_start is not None:
+                return cjs_snippet
+
         if symbol_name:
             ast_snippet, ast_start = _extract_symbol_definition_ast(
                 p, symbol_name, loc.start_line
@@ -2343,9 +2350,62 @@ def _find_commonjs_module_export_line(path: Path) -> int:
     except OSError:
         return 0
     for i, line in enumerate(lines):
-        if re.search(r"module\.exports\s*=\s*function\b", line):
+        if _COMMONJS_MODULE_EXPORT_LINE_RE.search(line):
             return i
     return 0
+
+
+_COMMONJS_MODULE_EXPORT_LINE_RE = re.compile(
+    r"module\.exports\s*=\s*(?:async\s+function\b|function\b|\([^)]*\)\s*=>)"
+)
+
+
+def _extract_commonjs_default_export_body(
+    lines: List[str],
+    hint_line0: int,
+    *,
+    max_lines: int = 200,
+) -> Tuple[Optional[str], Optional[int]]:
+    """Extract full ``module.exports = function … { … }`` body from a CJS entry file."""
+    candidates: List[int] = []
+    search_lo = max(0, hint_line0 - 3)
+    search_hi = min(len(lines), hint_line0 + 4)
+    for i in range(search_lo, search_hi):
+        if _COMMONJS_MODULE_EXPORT_LINE_RE.search(lines[i]):
+            candidates.append(i)
+    if not candidates:
+        return None, None
+    start = min(candidates, key=lambda i: abs(i - hint_line0))
+    end = _extend_declaration_end_line(lines, start, max_lines=max_lines)
+    snippet = "\n".join(lines[start : end + 1])
+    paren, brace = _delimiter_depths(snippet)
+    if paren != 0 or brace != 0:
+        end = _extend_declaration_end_line(lines, start, max_lines=max_lines * 2)
+        snippet = "\n".join(lines[start : end + 1])
+    if not snippet.strip():
+        return None, None
+    return snippet, start
+
+
+def _location_for_commonjs_default_export(path: Path) -> Optional[Location]:
+    """Build an LSP range spanning the full CJS default export when present."""
+    try:
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return None
+    line0 = _find_commonjs_module_export_line(path)
+    snippet, start = _extract_commonjs_default_export_body(lines, line0)
+    if snippet is None or start is None:
+        return None
+    end_line0 = start + snippet.count("\n")
+    end_char = len(lines[end_line0]) if 0 <= end_line0 < len(lines) else 0
+    return Location(
+        uri=file_uri(path),
+        start_line=start,
+        start_char=0,
+        end_line=end_line0,
+        end_char=end_char,
+    )
 
 
 def _find_definition_via_imports(
@@ -2452,13 +2512,15 @@ def _maybe_follow_import_for_call_site(
     if not found:
         return chosen_def, full_def_source, None
     def_path_found, def_line0 = found
-    loc_found = Location(
-        uri=file_uri(def_path_found),
-        start_line=def_line0,
-        start_char=0,
-        end_line=def_line0,
-        end_char=0,
-    )
+    loc_found = _location_for_commonjs_default_export(def_path_found)
+    if loc_found is None:
+        loc_found = Location(
+            uri=file_uri(def_path_found),
+            start_line=def_line0,
+            start_char=0,
+            end_line=def_line0,
+            end_char=0,
+        )
     upgraded = _build_def_candidate(repo_root, loc_found)
     upgraded_src = _read_definition_source(
         loc_found, symbol_name, usage_hint=usage_hint

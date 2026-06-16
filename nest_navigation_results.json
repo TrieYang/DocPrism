@@ -1,6 +1,6 @@
 {
   "summary": {
-    "runtime_seconds": 55.08,
+    "runtime_seconds": 47.21,
     "samples_skipped_no_callees": 6,
     "unique_sample_ids": 88,
     "callee_rows_total": 209,
@@ -165,7 +165,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -341,7 +341,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -517,7 +517,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -693,7 +693,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -933,7 +933,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -1220,7 +1220,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -1507,7 +1507,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -2048,7 +2048,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -2335,7 +2335,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -2511,7 +2511,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -2879,7 +2879,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -3055,7 +3055,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -3231,7 +3231,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -3407,7 +3407,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -3583,7 +3583,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -3759,7 +3759,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -3935,7 +3935,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -4111,7 +4111,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -4287,7 +4287,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -4574,7 +4574,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -5083,7 +5083,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -5259,7 +5259,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -5435,7 +5435,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -5722,7 +5722,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -6073,7 +6073,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -6249,7 +6249,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -6425,7 +6425,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -6601,7 +6601,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -6888,7 +6888,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -7064,7 +7064,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -7431,7 +7431,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -7607,7 +7607,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -7783,7 +7783,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -7959,7 +7959,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -8135,7 +8135,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -8311,7 +8311,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -8598,7 +8598,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -8774,7 +8774,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -8950,7 +8950,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -9126,7 +9126,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -9302,7 +9302,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -9478,7 +9478,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -9688,7 +9688,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -9864,7 +9864,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -10549,7 +10549,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -10725,7 +10725,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -10901,7 +10901,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -11077,7 +11077,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -11253,7 +11253,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -12065,7 +12065,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -12940,7 +12940,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -13116,7 +13116,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -13944,7 +13944,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -14756,7 +14756,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -14932,7 +14932,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -15108,7 +15108,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -15284,7 +15284,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -15619,7 +15619,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -16065,7 +16065,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -16499,7 +16499,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -16834,7 +16834,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -17010,7 +17010,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -17186,7 +17186,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -17362,7 +17362,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -17538,7 +17538,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -17714,7 +17714,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -17890,7 +17890,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -18066,7 +18066,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -18242,7 +18242,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -18418,7 +18418,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -18622,7 +18622,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "preferred_implementation_over_declaration_kept=2",
         "ambiguity": {
           "remaining": 2,
           "chosen": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/utils/cli-colors.util.ts",
@@ -18844,7 +18844,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "preferred_implementation_over_declaration_kept=2",
         "ambiguity": {
           "remaining": 2,
           "chosen": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/utils/cli-colors.util.ts",
@@ -19066,7 +19066,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "preferred_implementation_over_declaration_kept=2",
         "ambiguity": {
           "remaining": 2,
           "chosen": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/utils/cli-colors.util.ts",
@@ -19260,7 +19260,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -19547,7 +19547,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -19723,7 +19723,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -20121,7 +20121,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -20297,7 +20297,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -20473,7 +20473,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -20649,7 +20649,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -20825,7 +20825,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -21001,7 +21001,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -21288,7 +21288,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -21464,7 +21464,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -21640,7 +21640,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -21816,7 +21816,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -21992,7 +21992,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -22202,7 +22202,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -22378,7 +22378,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -22554,7 +22554,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -22730,7 +22730,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -22906,7 +22906,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -22931,7 +22931,7 @@
             },
             "directory": "/Users/trieyang/Desktop/DocPrism/nest/packages/microservices/ctx-host",
             "full_def_source": "  constructor(protected readonly args: T) {}",
-            "callee_documentation": "\n```typescript\n(property) BaseRpcContext<T = unknown[]>.args: T = unknown[]\n```\n",
+            "callee_documentation": null,
             "repo_relative_path": "packages/microservices/ctx-host/base-rpc.context.ts",
             "repo_relative_dir": "packages/microservices/ctx-host"
           },
@@ -23082,7 +23082,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -23107,7 +23107,7 @@
             },
             "directory": "/Users/trieyang/Desktop/DocPrism/nest/packages/microservices/ctx-host",
             "full_def_source": "  constructor(protected readonly args: T) {}",
-            "callee_documentation": null,
+            "callee_documentation": "\n```typescript\n(property) BaseRpcContext<T = unknown[]>.args: T = unknown[]\n```\n",
             "repo_relative_path": "packages/microservices/ctx-host/base-rpc.context.ts",
             "repo_relative_dir": "packages/microservices/ctx-host"
           },
@@ -23258,7 +23258,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -23434,7 +23434,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -23610,7 +23610,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -23786,7 +23786,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -23811,7 +23811,7 @@
             },
             "directory": "/Users/trieyang/Desktop/DocPrism/nest/packages/microservices/ctx-host",
             "full_def_source": "  constructor(protected readonly args: T) {}",
-            "callee_documentation": null,
+            "callee_documentation": "\n```typescript\n(property) BaseRpcContext<T = unknown[]>.args: T = unknown[]\n```\n",
             "repo_relative_path": "packages/microservices/ctx-host/base-rpc.context.ts",
             "repo_relative_dir": "packages/microservices/ctx-host"
           },
@@ -23962,7 +23962,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -24138,7 +24138,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -24314,7 +24314,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -24339,7 +24339,7 @@
             },
             "directory": "/Users/trieyang/Desktop/DocPrism/nest/packages/microservices/ctx-host",
             "full_def_source": "  constructor(protected readonly args: T) {}",
-            "callee_documentation": null,
+            "callee_documentation": "\n```typescript\n(property) BaseRpcContext<T = unknown[]>.args: T = unknown[]\n```\n",
             "repo_relative_path": "packages/microservices/ctx-host/base-rpc.context.ts",
             "repo_relative_dir": "packages/microservices/ctx-host"
           },
@@ -24490,7 +24490,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -24666,7 +24666,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -24691,7 +24691,7 @@
             },
             "directory": "/Users/trieyang/Desktop/DocPrism/nest/packages/microservices/ctx-host",
             "full_def_source": "  constructor(protected readonly args: T) {}",
-            "callee_documentation": "\n```typescript\n(property) BaseRpcContext<T = unknown[]>.args: T = unknown[]\n```\n",
+            "callee_documentation": null,
             "repo_relative_path": "packages/microservices/ctx-host/base-rpc.context.ts",
             "repo_relative_dir": "packages/microservices/ctx-host"
           },
@@ -24842,7 +24842,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -24867,7 +24867,7 @@
             },
             "directory": "/Users/trieyang/Desktop/DocPrism/nest/packages/microservices/ctx-host",
             "full_def_source": "  constructor(protected readonly args: T) {}",
-            "callee_documentation": null,
+            "callee_documentation": "\n```typescript\n(property) BaseRpcContext<T = unknown[]>.args: T = unknown[]\n```\n",
             "repo_relative_path": "packages/microservices/ctx-host/base-rpc.context.ts",
             "repo_relative_dir": "packages/microservices/ctx-host"
           },
@@ -25018,7 +25018,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -25043,7 +25043,7 @@
             },
             "directory": "/Users/trieyang/Desktop/DocPrism/nest/packages/microservices/ctx-host",
             "full_def_source": "  constructor(protected readonly args: T) {}",
-            "callee_documentation": "\n```typescript\n(property) BaseRpcContext<T = unknown[]>.args: T = unknown[]\n```\n",
+            "callee_documentation": null,
             "repo_relative_path": "packages/microservices/ctx-host/base-rpc.context.ts",
             "repo_relative_dir": "packages/microservices/ctx-host"
           },
@@ -25194,7 +25194,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -25370,7 +25370,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -25546,7 +25546,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -25722,7 +25722,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -25898,7 +25898,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -26074,7 +26074,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -26250,7 +26250,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -26426,7 +26426,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -26602,7 +26602,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -26778,7 +26778,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -26954,7 +26954,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -27130,7 +27130,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -27306,7 +27306,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -27482,7 +27482,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -27658,7 +27658,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -27834,7 +27834,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -28328,7 +28328,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -28504,7 +28504,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -28839,7 +28839,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -29015,7 +29015,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -29350,7 +29350,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -29526,7 +29526,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -29702,7 +29702,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -30037,7 +30037,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -30849,7 +30849,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -31168,7 +31168,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -31344,7 +31344,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -31663,7 +31663,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -31839,7 +31839,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -32015,7 +32015,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -32191,7 +32191,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -32431,7 +32431,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -32639,7 +32639,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -32926,7 +32926,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -33303,7 +33303,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "definition_via_node_module_import",
         "ambiguity": {
           "remaining": 1
         },
@@ -33314,23 +33314,23 @@
           "outer_ok": true,
           "outer_error": null,
           "outer_definition": {
-            "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/tools/gulp/tasks/clean.ts",
-            "path": "/Users/trieyang/Desktop/DocPrism/nest/tools/gulp/tasks/clean.ts",
+            "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/node_modules/gulp-clean/index.js",
+            "path": "/Users/trieyang/Desktop/DocPrism/nest/node_modules/gulp-clean/index.js",
             "range": {
               "start": {
-                "line0": 2,
-                "col0": 12
+                "line0": 6,
+                "col0": 0
               },
               "end": {
-                "line0": 2,
-                "col0": 17
+                "line0": 36,
+                "col0": 2
               }
             },
-            "directory": "/Users/trieyang/Desktop/DocPrism/nest/tools/gulp/tasks",
-            "full_def_source": "  ).pipe(clean());\n}\n\n/**\n * Cleans empty dirs\n */\nfunction cleanDirs(done: () => void) {\n  deleteEmpty.sync(`${source}/`);\n  done();\n}\n\ntask('clean:output', cleanOutput);\ntask('clean:dirs', cleanDirs);\ntask('clean:bundle', series('clean:output', 'clean:dirs'));",
-            "callee_documentation": "\n```typescript\nimport clean\n```\n",
-            "repo_relative_path": "tools/gulp/tasks/clean.ts",
-            "repo_relative_dir": "tools/gulp/tasks"
+            "directory": "/Users/trieyang/Desktop/DocPrism/nest/node_modules/gulp-clean",
+            "full_def_source": "module.exports = function (options) {\n  return through2.obj(function (file, enc, cb) {\n    // Paths are resolved by gulp\n    var filepath = file.path;\n    var cwd = file.cwd;\n    var relative = path.relative(cwd, filepath);\n\n    // Prevent mistakes with paths\n    if (!(relative.substr(0, 2) === '..') && relative !== '' || (options ? (options.force && typeof options.force === 'boolean') : false)) {\n      rimraf(filepath, function (error) {\n        if (error) {\n          this.emit('error', new utils.PluginError('gulp-clean', 'Unable to delete \"' + filepath + '\" file (' + error.message + ').'));\n        }\n        this.push(file);\n        cb();\n      }.bind(this));\n    } else if (relative === '') {\n      var msgCurrent = 'Cannot delete current working directory. (' + filepath + '). Use option force.';\n      utils.log('gulp-clean: ' + msgCurrent);\n      this.emit('error', new utils.PluginError('gulp-clean', msgCurrent));\n      this.push(file);\n      cb();\n    } else {\n      var msgOutside = 'Cannot delete files outside the current working directory. (' + filepath + '). Use option force.';\n      utils.log('gulp-clean: ' + msgOutside);\n      this.emit('error', new utils.PluginError('gulp-clean', msgOutside));\n      this.push(file);\n      cb();\n    }\n  });\n};",
+            "callee_documentation": null,
+            "repo_relative_path": "node_modules/gulp-clean/index.js",
+            "repo_relative_dir": "node_modules/gulp-clean"
           },
           "argument_usages_resolved": []
         }
@@ -34306,7 +34306,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },
@@ -34482,7 +34482,7 @@
         "dropped": {
           "d_ts": []
         },
-        "note": "go_to_source_definition_primary",
+        "note": "dropped_import_export_sites_kept=1",
         "ambiguity": {
           "remaining": 1
         },

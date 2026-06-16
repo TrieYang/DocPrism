@@ -8,6 +8,7 @@ from pathlib import Path
 from code_navigation_TypeScript import (
     Location,
     _definition_source_matches_symbol,
+    _extract_commonjs_default_export_body,
     _extract_ts_enum_member_definition,
     _extract_ts_property_definition,
     _find_definition_via_imports,
@@ -53,6 +54,17 @@ class TestNodeModuleImportFollow(unittest.TestCase):
         path, line0 = found
         self.assertIn("gulp-clean", str(path))
         self.assertEqual(line0, _find_commonjs_module_export_line(path))
+
+    def test_commonjs_export_body_is_complete(self):
+        entry = Path("nest/node_modules/gulp-clean/index.js")
+        if not entry.exists():
+            self.skipTest("gulp-clean not installed")
+        lines = entry.read_text(encoding="utf-8").splitlines()
+        snippet, start = _extract_commonjs_default_export_body(lines, 6)
+        self.assertIsNotNone(snippet)
+        self.assertGreater(snippet.count("\n"), 10)
+        self.assertIn("rimraf", snippet)
+        self.assertTrue(snippet.rstrip().endswith("};"))
 
 
 class TestEnumMemberExtraction(unittest.TestCase):

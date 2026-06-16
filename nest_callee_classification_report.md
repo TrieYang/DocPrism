@@ -20,7 +20,7 @@
 
 | Metric | Count | % |
 |--------|------:|--:|
-| External libraries | 26 | **14.0%** |
+| External libraries | 27 | **14.5%** |
 | Declaration / interface level retrieved | 81 | **43.5%** |
 | Runtime implementation retrieved | 105 | **56.5%** |
 
@@ -28,8 +28,8 @@
 
 | Origin | Declaration only | Runtime impl | Total |
 |--------|-----------------:|-------------:|------:|
-| **External** (node_modules) | 17 (65.4%) | 9 (34.6%) | 26 (14.0%) |
-| **Internal** (repo source) | 64 (40.0%) | 96 (60.0%) | 160 (86.0%) |
+| **External** (node_modules) | 17 (63.0%) | 10 (37.0%) | 27 (14.5%) |
+| **Internal** (repo source) | 64 (40.3%) | 95 (59.7%) | 159 (85.5%) |
 
 ### Runtime retrieval breakdown (105 rows)
 
@@ -61,7 +61,7 @@
 
 | Metric | Count | % |
 |--------|------:|--:|
-| External libraries | 44 | **21.6%** |
+| External libraries | 45 | **22.1%** |
 | Declaration / interface level retrieved | 99 | **48.5%** |
 | Runtime implementation retrieved | 105 | **51.5%** |
 
@@ -69,8 +69,8 @@
 
 | Origin | Declaration only | Runtime impl | Total |
 |--------|-----------------:|-------------:|------:|
-| **External** (node_modules) | 35 (79.5%) | 9 (20.5%) | 44 (21.6%) |
-| **Internal** (repo source) | 64 (40.0%) | 96 (60.0%) | 160 (78.4%) |
+| **External** (node_modules) | 35 (77.8%) | 10 (22.2%) | 45 (22.1%) |
+| **Internal** (repo source) | 64 (40.3%) | 95 (59.7%) | 159 (77.9%) |
 
 ### Impact of Prisma + lib.es5 on declaration rate
 
@@ -87,8 +87,8 @@
 
 | Scope | Has interface | % |
 |-------|-------------:|--:|
-| **Internal** (160) | 42 | **26.2%** |
-| **External** (26) | 17 | **65.4%** |
+| **Internal** (159) | 42 | **26.4%** |
+| **External** (27) | 17 | **63.0%** |
 | **All** (186) | 59 | **31.7%** |
 
 ---
@@ -99,8 +99,8 @@
 
 | Scope | Has interface | % |
 |-------|-------------:|--:|
-| **Internal** (160) | 42 | **26.2%** |
-| **External** (44) | 35 | **79.5%** |
+| **Internal** (159) | 42 | **26.4%** |
+| **External** (45) | 35 | **77.8%** |
 | **All** (204) | 77 | **37.7%** |
 
 ---
