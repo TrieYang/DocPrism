@@ -391,11 +391,22 @@ def _format_row(idx: int, row: Dict[str, Any]) -> List[str]:
     return lines
 
 
+def _eval_label_from_json_path(json_path: Optional[Path]) -> str:
+    if not json_path:
+        return "eval"
+    stem = json_path.stem
+    if stem.endswith("_navigation_results"):
+        return stem[: -len("_navigation_results")]
+    return stem
+
+
 def json_to_markdown(
     data: Dict[str, Any],
     *,
     dedupe: bool = True,
     group_callees: bool = False,
+    eval_label: str = "eval",
+    eval_json_name: str = "eval.json",
 ) -> str:
     summary = data.get("summary") or {}
     results: List[Dict[str, Any]] = data.get("results") or []
@@ -407,10 +418,10 @@ def json_to_markdown(
     callee_groups = _group_rows_by_callee(results) if group_callees else []
 
     out: List[str] = [
-        "# Hoppscotch code navigation results",
+        f"# {eval_label} code navigation results",
         "",
         "Generated from `code_navigation_TypeScript.resolve_from_snippet` "
-        "on samples in `hoppscotch.json`.",
+        f"on samples in `{eval_json_name}`.",
         "",
         "## Summary",
         "",
@@ -465,11 +476,15 @@ def main() -> None:
     )
     args = ap.parse_args()
     data = json.loads(args.json.read_text(encoding="utf-8"))
+    label = _eval_label_from_json_path(args.json)
+    eval_json_name = f"{label}.json"
     args.out.write_text(
         json_to_markdown(
             data,
             dedupe=not args.no_dedupe,
             group_callees=args.group_callees,
+            eval_label=label,
+            eval_json_name=eval_json_name,
         ),
         encoding="utf-8",
     )

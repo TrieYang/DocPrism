@@ -32,10 +32,14 @@ from typing import Any, Dict, List, Optional, Tuple
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 DOCPRISM_ROOT = SCRIPT_DIR
-HOPPSCOTCH_REPO_ROOT = DOCPRISM_ROOT / "hoppscotch"
+# Defaults (Hoppscotch); override via --eval-json / --repo-root / --path-prefix
+EVAL_REPO_ROOT = DOCPRISM_ROOT / "hoppscotch"
 EVAL_JSON = DOCPRISM_ROOT / "hoppscotch.json"
+EVAL_PATH_PREFIX = "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/"
 
-HOPPSCOTCH_PATH_PREFIX = "/Users/kyle/Documents/ubc/research/data/ts/hoppscotch/"
+# Back-compat aliases
+HOPPSCOTCH_REPO_ROOT = EVAL_REPO_ROOT
+HOPPSCOTCH_PATH_PREFIX = EVAL_PATH_PREFIX
 
 
 def load_eval_set(path: Path) -> list[dict]:
@@ -575,21 +579,27 @@ def extract_first_callee(code: str, tested_function: str) -> str | None:
     return None
 
 
-def json_filename_to_local_path(filename: str) -> Path:
-    """Convert absolute path from JSON to local path."""
-    if filename.startswith(HOPPSCOTCH_PATH_PREFIX):
-        rel = filename[len(HOPPSCOTCH_PATH_PREFIX) :]
+def json_filename_to_local_path(
+    filename: str,
+    *,
+    repo_root: Path,
+    path_prefix: str,
+) -> Path:
+    """Convert absolute path from JSON to local path under repo_root."""
+    repo_name = repo_root.name
+    if path_prefix and filename.startswith(path_prefix):
+        rel = filename[len(path_prefix) :]
+    elif f"/{repo_name}/" in filename:
+        rel = filename.split(f"/{repo_name}/", 1)[1]
     else:
-        if "/hoppscotch/" in filename:
-            rel = filename.split("/hoppscotch/", 1)[1]
-        else:
-            rel = Path(filename).name
-    return HOPPSCOTCH_REPO_ROOT / rel
+        rel = Path(filename).name
+    return repo_root / rel
 
 
 def _stub_resolve_shape(
     *,
     error: str,
+    repo_root: Path,
     tested_function: str = "",
     script_path_str: str = "",
     snippet: str = "",
@@ -598,7 +608,7 @@ def _stub_resolve_shape(
     return {
         "ok": False,
         "input": {
-            "repo_root": str(HOPPSCOTCH_REPO_ROOT),
+            "repo_root": str(repo_root),
             "script_path": script_path_str,
             "tested_function": tested_function,
             "snippet": snippet,
@@ -615,20 +625,26 @@ def _stub_resolve_shape(
     }
 
 
-def _eval_sample(item: dict) -> List[dict]:
+def _eval_sample(args: Tuple[dict, str, str]) -> List[dict]:
     """
-    Evaluate one hoppscotch.json sample: extract callees, run resolve_from_snippet on each.
+    Evaluate one eval JSON sample: extract callees, run resolve_from_snippet on each.
     Returns one dict per callee — each dict is eval metadata plus the full navigator output.
 
     Defined at module top level for ProcessPoolExecutor (imports inside worker).
+    args = (item, repo_root_str, path_prefix)
     """
+    item, repo_root_str, path_prefix = args
+    repo_root = Path(repo_root_str)
+
     sys.path.insert(0, str(DOCPRISM_ROOT))
     from code_navigation_TypeScript import resolve_from_snippet
 
     eid = item.get("id", "?")
     filename = item.get("filename", "")
     code = item.get("code", "")
-    script_path = json_filename_to_local_path(filename)
+    script_path = json_filename_to_local_path(
+        filename, repo_root=repo_root, path_prefix=path_prefix
+    )
 
     def one_row(
         *,
@@ -652,7 +668,7 @@ def _eval_sample(item: dict) -> List[dict]:
                 callee_index=0,
                 tested_function=None,
                 callee=None,
-                navigation=_stub_resolve_shape(error="missing code"),
+                navigation=_stub_resolve_shape(error="missing code", repo_root=repo_root),
             )
         ]
 
@@ -663,7 +679,9 @@ def _eval_sample(item: dict) -> List[dict]:
                 callee_index=0,
                 tested_function=None,
                 callee=None,
-                navigation=_stub_resolve_shape(error="could not extract tested_function"),
+                navigation=_stub_resolve_shape(
+                    error="could not extract tested_function", repo_root=repo_root
+                ),
             )
         ]
 
@@ -679,6 +697,7 @@ def _eval_sample(item: dict) -> List[dict]:
                 callee=callees[0],
                 navigation=_stub_resolve_shape(
                     error=f"file not found: {script_path}",
+                    repo_root=repo_root,
                     tested_function=tested_function,
                     script_path_str=str(script_path),
                     snippet=callees[0],
@@ -690,7 +709,7 @@ def _eval_sample(item: dict) -> List[dict]:
     for idx, callee in enumerate(callees):
         try:
             res = resolve_from_snippet(
-                repo_root=HOPPSCOTCH_REPO_ROOT,
+                repo_root=repo_root,
                 script_path=script_path,
                 tested_function=tested_function,
                 snippet=callee,
@@ -707,6 +726,7 @@ def _eval_sample(item: dict) -> List[dict]:
         except Exception as e:
             stub = _stub_resolve_shape(
                 error=f"{type(e).__name__}: {e}",
+                repo_root=repo_root,
                 tested_function=tested_function,
                 script_path_str=str(script_path),
                 snippet=callee,
@@ -743,11 +763,14 @@ def _pool_max_workers(num_items: int, workers: Optional[int]) -> int:
 
 
 def run_eval(
+    eval_json: Path,
+    repo_root: Path,
+    path_prefix: str,
     limit: Optional[int] = None,
     ids: Optional[list[int]] = None,
     workers: Optional[int] = None,
 ) -> Tuple[List[dict], int, int]:
-    eval_items = load_eval_set(EVAL_JSON)
+    eval_items = load_eval_set(eval_json)
     if ids is not None:
         id_set = set(ids)
         eval_items = [item for item in eval_items if item.get("id") in id_set]
@@ -758,33 +781,68 @@ def run_eval(
     if not eval_items:
         return [], max_workers, 0
 
+    worker_args = [
+        (item, str(repo_root), path_prefix) for item in eval_items
+    ]
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        per_sample = list(executor.map(_eval_sample, eval_items))
+        per_sample = list(executor.map(_eval_sample, worker_args))
     flat = [row for sample_rows in per_sample for row in sample_rows]
     skipped_no_callees = sum(1 for rows in per_sample if not rows)
     return flat, max_workers, skipped_no_callees
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Run code_navigation_TypeScript on hoppscotch.json evaluation set")
+    global EVAL_JSON, EVAL_REPO_ROOT, EVAL_PATH_PREFIX, HOPPSCOTCH_REPO_ROOT, HOPPSCOTCH_PATH_PREFIX
+
+    ap = argparse.ArgumentParser(description="Run code_navigation_TypeScript on a JSON evaluation set")
     ap.add_argument("--limit", type=int, default=None, help="Max number of items to run (default: all)")
     ap.add_argument("--ids", type=int, nargs="+", default=None, metavar="ID", help="Run only these evaluation IDs (e.g. --ids 14 79 95)")
     ap.add_argument("--output", "-o", type=str, default=None, help="Write summary output to this file as well as stdout")
+    ap.add_argument(
+        "--eval-json",
+        type=str,
+        default=None,
+        metavar="PATH",
+        help="Evaluation JSON (default: hoppscotch.json)",
+    )
+    ap.add_argument(
+        "--repo-root",
+        type=str,
+        default=None,
+        metavar="PATH",
+        help="Clone root for the evaluated repo (default: ./hoppscotch)",
+    )
+    ap.add_argument(
+        "--path-prefix",
+        type=str,
+        default=None,
+        metavar="PREFIX",
+        help="Absolute path prefix in JSON filenames (default: Kyle hoppscotch path)",
+    )
     ap.add_argument(
         "--results-json",
         type=str,
         default=None,
         metavar="PATH",
-        help="Write full JSON results to this path (default: hoppscotch_eval_results.json)",
+        help="Write full JSON results to this path (default: <eval-stem>_navigation_results.json)",
     )
     ap.add_argument("--workers", type=int, default=None, help="Number of parallel workers (default: min(32, number of samples))")
     args = ap.parse_args()
 
+    if args.eval_json:
+        EVAL_JSON = Path(args.eval_json).resolve()
+    if args.repo_root:
+        EVAL_REPO_ROOT = Path(args.repo_root).resolve()
+    if args.path_prefix is not None:
+        EVAL_PATH_PREFIX = args.path_prefix
+    HOPPSCOTCH_REPO_ROOT = EVAL_REPO_ROOT
+    HOPPSCOTCH_PATH_PREFIX = EVAL_PATH_PREFIX
+
     if not EVAL_JSON.exists():
         print(f"Eval file not found: {EVAL_JSON}", file=sys.stderr)
         sys.exit(1)
-    if not HOPPSCOTCH_REPO_ROOT.is_dir():
-        print(f"Hoppscotch repo root not found: {HOPPSCOTCH_REPO_ROOT}", file=sys.stderr)
+    if not EVAL_REPO_ROOT.is_dir():
+        print(f"Repo root not found: {EVAL_REPO_ROOT}", file=sys.stderr)
         sys.exit(1)
 
     out_lines: List[str] = []
@@ -793,8 +851,8 @@ def main():
         print(msg)
         out_lines.append(msg)
 
-    emit("Running code_navigation_TypeScript on hoppscotch.json evaluation set...")
-    emit(f"Repo root: {HOPPSCOTCH_REPO_ROOT}")
+    emit(f"Running code_navigation_TypeScript on {EVAL_JSON.name} evaluation set...")
+    emit(f"Repo root: {EVAL_REPO_ROOT}")
     if args.limit:
         emit(f"Limit: first {args.limit} items")
     if args.ids:
@@ -803,7 +861,12 @@ def main():
 
     start_time = time.perf_counter()
     results, pool_workers, skipped_no_callees = run_eval(
-        limit=args.limit, ids=args.ids, workers=args.workers
+        EVAL_JSON,
+        EVAL_REPO_ROOT,
+        EVAL_PATH_PREFIX,
+        limit=args.limit,
+        ids=args.ids,
+        workers=args.workers,
     )
     runtime_seconds = time.perf_counter() - start_time
     passed = [r for r in results if r.get("ok")]
@@ -866,7 +929,8 @@ def main():
                 emit(f"    file:   {r['script_path']}")
         emit()
 
-    out_json = Path(args.results_json).resolve() if args.results_json else (DOCPRISM_ROOT / "hoppscotch_eval_results.json")
+    default_results = DOCPRISM_ROOT / f"{EVAL_JSON.stem}_navigation_results.json"
+    out_json = Path(args.results_json).resolve() if args.results_json else default_results
     with open(out_json, "w", encoding="utf-8") as f:
         json.dump(
             {

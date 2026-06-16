@@ -1,6 +1,5 @@
 # Vendored evaluation repos (clone separately; too large for this repo)
-hoppscotch/
-n8n/
+nest/
 x64dbg_gui/
 
 # Dependencies & caches

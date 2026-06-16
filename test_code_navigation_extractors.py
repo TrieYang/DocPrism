@@ -3,12 +3,17 @@ from __future__ import annotations
 
 import re
 import unittest
+from pathlib import Path
 
 from code_navigation_TypeScript import (
     Location,
+    _definition_source_matches_symbol,
     _extract_ts_enum_member_definition,
     _extract_ts_property_definition,
+    _find_definition_via_imports,
+    _find_commonjs_module_export_line,
     _lsp_range_is_complete_declaration,
+    _resolve_node_module_entry,
     _symbol_identifier_pattern,
     _trim_trusted_lsp_snippet_to_symbol,
 )
@@ -24,6 +29,30 @@ class TestSymbolPatterns(unittest.TestCase):
     def test_bare_transaction_not_inside_dollar(self):
         text = "await transaction(async () => {})"
         self.assertIsNotNone(re.search(_symbol_identifier_pattern("transaction"), text))
+
+    def test_task_string_does_not_match_clean_type_pattern(self):
+        src = "task('clean:output', cleanOutput);\ntask('clean:dirs', cleanDirs);"
+        self.assertFalse(_definition_source_matches_symbol(src, "clean"))
+
+
+class TestNodeModuleImportFollow(unittest.TestCase):
+    def test_resolve_gulp_clean_entry(self):
+        script = Path("nest/tools/gulp/tasks/clean.ts")
+        if not script.exists():
+            self.skipTest("nest clone not present")
+        entry = _resolve_node_module_entry(script, "gulp-clean")
+        self.assertIsNotNone(entry)
+        self.assertTrue(str(entry).endswith("gulp-clean/index.js"))
+
+    def test_find_definition_via_namespace_import(self):
+        script = Path("nest/tools/gulp/tasks/clean.ts")
+        if not script.exists():
+            self.skipTest("nest clone not present")
+        found = _find_definition_via_imports(script, "clean", Path("nest"))
+        self.assertIsNotNone(found)
+        path, line0 = found
+        self.assertIn("gulp-clean", str(path))
+        self.assertEqual(line0, _find_commonjs_module_export_line(path))
 
 
 class TestEnumMemberExtraction(unittest.TestCase):

@@ -2145,6 +2145,20 @@ def _try_resolve_primary_go_to_source_definition(
         usage_kind=selector.kind,
     )
 
+    followed_module_entry = False
+    chosen_def, full_def_source, import_note = _maybe_follow_import_for_call_site(
+        script_path=script_path,
+        repo_root=repo_root,
+        doc_uri=doc_uri,
+        symbol_name=symbol_name_for_choice,
+        chosen_def=chosen_def,
+        full_def_source=full_def_source,
+        usage_hint=selector.name or "",
+    )
+    if import_note:
+        followed_module_entry = "node_module" in import_note
+        debug = {**debug, "note": import_note}
+
     declaration_surface_snapshot: Optional[Dict[str, Any]] = None
     upgraded_from_declaration = False
     runtime_implementation: Optional[Dict[str, Any]] = None
@@ -2202,7 +2216,12 @@ def _try_resolve_primary_go_to_source_definition(
                     debug = {**debug, "note": "primary_refined_via_document_symbols"}
         except Exception:
             pass
-        if not _definition_source_matches_symbol(full_def_source, symbol_name_for_choice):
+        if (
+            not followed_module_entry
+            and not _definition_source_matches_symbol(
+                full_def_source, symbol_name_for_choice
+            )
+        ):
             return None, client
 
     loc = chosen_def.loc
@@ -2226,9 +2245,14 @@ def _try_resolve_primary_go_to_source_definition(
     except Exception:
         pass
 
+    primary_note = debug.get("note") or "go_to_source_definition_primary"
+    if primary_note == "go_to_source_definition_primary" or import_note:
+        resolved_note = import_note or "go_to_source_definition_primary"
+    else:
+        resolved_note = primary_note
     result["chosen_definition_reason"] = {
         **debug,
-        "note": "go_to_source_definition_primary",
+        "note": resolved_note,
         "go_to_source_definition": True,
     }
     result["definitions"] = [
@@ -2281,6 +2305,49 @@ def _definition_source_looks_like_usage(
     return False
 
 
+def _resolve_node_module_entry(from_file: Path, specifier: str) -> Optional[Path]:
+    """Resolve a bare package specifier (e.g. ``gulp-clean``) to its main entry file."""
+    if specifier.startswith("."):
+        return None
+    search_dirs: List[Path] = []
+    cur = from_file.parent.resolve()
+    while True:
+        search_dirs.append(cur)
+        if cur.parent == cur:
+            break
+        cur = cur.parent
+    module_root = Path("node_modules") / specifier
+    for directory in search_dirs:
+        pkg_dir = (directory / module_root).resolve()
+        if not pkg_dir.is_dir():
+            continue
+        pkg_json = pkg_dir / "package.json"
+        main_rel = "index.js"
+        if pkg_json.is_file():
+            try:
+                data = json.loads(pkg_json.read_text(encoding="utf-8"))
+                main_rel = data.get("main") or main_rel
+            except Exception:
+                pass
+        for candidate_rel in (main_rel, "index.js", "index.mjs", "index.cjs"):
+            entry = (pkg_dir / candidate_rel).resolve()
+            if entry.is_file():
+                return entry
+    return None
+
+
+def _find_commonjs_module_export_line(path: Path) -> int:
+    """Return 0-based line of ``module.exports = function`` when present."""
+    try:
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return 0
+    for i, line in enumerate(lines):
+        if re.search(r"module\.exports\s*=\s*function\b", line):
+            return i
+    return 0
+
+
 def _find_definition_via_imports(
     script_path: Path,
     symbol_name: str,
@@ -2294,6 +2361,22 @@ def _find_definition_via_imports(
         text = script_path.read_text(encoding="utf-8", errors="replace")
     except Exception:
         return None
+
+    # ``import * as clean from 'gulp-clean'`` / ``import clean from 'pkg'`` — callable CJS module.
+    for pattern in (
+        rf"import\s+\*\s+as\s+{re.escape(symbol_name)}\s+from\s+['\"]([^'\"]+)['\"]",
+        rf"import\s+{re.escape(symbol_name)}\s+from\s+['\"]([^'\"]+)['\"]",
+    ):
+        m = re.search(pattern, text)
+        if not m:
+            continue
+        from_path_str = m.group(1)
+        if from_path_str.startswith("."):
+            continue
+        entry = _resolve_node_module_entry(script_path, from_path_str)
+        if entry is not None:
+            return (entry, _find_commonjs_module_export_line(entry))
+
     # Find import that mentions symbol_name: import { x, symbol_name, y } from 'path' or import symbol_name from 'path'
     imp_re = re.compile(
         r"import\s+(?:\{[^}]*\b" + re.escape(symbol_name) + r"\b[^}]*\}|"
@@ -2305,7 +2388,7 @@ def _find_definition_via_imports(
         if from_path_str.startswith("."):
             resolved = (script_path.parent / from_path_str).resolve()
         else:
-            continue  # node_modules; skip
+            continue  # other node_modules forms handled above
         if not resolved.exists():
             # TypeScript/JS often omit extension in imports; try .ts, .tsx, .js, .jsx
             for ext in (".ts", ".tsx", ".mts", ".js", ".jsx", ".mjs"):
@@ -2332,6 +2415,62 @@ def _find_definition_via_imports(
             if export_re.search(line):
                 return (resolved, i)
     return None
+
+
+def _maybe_follow_import_for_call_site(
+    *,
+    script_path: Path,
+    repo_root: Path,
+    doc_uri: str,
+    symbol_name: Optional[str],
+    chosen_def: DefCandidate,
+    full_def_source: Optional[str],
+    usage_hint: str,
+) -> Tuple[DefCandidate, Optional[str], Optional[str]]:
+    """
+    When LSP/go-to-source landed on a call site, follow imports to the real module body.
+    Returns (chosen_def, full_def_source, note).
+    """
+    if not symbol_name or not full_def_source:
+        return chosen_def, full_def_source, None
+    is_call_site = (
+        _definition_location_is_call_site_ast(chosen_def.path, chosen_def.loc)
+        or _definition_source_looks_like_usage(
+            chosen_def.loc,
+            symbol_name,
+            doc_uri,
+            full_def_source,
+        )
+    )
+    same_file_without_declaration = (
+        chosen_def.path.resolve() == script_path.resolve()
+        and not _definition_source_matches_symbol(full_def_source, symbol_name)
+    )
+    if not is_call_site and not same_file_without_declaration:
+        return chosen_def, full_def_source, None
+    found = _find_definition_via_imports(script_path, symbol_name, repo_root)
+    if not found:
+        return chosen_def, full_def_source, None
+    def_path_found, def_line0 = found
+    loc_found = Location(
+        uri=file_uri(def_path_found),
+        start_line=def_line0,
+        start_char=0,
+        end_line=def_line0,
+        end_char=0,
+    )
+    upgraded = _build_def_candidate(repo_root, loc_found)
+    upgraded_src = _read_definition_source(
+        loc_found, symbol_name, usage_hint=usage_hint
+    )
+    if not upgraded_src:
+        return chosen_def, full_def_source, None
+    note = (
+        "definition_via_node_module_import"
+        if "node_modules" in def_path_found.as_posix()
+        else "definition_via_imports_followed"
+    )
+    return upgraded, upgraded_src, note
 
 
 def _location_has_implementation_body(loc: Location, symbol_name: Optional[str]) -> bool:
@@ -2394,9 +2533,11 @@ def _definition_source_matches_symbol(source: Optional[str], symbol_name: str) -
         rf"\b(?:get|set)\s+{esc}\s*\(",
         rf"\b{esc}\s*:\s*(?:function\b|\([^)]*\)\s*=>)",
         rf"\[\s*['\"]{esc}['\"]\s*\]\s*=",
-        rf"\b{esc}\s*:\s*",
-        rf"\b{esc}\s*\??\s*:\s*",
+        # Require non-string context so task('clean:output') does not match symbol clean.
+        rf"(?<![\'\"])\b{esc}\s*:\s*(?!['\"])",
+        rf"(?<![\'\"])\b{esc}\s*\??\s*:\s*(?!['\"])",
         rf"(^|\n)\s*{esc}\s*=\s*",
+        r"module\.exports\s*=\s*function\b",
     )
     return any(re.search(p, source, re.M) for p in patterns)
 
