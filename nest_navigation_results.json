@@ -1,6 +1,6 @@
 {
   "summary": {
-    "runtime_seconds": 47.21,
+    "runtime_seconds": 42.5,
     "samples_skipped_no_callees": 6,
     "unique_sample_ids": 88,
     "callee_rows_total": 209,
@@ -11436,7 +11436,7 @@
               }
             },
             "directory": "/Users/trieyang/Desktop/DocPrism/nest/packages/core/injector",
-            "full_def_source": "  private readonly settledPromise: Promise<unknown>;\n  private settleFn!: (err?: unknown) => void;",
+            "full_def_source": "private settleFn!: (err?: unknown) => void;",
             "callee_documentation": null,
             "repo_relative_path": "packages/core/injector/settlement-signal.ts",
             "repo_relative_dir": "packages/core/injector"
@@ -11754,7 +11754,7 @@
               }
             },
             "directory": "/Users/trieyang/Desktop/DocPrism/nest/packages/core/injector",
-            "full_def_source": "  private readonly settledPromise: Promise<unknown>;\n  private settleFn!: (err?: unknown) => void;",
+            "full_def_source": "private settleFn!: (err?: unknown) => void;",
             "callee_documentation": null,
             "repo_relative_path": "packages/core/injector/settlement-signal.ts",
             "repo_relative_dir": "packages/core/injector"
@@ -22579,7 +22579,7 @@
             },
             "directory": "/Users/trieyang/Desktop/DocPrism/nest/packages/microservices/ctx-host",
             "full_def_source": "  constructor(protected readonly args: T) {}",
-            "callee_documentation": null,
+            "callee_documentation": "\n```typescript\n(property) BaseRpcContext<T = unknown[]>.args: T = unknown[]\n```\n",
             "repo_relative_path": "packages/microservices/ctx-host/base-rpc.context.ts",
             "repo_relative_dir": "packages/microservices/ctx-host"
           },
@@ -22755,7 +22755,7 @@
             },
             "directory": "/Users/trieyang/Desktop/DocPrism/nest/packages/microservices/ctx-host",
             "full_def_source": "  constructor(protected readonly args: T) {}",
-            "callee_documentation": null,
+            "callee_documentation": "\n```typescript\n(property) BaseRpcContext<T = unknown[]>.args: T = unknown[]\n```\n",
             "repo_relative_path": "packages/microservices/ctx-host/base-rpc.context.ts",
             "repo_relative_dir": "packages/microservices/ctx-host"
           },
@@ -22931,7 +22931,7 @@
             },
             "directory": "/Users/trieyang/Desktop/DocPrism/nest/packages/microservices/ctx-host",
             "full_def_source": "  constructor(protected readonly args: T) {}",
-            "callee_documentation": null,
+            "callee_documentation": "\n```typescript\n(property) BaseRpcContext<T = unknown[]>.args: T = unknown[]\n```\n",
             "repo_relative_path": "packages/microservices/ctx-host/base-rpc.context.ts",
             "repo_relative_dir": "packages/microservices/ctx-host"
           },
@@ -24691,7 +24691,7 @@
             },
             "directory": "/Users/trieyang/Desktop/DocPrism/nest/packages/microservices/ctx-host",
             "full_def_source": "  constructor(protected readonly args: T) {}",
-            "callee_documentation": null,
+            "callee_documentation": "\n```typescript\n(property) BaseRpcContext<T = unknown[]>.args: T = unknown[]\n```\n",
             "repo_relative_path": "packages/microservices/ctx-host/base-rpc.context.ts",
             "repo_relative_dir": "packages/microservices/ctx-host"
           },
@@ -25043,7 +25043,7 @@
             },
             "directory": "/Users/trieyang/Desktop/DocPrism/nest/packages/microservices/ctx-host",
             "full_def_source": "  constructor(protected readonly args: T) {}",
-            "callee_documentation": null,
+            "callee_documentation": "\n```typescript\n(property) BaseRpcContext<T = unknown[]>.args: T = unknown[]\n```\n",
             "repo_relative_path": "packages/microservices/ctx-host/base-rpc.context.ts",
             "repo_relative_dir": "packages/microservices/ctx-host"
           },
