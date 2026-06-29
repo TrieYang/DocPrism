@@ -2072,6 +2072,88 @@ def _upgrade_external_declaration_runtime(
     return chosen_def, full_def_source, trace, runtime_implementation
 
 
+def _declaration_surface_snapshot_from_def(chosen_def: DefCandidate) -> Dict[str, Any]:
+    return {
+        "path": chosen_def.path.as_posix(),
+        "uri": chosen_def.loc.uri,
+        "range": {
+            "start": {
+                "line0": chosen_def.loc.start_line,
+                "col0": chosen_def.loc.start_char,
+            },
+            "end": {
+                "line0": chosen_def.loc.end_line,
+                "col0": chosen_def.loc.end_char,
+            },
+        },
+    }
+
+
+def _try_external_declaration_runtime_upgrade(
+    client: Optional[GenericLSPClient],
+    repo_root: Path,
+    chosen_def: DefCandidate,
+    full_def_source: Optional[str],
+    symbol_name: Optional[str],
+) -> Tuple[bool, Optional[Dict[str, Any]], Optional[Dict[str, Any]], Optional[Dict[str, Any]]]:
+    """
+    Resolve runtime implementation for an external node_modules .d.ts definition.
+
+    Returns ``(upgraded, declaration_surface, runtime_implementation, ext_trace)``.
+    ``upgraded`` is True when ``ext_trace`` is not None.
+    """
+    if client is None or not chosen_def.is_d_ts or not chosen_def.in_node_modules:
+        return False, None, None, None
+
+    declaration_surface = _declaration_surface_snapshot_from_def(chosen_def)
+    _, _, ext_trace, runtime_implementation = _upgrade_external_declaration_runtime(
+        client,
+        repo_root,
+        chosen_def,
+        full_def_source,
+        symbol_name,
+    )
+    if ext_trace is None:
+        return False, None, None, None
+    return True, declaration_surface, runtime_implementation, ext_trace
+
+
+def _build_outer_definition(
+    *,
+    chosen_def: DefCandidate,
+    repo_root: Path,
+    full_def_source: Optional[str],
+    client: Optional[GenericLSPClient] = None,
+    declaration_surface: Optional[Dict[str, Any]] = None,
+    runtime_implementation: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Build the ``outer_definition`` payload from a chosen definition candidate."""
+    loc = chosen_def.loc
+    def_path = chosen_def.path
+    outer: Dict[str, Any] = {**loc.to_json()}
+    outer["path"] = def_path.as_posix()
+    outer["directory"] = def_path.parent.as_posix()
+    outer["full_def_source"] = full_def_source
+    if declaration_surface is not None:
+        outer["declaration_surface"] = declaration_surface
+    if runtime_implementation is not None:
+        outer["runtime_implementation"] = runtime_implementation
+    if client is not None:
+        try:
+            outer["callee_documentation"] = client.hover(loc.uri, loc.start_line, loc.start_char)
+        except Exception:
+            outer["callee_documentation"] = None
+    else:
+        outer["callee_documentation"] = None
+    try:
+        rel = def_path.resolve().relative_to(repo_root.resolve())
+        outer["repo_relative_path"] = rel.as_posix()
+        outer["repo_relative_dir"] = rel.parent.as_posix()
+    except Exception:
+        pass
+    return outer
+
+
 def _try_resolve_primary_go_to_source_definition(
     *,
     result: Dict[str, Any],
@@ -2145,40 +2227,22 @@ def _try_resolve_primary_go_to_source_definition(
         usage_kind=selector.kind,
     )
 
-    declaration_surface_snapshot: Optional[Dict[str, Any]] = None
-    upgraded_from_declaration = False
-    runtime_implementation: Optional[Dict[str, Any]] = None
-    if chosen_def.is_d_ts and chosen_def.in_node_modules:
-        declaration_surface_snapshot = {
-            "path": chosen_def.path.as_posix(),
-            "uri": chosen_def.loc.uri,
-            "range": {
-                "start": {
-                    "line0": chosen_def.loc.start_line,
-                    "col0": chosen_def.loc.start_char,
-                },
-                "end": {
-                    "line0": chosen_def.loc.end_line,
-                    "col0": chosen_def.loc.end_char,
-                },
-            },
-        }
-        uc, us, ext_trace, runtime_impl = _upgrade_external_declaration_runtime(
+    upgraded_from_declaration, declaration_surface_snapshot, runtime_implementation, ext_trace = (
+        _try_external_declaration_runtime_upgrade(
             client,
             repo_root,
             chosen_def,
             full_def_source,
             symbol_name_for_choice,
         )
-        if ext_trace is not None:
-            upgraded_from_declaration = True
-            runtime_implementation = runtime_impl
-            debug = {
-                **debug,
-                "external_runtime_resolution": ext_trace,
-            }
-        elif chosen_def.is_d_ts:
-            return None, client
+    )
+    if upgraded_from_declaration and ext_trace is not None:
+        debug = {
+            **debug,
+            "external_runtime_resolution": ext_trace,
+        }
+    elif chosen_def.is_d_ts and chosen_def.in_node_modules:
+        return None, client
 
     if (
         symbol_name_for_choice
@@ -2205,26 +2269,14 @@ def _try_resolve_primary_go_to_source_definition(
         if not _definition_source_matches_symbol(full_def_source, symbol_name_for_choice):
             return None, client
 
-    loc = chosen_def.loc
-    def_path = chosen_def.path
-    outer: Dict[str, Any] = {**loc.to_json()}
-    outer["path"] = def_path.as_posix()
-    outer["directory"] = def_path.parent.as_posix()
-    outer["full_def_source"] = full_def_source
-    if upgraded_from_declaration and declaration_surface_snapshot is not None:
-        outer["declaration_surface"] = declaration_surface_snapshot
-    if runtime_implementation is not None:
-        outer["runtime_implementation"] = runtime_implementation
-    try:
-        outer["callee_documentation"] = client.hover(loc.uri, loc.start_line, loc.start_char)
-    except Exception:
-        outer["callee_documentation"] = None
-    try:
-        rel = def_path.resolve().relative_to(repo_root.resolve())
-        outer["repo_relative_path"] = rel.as_posix()
-        outer["repo_relative_dir"] = rel.parent.as_posix()
-    except Exception:
-        pass
+    outer = _build_outer_definition(
+        chosen_def=chosen_def,
+        repo_root=repo_root,
+        full_def_source=full_def_source,
+        client=client,
+        declaration_surface=declaration_surface_snapshot if upgraded_from_declaration else None,
+        runtime_implementation=runtime_implementation,
+    )
 
     result["chosen_definition_reason"] = {
         **debug,
@@ -2702,10 +2754,8 @@ def resolve_from_snippet(
     doc_uri = file_uri(script_path)
     workspace_uris = ts_workspace_folder_uris(repo_root, script_path)
 
-    # Reuse a single long-lived LSP client per (root_uri, language_id) so we
-    # don't spawn a new tsserver for every callee (which can exhaust file
-    # descriptors). Resolution order: go-to-source-definition (LSP) first,
-    # then ts_navigation.js, then other LSP methods + heuristics.
+    #---phase 1 done: prep, find the file and clean the callee anchor, get uri for config files in the repo---
+    #---phase 2 start: find location of the callee in the file using ast---#
     client: Optional[GenericLSPClient] = None
 
     script_lines = text.splitlines()
@@ -2816,6 +2866,9 @@ def resolve_from_snippet(
 
     line0, col0 = _clamp_position_to_source(text, line0, col0)
     result["navigation_position"] = {"line0": line0, "col0": col0}
+    
+    #---phase 2 ends, the cursor is set to the exact callee position----#
+    #---phase 3 starts: try using go to source definition from lsp using set ups from step 1 and 2---#
 
     outer_item: Dict[str, Any] = {
         "outer_ok": False,
@@ -2843,61 +2896,13 @@ def resolve_from_snippet(
     if primary_result is not None:
         return primary_result
 
-    # Secondary: TS compiler API helper (ts_navigation.js).
+    # ---phase 4: TS compiler API helper (ts_navigation.js) if phase 3 didn't work--.
     ts_nav = _ts_navigation_resolve(repo_root, script_path, line0, col0)
     if ts_nav is not None and ts_nav.get("fullDefSource"):
         def_path_str = ts_nav.get("definitionPath")
         definition_range = ts_nav.get("definitionRange") or {}
-        node_kind = ts_nav.get("nodeKind")
 
-        # Heuristic: if the TS helper thinks the "definition" is the same
-        # file and a ClassDeclaration that *contains* the call site, it's
-        # likely returning the outer caller class rather than the callee
-        # definition (e.g. this.credentialsRepository.findOneBy(...)).
-        # In that case, treat it as a miss and let the LSP fallback (or
-        # ultimately "no definition found") instead of incorrectly
-        # returning the caller class as the callee definition.
         if def_path_str:
-            try:
-                def_path_candidate = Path(def_path_str).resolve()
-                script_resolved = script_path.resolve()
-                same_file = def_path_candidate == script_resolved
-            except Exception:
-                same_file = False
-        else:
-            same_file = False
-
-        contains_call = False
-        if definition_range:
-            try:
-                s = definition_range.get("start") or {}
-                e = definition_range.get("end") or {}
-                s_line = int(s.get("line", 0))
-                e_line = int(e.get("line", 0))
-                if s_line <= line0 <= e_line:
-                    contains_call = True
-            except Exception:
-                contains_call = False
-
-        is_outer_class = (
-            same_file
-            and contains_call
-            and isinstance(node_kind, str)
-            and node_kind == "ClassDeclaration"
-        )
-
-        # Keep ts_nav for `this.field` even when the "definition" span is the whole
-        # class: _read_definition_source(class_span, name) finds the constructor/property
-        # line in this file. Discarding ts_nav here previously forced LSP, where
-        # definition + typeDefinition produced two in-repo targets and the shorter-path
-        # tie-break picked pubsub.service.ts's inner `pubsub: LocalPubSub` over the
-        # inject site `pubsub: PubSubService` in the caller.
-        use_ts_nav_class_span = (
-            is_outer_class
-            and selector.kind == "attr"
-            and selector.receiver == "this"
-        )
-        if (not is_outer_class or use_ts_nav_class_span) and def_path_str:
             def_path = Path(def_path_str)
             start = definition_range.get("start") or {}
             end = definition_range.get("end") or {}
@@ -2908,173 +2913,52 @@ def resolve_from_snippet(
                 end_line=int(end.get("line", 0)),
                 end_char=int(end.get("character", 0)),
             )
-            outer: Dict[str, Any] = {**loc.to_json()}
-            outer["path"] = def_path.as_posix()
-            outer["directory"] = def_path.parent.as_posix()
-            # Prefer file+symbol re-read so JSDoc and full `export declare const` lines are included
-            # (ts_navigation.js often returns a narrow text slice from the AST node).
-            rich_def = _read_definition_source(
-                loc, selector.name, usage_hint=usage_hint
-            )
-            base_text = rich_def if rich_def else ts_nav.get("fullDefSource")
-            outer["full_def_source"] = _prefer_lib_global_constructor_snippet(
-                base_text,
+            cand_decl = _build_def_candidate(repo_root, loc)
+            full_def_source = _prefer_lib_global_constructor_snippet(
+                ts_nav.get("fullDefSource"),
                 def_path,
                 selector.name,
                 usage_kind=selector.kind,
             )
-            outer["callee_documentation"] = None
+
+            declaration_surface: Optional[Dict[str, Any]] = None
+            runtime_impl: Optional[Dict[str, Any]] = None
+            #---phase 4, step 2: got declaration from external declaration surface (.d.ts / .d.cts / …): try runtime upgrade.---
             try:
-                rel = def_path.resolve().relative_to(repo_root.resolve())
-                outer["repo_relative_path"] = rel.as_posix()
-                outer["repo_relative_dir"] = rel.parent.as_posix()
-            except Exception:
-                pass
+                from ts_external_runtime_impl import should_attempt_external_runtime_resolution
 
-            # External declaration surface: runtime upgrade (.d.ts / .d.cts / …).
-            # Go-to-source was already attempted at the call site in the primary path.
-            if "node_modules" in str(def_path).replace("\\", "/"):
-                try:
-                    from ts_external_runtime_impl import (
-                        is_declaration_surface,
-                        should_attempt_external_runtime_resolution,
-                    )
-
-                    if is_declaration_surface(def_path) and should_attempt_external_runtime_resolution(
-                        def_path, repo_root=repo_root
-                    ):
-                        if client is None:
-                            client = _get_or_create_ts_lsp_client(
-                                repo_root, script_path, lang_id, cmd, root_uri, workspace_uris
-                            )
-                            client.open_document(doc_uri, text)
-                            time.sleep(0.15)
-                        loc_decl = Location(
-                            uri=file_uri(def_path),
-                            start_line=int(start.get("line", 0)),
-                            start_char=int(start.get("character", 0)),
-                            end_line=int(end.get("line", 0)),
-                            end_char=int(end.get("character", 0)),
+                if should_attempt_external_runtime_resolution(def_path, repo_root=repo_root):
+                    if client is None:
+                        client = _get_or_create_ts_lsp_client(
+                            repo_root, script_path, lang_id, cmd, root_uri, workspace_uris
                         )
-                        cand_decl = _build_def_candidate(repo_root, loc_decl)
-                        uc, us, ext_trace, runtime_impl = _upgrade_external_declaration_runtime(
+                        client.open_document(doc_uri, text)
+                        time.sleep(0.15)
+                    _, declaration_surface, runtime_impl, ext_trace = (
+                        _try_external_declaration_runtime_upgrade(
                             client,
                             repo_root,
                             cand_decl,
-                            outer.get("full_def_source"),
+                            full_def_source,
                             selector.name,
                         )
-                        if ext_trace is not None:
-                            outer["declaration_surface"] = {
-                                "path": def_path.as_posix(),
-                                "uri": loc_decl.uri,
-                                "range": {
-                                    "start": {
-                                        "line0": loc_decl.start_line,
-                                        "col0": loc_decl.start_char,
-                                    },
-                                    "end": {
-                                        "line0": loc_decl.end_line,
-                                        "col0": loc_decl.end_char,
-                                    },
-                                },
-                            }
-                            if runtime_impl is not None:
-                                outer["runtime_implementation"] = runtime_impl
-                            result["chosen_definition_reason"] = {
-                                "note": "external_runtime_resolution_after_ts_nav",
-                                "external_runtime_resolution": ext_trace,
-                            }
-                except Exception:
-                    pass
+                    )
+                    if ext_trace is not None and declaration_surface is not None:
+                        result["chosen_definition_reason"] = {
+                            "note": "external_runtime_resolution_after_ts_nav",
+                            "external_runtime_resolution": ext_trace,
+                        }
+            except Exception:
+                pass
 
-            # Validate symbol anchoring on the fast path as well.
-            if selector.name and not _definition_source_matches_symbol(
-                outer.get("full_def_source"), selector.name
-            ):
-                try:
-                    client_fast = _get_or_create_ts_lsp_client(
-                        repo_root, script_path, lang_id, cmd, root_uri, workspace_uris
-                    )
-                    syms = client_fast.document_symbols(outer.get("uri") or loc.uri)
-                    parent_hint = (
-                        selector.receiver.split(".")[-1].strip()
-                        if selector.receiver
-                        else None
-                    )
-                    sym_loc = _find_symbol_location_from_document_symbols(
-                        syms,
-                        uri=outer.get("uri") or loc.uri,
-                        symbol_name=selector.name,
-                        hint_line0=int((outer.get("range") or {}).get("start", {}).get("line0", 0)),
-                        parent_name_hint=parent_hint,
-                    )
-                    if sym_loc is not None:
-                        refined_path = uri_to_path(sym_loc.uri)
-                        refined_src = _read_definition_source(
-                            sym_loc, selector.name, usage_hint=usage_hint
-                        )
-                        if _definition_source_matches_symbol(refined_src, selector.name):
-                            outer["uri"] = sym_loc.uri
-                            outer["path"] = refined_path.as_posix()
-                            outer["directory"] = refined_path.parent.as_posix()
-                            outer["range"] = {
-                                "start": {"line0": sym_loc.start_line, "col0": sym_loc.start_char},
-                                "end": {"line0": sym_loc.end_line, "col0": sym_loc.end_char},
-                            }
-                            outer["full_def_source"] = refined_src
-                            try:
-                                rel3 = refined_path.resolve().relative_to(repo_root.resolve())
-                                outer["repo_relative_path"] = rel3.as_posix()
-                                outer["repo_relative_dir"] = rel3.parent.as_posix()
-                            except Exception:
-                                pass
-                            result["chosen_definition_reason"] = {
-                                **(result.get("chosen_definition_reason") or {}),
-                                "note": "fast_path_refined_via_document_symbols",
-                            }
-                except Exception:
-                    pass
-
-            if (
-                selector.name
-                and not _definition_source_matches_symbol(outer.get("full_def_source"), selector.name)
-                and isinstance(outer.get("declaration_surface"), dict)
-            ):
-                ds = outer.get("declaration_surface") or {}
-                ds_range = ds.get("range") or {}
-                ds_start = ds_range.get("start") or {}
-                ds_end = ds_range.get("end") or {}
-                decl_loc = Location(
-                    uri=str(ds.get("uri") or ""),
-                    start_line=int(ds_start.get("line0", 0)),
-                    start_char=int(ds_start.get("col0", 0)),
-                    end_line=int(ds_end.get("line0", 0)),
-                    end_char=int(ds_end.get("col0", 0)),
-                )
-                decl_path = uri_to_path(decl_loc.uri)
-                decl_src = _read_definition_source(
-                    decl_loc, selector.name, usage_hint=usage_hint
-                )
-                if _definition_source_matches_symbol(decl_src, selector.name):
-                    outer["uri"] = decl_loc.uri
-                    outer["path"] = decl_path.as_posix()
-                    outer["directory"] = decl_path.parent.as_posix()
-                    outer["range"] = {
-                        "start": {"line0": decl_loc.start_line, "col0": decl_loc.start_char},
-                        "end": {"line0": decl_loc.end_line, "col0": decl_loc.end_char},
-                    }
-                    outer["full_def_source"] = decl_src
-                    try:
-                        rel4 = decl_path.resolve().relative_to(repo_root.resolve())
-                        outer["repo_relative_path"] = rel4.as_posix()
-                        outer["repo_relative_dir"] = rel4.parent.as_posix()
-                    except Exception:
-                        pass
-                    result["chosen_definition_reason"] = {
-                        **(result.get("chosen_definition_reason") or {}),
-                        "note": "fast_path_runtime_unresolved_fell_back_to_declaration",
-                    }
+            outer = _build_outer_definition(
+                chosen_def=cand_decl,
+                repo_root=repo_root,
+                full_def_source=full_def_source,
+                client=None,
+                declaration_surface=declaration_surface,
+                runtime_implementation=runtime_impl,
+            )
 
             outer_item["outer_ok"] = True
             outer_item["outer_definition"] = outer
@@ -3082,17 +2966,14 @@ def resolve_from_snippet(
             result["definitions"] = [outer_item]
             result["ok"] = True
             return result
+    # phase 5: LSP go to definition / typeDefinition / implementation if ts_navigation.js failed
 
-    # Tertiary: LSP definition / typeDefinition / implementation if ts_navigation.js failed
     try:
         if client is None:
             client = _get_or_create_ts_lsp_client(
                 repo_root, script_path, lang_id, cmd, root_uri, workspace_uris
             )
 
-            # (Re)open the current document so the LSP sees the latest
-            # text. GenericLSPClient is responsible for handling multiple
-            # open_document calls for the same URI.
             client.open_document(doc_uri, text)
             time.sleep(0.2)
 
@@ -3105,22 +2986,14 @@ def resolve_from_snippet(
                 except Exception:
                     pass
 
-        source_def_locs: List[Location] = []
-        if use_go_to_source_definition:
-            try:
-                source_def_locs = client.goto_source_definition(doc_uri, line0, col0)
-            except Exception:
-                source_def_locs = []
-
         if selector.kind == "attr":
             locs = []
-            locs.extend(source_def_locs)
             locs.extend(client.goto_definition(doc_uri, line0, col0))
             locs.extend(client.goto_type_definition(doc_uri, line0, col0))
             locs.extend(client.goto_implementation(doc_uri, line0, col0))
             locs = _dedupe_locations(locs)
         else:
-            locs = list(source_def_locs)
+            locs = []
             locs.extend(client.goto_implementation(doc_uri, line0, col0))
             if not locs:
                 locs.extend(client.goto_definition(doc_uri, line0, col0))
@@ -3128,8 +3001,6 @@ def resolve_from_snippet(
             if not locs:
                 locs = client.goto_type_definition(doc_uri, line0, col0)
             locs = _dedupe_locations(locs)
-        if source_def_locs:
-            result["source_definition_locations"] = [loc.to_json() for loc in source_def_locs]
     except Exception as e:
         result["error"] = f"LSP definition request failed: {e}"
         return result
@@ -3162,52 +3033,8 @@ def resolve_from_snippet(
         symbol_name=symbol_name_for_choice,
         usage_kind=selector.kind,
         prefer_same_document_uri=prefer_same_doc_uri,
-        preferred_locations=source_def_locs or None if use_go_to_source_definition else None,
     )
     result["chosen_definition_reason"] = debug
-    if (
-        use_go_to_source_definition
-        and source_def_locs
-        and debug.get("note")
-        and "preferred_go_to_source_definition" in str(debug.get("note"))
-    ):
-        result["chosen_definition_reason"] = {
-            **debug,
-            "go_to_source_definition": True,
-        }
-
-    # If the only definition we have is an import/export site, try a second hop: go to
-    # definition from that location to reach the actual implementation (e.g. successToast
-    # in folders.ts import -> notifications.ts).
-    if (
-        chosen_def is not None
-        and symbol_name_for_choice
-        and _definition_source_is_import_or_export(chosen_def.loc, symbol_name_for_choice)
-    ):
-        try:
-            second_locs = client.goto_definition(
-                chosen_def.loc.uri,
-                chosen_def.loc.start_line,
-                chosen_def.loc.start_char,
-            )
-            if second_locs:
-                second_chosen, _ = _choose_one_definition(
-                    repo_root,
-                    second_locs,
-                    symbol_name=symbol_name_for_choice,
-                    usage_kind=selector.kind,
-                    prefer_same_document_uri=prefer_same_doc_uri,
-                )
-                if second_chosen is not None and not _definition_source_is_import_or_export(
-                    second_chosen.loc, symbol_name_for_choice
-                ):
-                    chosen_def = second_chosen
-                    result["chosen_definition_reason"] = {
-                        **debug,
-                        "note": "second_hop_from_import_to_definition",
-                    }
-        except Exception:
-            pass
 
     if chosen_def is None:
         outer_item["outer_error"] = "No valid implementation found after filtering."
@@ -3216,170 +3043,29 @@ def resolve_from_snippet(
         result["ok"] = False
         return result
 
-    # Ensure the chosen definition's source actually references the symbol (reject wrong
-    # LSP results like type RejectFn for 'reject', or interface Array for 'getHighestNode').
-    remaining = list(locs)
-    full_def_source = None
-    while chosen_def is not None:
-        full_def_source = _read_definition_source(
-            chosen_def.loc,
-            symbol_name_for_choice,
-            usage_hint=usage_hint,
-        )
-        if (
-            selector.kind == "attr"
-            and symbol_name_for_choice
-            and not _definition_source_matches_symbol(full_def_source, symbol_name_for_choice)
-        ):
-            try:
-                lines = chosen_def.path.read_text(encoding="utf-8", errors="replace").splitlines()
-                member_src, sym_line = _extract_ts_symbol_definition(
-                    lines, symbol_name_for_choice, chosen_def.loc.start_line
-                )
-                if not member_src:
-                    member_src, sym_line = _extract_ts_enum_member_definition(
-                        lines, symbol_name_for_choice, chosen_def.loc.start_line
-                    )
-                if not member_src:
-                    member_src = _extract_ts_property_definition(
-                        lines, symbol_name_for_choice, chosen_def.loc.start_line
-                    )
-                    sym_line = None
-                if member_src and _definition_source_matches_symbol(member_src, symbol_name_for_choice):
-                    if sym_line is not None:
-                        full_def_source = _append_preceding_jsdoc_to_snippet(
-                            lines, member_src, sym_line
-                        )
-                    else:
-                        full_def_source = member_src
-                    break
-            except Exception:
-                pass
-        # LSP-first refinement: when source doesn't match the selected symbol, ask
-        # TypeScript for symbols in this file and jump directly to the symbol entry.
-        if (
-            chosen_def is not None
-            and symbol_name_for_choice
-            and not _definition_source_matches_symbol(full_def_source, symbol_name_for_choice)
-        ):
-            try:
-                syms = client.document_symbols(chosen_def.loc.uri)
-                sym_loc = _find_symbol_location_from_document_symbols(
-                    syms,
-                    uri=chosen_def.loc.uri,
-                    symbol_name=symbol_name_for_choice,
-                    hint_line0=chosen_def.loc.start_line,
-                    parent_name_hint=receiver_parent_hint,
-                )
-                if sym_loc is not None:
-                    refined = _build_def_candidate(repo_root, sym_loc)
-                    refined_src = _read_definition_source(
-                        refined.loc,
-                        symbol_name_for_choice,
-                        usage_hint=usage_hint,
-                    )
-                    if _definition_source_matches_symbol(refined_src, symbol_name_for_choice):
-                        chosen_def = refined
-                        full_def_source = refined_src
-                        result["chosen_definition_reason"] = {
-                            **(result.get("chosen_definition_reason") or {}),
-                            "note": "refined_via_document_symbols",
-                        }
-                        break
-            except Exception:
-                pass
-        if not symbol_name_for_choice or _definition_source_matches_symbol(
-            full_def_source, symbol_name_for_choice
-        ):
-            break
-        remaining = [L for L in remaining if L != chosen_def.loc]
-        if not remaining:
-            chosen_def = None
-            break
-        chosen_def, debug = _choose_one_definition(
-            repo_root,
-            remaining,
-            symbol_name=symbol_name_for_choice,
-            usage_kind=selector.kind,
-            prefer_same_document_uri=prefer_same_doc_uri,
-        )
-        result["chosen_definition_reason"] = debug
-
-    if chosen_def is None and symbol_name_for_choice:
-        # Retry with implementation-only: definition/typeDefinition may have returned wrong symbol
-        try:
-            impl_locs = client.goto_implementation(doc_uri, line0, col0)
-            if impl_locs:
-                chosen_def, _ = _choose_one_definition(
-                    repo_root,
-                    impl_locs,
-                    symbol_name=symbol_name_for_choice,
-                    usage_kind=selector.kind,
-                    prefer_same_document_uri=prefer_same_doc_uri,
-                )
-                if chosen_def is not None:
-                    full_def_source = _read_definition_source(
-                        chosen_def.loc,
-                        symbol_name_for_choice,
-                        usage_hint=usage_hint,
-                    )
-                    if _definition_source_matches_symbol(
-                        full_def_source, symbol_name_for_choice
-                    ):
-                        pass  # use chosen_def and full_def_source below
-        except Exception:
-            pass
-
-    if chosen_def is None:
-        outer_item["outer_error"] = (
-            f"Chosen definition source does not reference symbol {symbol_name_for_choice!r}."
-        )
-        result["definitions"] = [outer_item]
-        result["error"] = outer_item["outer_error"]
-        result["ok"] = False
-        return result
-
-    # When LSP returned a call site as the definition, follow imports or do a second LSP hop.
-    # Use AST to detect call sites (call_expression / new_expression) so we don't misclassify
-    # method definitions or other declaration forms; fall back to heuristic when AST unavailable.
-    _is_call_site = (
-        _definition_location_is_call_site_ast(chosen_def.path, chosen_def.loc)
-        or _definition_source_looks_like_usage(
-            chosen_def.loc,
-            symbol_name_for_choice,
-            doc_uri,
-            full_def_source,
-        )
+    full_def_source = _read_definition_source(
+        chosen_def.loc,
+        symbol_name_for_choice,
+        usage_hint=usage_hint,
     )
-    if (
-        chosen_def is not None
-        and full_def_source is not None
-        and symbol_name_for_choice
-        and _is_call_site
-    ):
-        found = _find_definition_via_imports(script_path, symbol_name_for_choice, repo_root)
-        if found:
-            def_path_found, def_line0 = found
-            loc_found = Location(
-                uri=file_uri(def_path_found),
-                start_line=def_line0,
-                start_char=0,
-                end_line=def_line0,
-                end_char=0,
-            )
-            chosen_def = _build_def_candidate(repo_root, loc_found)
-            full_def_source = _read_definition_source(
-                loc_found, symbol_name_for_choice, usage_hint=usage_hint
-            )
-            if full_def_source:
-                result["chosen_definition_reason"] = {
-                    **result.get("chosen_definition_reason", {}),
-                    "note": "definition_via_imports_followed",
-                }
-
-        # If still a call site (same-file call or lib call, imports didn't help),
-        # do a second LSP hop from the current location to get the real definition.
-        _still_call_site = (
+    full_def_source = _prefer_lib_global_constructor_snippet(
+        full_def_source,
+        chosen_def.path,
+        symbol_name_for_choice,
+        usage_kind=selector.kind,
+    )
+    #---phase 5: step 2---
+    # Second hop when LSP landed on a non-definition site (import/re-export or call usage).
+    # can be merged with phase 3
+    # module 
+    fix_import = bool(
+        symbol_name_for_choice
+        and _definition_source_is_import_or_export(chosen_def.loc, symbol_name_for_choice)
+    )
+    fix_call = bool(
+        symbol_name_for_choice
+        and full_def_source
+        and (
             _definition_location_is_call_site_ast(chosen_def.path, chosen_def.loc)
             or _definition_source_looks_like_usage(
                 chosen_def.loc,
@@ -3388,7 +3074,44 @@ def resolve_from_snippet(
                 full_def_source,
             )
         )
-        if chosen_def is not None and full_def_source is not None and _still_call_site:
+    )
+
+    if fix_import or fix_call:
+        if fix_call:
+            found = _find_definition_via_imports(script_path, symbol_name_for_choice, repo_root)
+            if found:
+                def_path_found, def_line0 = found
+                loc_found = Location(
+                    uri=file_uri(def_path_found),
+                    start_line=def_line0,
+                    start_char=0,
+                    end_line=def_line0,
+                    end_char=0,
+                )
+                chosen_def = _build_def_candidate(repo_root, loc_found)
+                full_def_source = _read_definition_source(
+                    loc_found, symbol_name_for_choice, usage_hint=usage_hint
+                )
+                if full_def_source:
+                    result["chosen_definition_reason"] = {
+                        **result.get("chosen_definition_reason", {}),
+                        "note": "definition_via_imports_followed",
+                    }
+                    fix_call = bool(
+                        _definition_location_is_call_site_ast(chosen_def.path, chosen_def.loc)
+                        or _definition_source_looks_like_usage(
+                            chosen_def.loc,
+                            symbol_name_for_choice,
+                            doc_uri,
+                            full_def_source,
+                        )
+                    )
+
+        fix_import = bool(
+            symbol_name_for_choice
+            and _definition_source_is_import_or_export(chosen_def.loc, symbol_name_for_choice)
+        )
+        if fix_import or fix_call:
             try:
                 second_locs = client.goto_definition(
                     chosen_def.loc.uri,
@@ -3396,28 +3119,31 @@ def resolve_from_snippet(
                     chosen_def.loc.start_char,
                 )
                 if second_locs:
-                    second_candidates_with_def = [
-                        loc
-                        for loc in second_locs
-                        if not _definition_location_is_call_site_ast(
-                            uri_to_path(loc.uri), loc
-                        )
-                        and not _definition_source_looks_like_usage(
-                            loc,
-                            symbol_name_for_choice,
-                            doc_uri,
-                            _read_definition_source(
+                    if fix_call:
+                        second_candidates_with_def = [
+                            loc
+                            for loc in second_locs
+                            if not _definition_location_is_call_site_ast(
+                                uri_to_path(loc.uri), loc
+                            )
+                            and not _definition_source_looks_like_usage(
                                 loc,
                                 symbol_name_for_choice,
-                                usage_hint=usage_hint,
-                            ),
+                                doc_uri,
+                                _read_definition_source(
+                                    loc,
+                                    symbol_name_for_choice,
+                                    usage_hint=usage_hint,
+                                ),
+                            )
+                        ]
+                        pool = (
+                            second_candidates_with_def
+                            if second_candidates_with_def
+                            else second_locs
                         )
-                    ]
-                    pool = (
-                        second_candidates_with_def
-                        if second_candidates_with_def
-                        else second_locs
-                    )
+                    else:
+                        pool = second_locs
                     second_chosen, _ = _choose_one_definition(
                         repo_root,
                         pool,
@@ -3431,63 +3157,50 @@ def resolve_from_snippet(
                             symbol_name_for_choice,
                             usage_hint=usage_hint,
                         )
-                        # Accept only if we're confident it's a definition (not a call site)
-                        _second_is_call = _definition_location_is_call_site_ast(
-                            second_chosen.path, second_chosen.loc
-                        )
-                        _second_looks_usage = _definition_source_looks_like_usage(
-                            second_chosen.loc,
-                            symbol_name_for_choice,
-                            doc_uri,
-                            second_src or "",
-                        )
-                        if (
-                            second_src
-                            and not _second_is_call
-                            and not _second_looks_usage
-                        ):
+                        accept = bool(second_src)
+                        if accept and fix_import:
+                            accept = not _definition_source_is_import_or_export(
+                                second_chosen.loc, symbol_name_for_choice
+                            )
+                        if accept and fix_call:
+                            accept = not _definition_location_is_call_site_ast(
+                                second_chosen.path, second_chosen.loc
+                            ) and not _definition_source_looks_like_usage(
+                                second_chosen.loc,
+                                symbol_name_for_choice,
+                                doc_uri,
+                                second_src or "",
+                            )
+                        if accept:
                             chosen_def = second_chosen
                             full_def_source = second_src
                             result["chosen_definition_reason"] = {
                                 **result.get("chosen_definition_reason", {}),
-                                "note": "second_hop_from_call_site_to_definition",
+                                "note": (
+                                    "second_hop_from_import_to_definition"
+                                    if fix_import and not fix_call
+                                    else "second_hop_from_call_site_to_definition"
+                                ),
                             }
             except Exception:
                 pass
 
-    declaration_surface_snapshot: Optional[Dict[str, Any]] = None
-    upgraded_from_declaration = False
-    runtime_implementation: Optional[Dict[str, Any]] = None
-    if client is not None and chosen_def.is_d_ts and chosen_def.in_node_modules:
-        declaration_surface_snapshot = {
-            "path": chosen_def.path.as_posix(),
-            "uri": chosen_def.loc.uri,
-            "range": {
-                "start": {
-                    "line0": chosen_def.loc.start_line,
-                    "col0": chosen_def.loc.start_char,
-                },
-                "end": {
-                    "line0": chosen_def.loc.end_line,
-                    "col0": chosen_def.loc.end_char,
-                },
-            },
-        }
-        uc, us, ext_trace, runtime_impl = _upgrade_external_declaration_runtime(
+    upgraded_from_declaration, declaration_surface_snapshot, runtime_implementation, ext_trace = (
+        _try_external_declaration_runtime_upgrade(
+        ## python parse to AST 
             client,
             repo_root,
             chosen_def,
             full_def_source,
             symbol_name_for_choice,
         )
-        if ext_trace is not None:
-            upgraded_from_declaration = True
-            runtime_implementation = runtime_impl
-            result["chosen_definition_reason"] = {
-                **(result.get("chosen_definition_reason") or {}),
-                "external_runtime_resolution": ext_trace,
-            }
-
+    )
+    if ext_trace is not None:
+        result["chosen_definition_reason"] = {
+            **(result.get("chosen_definition_reason") or {}),
+            "external_runtime_resolution": ext_trace,
+        }
+    #---phase 6: step 2---
     # After external runtime upgrade, verify symbol anchoring again. Some packages (fp-ts,
     # prisma generated clients) can still return broad top-of-file windows from runtime files.
     if (
@@ -3520,8 +3233,7 @@ def resolve_from_snippet(
                     }
         except Exception:
             pass
-        # If runtime upgrade still isn't anchored to the symbol, prefer the original
-        # declaration surface over a misleading top-of-file runtime snippet.
+        # If runtime upgrade still isn't anchored to the symbol, return the original declaration surface.
         if (
             declaration_surface_snapshot is not None
             and not _definition_source_matches_symbol(full_def_source, symbol_name_for_choice)
@@ -3552,28 +3264,17 @@ def resolve_from_snippet(
             except Exception:
                 pass
 
-    loc = chosen_def.loc
-    def_path = chosen_def.path
-    outer: Dict[str, Any] = {**loc.to_json()}
-    outer["path"] = def_path.as_posix()
-    outer["directory"] = def_path.parent.as_posix()
-    outer["full_def_source"] = full_def_source
-    if upgraded_from_declaration and declaration_surface_snapshot is not None:
-        outer["declaration_surface"] = declaration_surface_snapshot
-    if runtime_implementation is not None:
-        outer["runtime_implementation"] = runtime_implementation
-    try:
-        outer["callee_documentation"] = client.hover(loc.uri, loc.start_line, loc.start_char)
-    except Exception:
-        outer["callee_documentation"] = None
-
-    try:
-        rel = def_path.resolve().relative_to(repo_root.resolve())
-        outer["repo_relative_path"] = rel.as_posix()
-        outer["repo_relative_dir"] = rel.parent.as_posix()
-    except Exception:
-        pass
-
+    outer = _build_outer_definition(
+        chosen_def=chosen_def,
+        repo_root=repo_root,
+        full_def_source=full_def_source,
+        client=client,
+        declaration_surface=declaration_surface_snapshot if upgraded_from_declaration else None,
+        runtime_implementation=runtime_implementation,
+    )
+    #---phase 7---- check the nested callee
+    #--- edit this to be ast separated and resurvie
+    
     nested_recs: List[Dict[str, Any]] = []
     for u in _nested_usages_in_snippet(snippet, selector.name):
         try:

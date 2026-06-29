@@ -1,0 +1,78 @@
+Running code_navigation_TypeScript on puppeteer.json evaluation set...
+Repo root: /Users/trieyang/Desktop/DocPrism/puppeteer
+
+======================================================================
+SUMMARY
+======================================================================
+Process pool:   max_workers=3 (override: --workers or HOPPSCOTCH_CODE_NAV_EVAL_WORKERS)
+Runtime:        263.88s
+Samples skipped (no extractable callees): 22
+Samples (ids):    78
+Callee rows:      246 total, 246 ok, 0 failed
+Row pass rate:    100.0%
+Samples all ok:   78 / 78 (every callee row succeeded for that sample)
+
+--- OK rows (first 30) ---
+  sample=1 idx=0 fn=path -> packages/browsers/src/Cache.ts
+    callee: 'cache.installationDir(...)'
+  sample=1 idx=1 fn=path -> packages/browsers/src/Cache.ts
+    callee: 'this.browser'
+  sample=1 idx=2 fn=path -> packages/browsers/src/Cache.ts
+    callee: 'this.platform'
+  sample=1 idx=3 fn=path -> packages/browsers/src/Cache.ts
+    callee: 'this.buildId'
+  sample=2 idx=0 fn=syncPreferences -> node_modules/@types/node/path.d.ts
+    callee: "path.join(options.path, 'prefs.js')"
+  sample=2 idx=1 fn=syncPreferences -> node_modules/@types/node/path.d.ts
+    callee: "path.join(options.path, 'user.js')"
+  sample=2 idx=2 fn=syncPreferences -> (no path)
+    callee: 'Object.entries(options.preferences)'
+  sample=2 idx=3 fn=syncPreferences -> (no path)
+    callee: 'JSON.stringify(key)'
+  sample=2 idx=4 fn=syncPreferences -> (no path)
+    callee: 'JSON.stringify(value)'
+  sample=2 idx=5 fn=syncPreferences -> (no path)
+    callee: 'Promise.allSettled(...)'
+  sample=2 idx=6 fn=syncPreferences -> node_modules/@types/node/fs/promises.d.ts
+    callee: "fs.promises.writeFile(userPath, lines.join('\\n'))"
+  sample=2 idx=7 fn=syncPreferences -> packages/browsers/src/browser-data/firefox.ts
+    callee: 'backupFile(userPath)'
+  sample=2 idx=8 fn=syncPreferences -> packages/browsers/src/browser-data/firefox.ts
+    callee: 'backupFile(prefsPath)'
+  sample=2 idx=9 fn=syncPreferences -> node_modules/@types/node/fs.d.ts
+    callee: 'fs.promises'
+  sample=3 idx=0 fn=pages -> (no path)
+    callee: 'Promise.all(...)'
+  sample=3 idx=1 fn=pages -> packages/puppeteer-core/src/bidi/Browser.ts
+    callee: 'this.browserContexts()'
+  sample=3 idx=2 fn=pages -> packages/puppeteer-core/src/bidi/BrowserContext.ts
+    callee: 'context.pages()'
+  sample=4 idx=0 fn=cookies -> packages/puppeteer-core/src/bidi/Browser.ts
+    callee: 'this.defaultBrowserContext()'
+  sample=5 idx=0 fn=isConnected -> packages/puppeteer-core/src/bidi/Browser.ts
+    callee: 'this.connected'
+  sample=6 idx=0 fn=deleteCookie -> packages/puppeteer-core/src/bidi/BrowserContext.ts
+    callee: 'this.setCookie(...)'
+  sample=7 idx=0 fn=closed -> packages/puppeteer-core/src/bidi/BrowserContext.ts
+    callee: 'this.browser()'
+  sample=12 idx=0 fn=accept -> packages/puppeteer-core/src/bidi/Dialog.ts
+    callee: 'this.handle(...)'
+  sample=12 idx=1 fn=accept -> packages/puppeteer-core/src/util/assert.ts
+    callee: "assert(!this.handled, 'Cannot accept dialog which is already…"
+  sample=12 idx=2 fn=accept -> packages/puppeteer-core/src/api/Dialog.ts
+    callee: 'this.handled'
+  sample=14 idx=0 fn=continueRequestOverrides -> packages/puppeteer-core/src/util/assert.ts
+    callee: "assert(this.interception.enabled, 'Request Interception is n…"
+  sample=14 idx=1 fn=continueRequestOverrides -> packages/puppeteer-core/src/api/HTTPRequest.ts
+    callee: 'this.interception'
+  sample=15 idx=0 fn=abortErrorReason -> packages/puppeteer-core/src/util/assert.ts
+    callee: "assert(this.interception.enabled, 'Request Interception is n…"
+  sample=15 idx=1 fn=abortErrorReason -> packages/puppeteer-core/src/api/HTTPRequest.ts
+    callee: 'this.interception'
+  sample=16 idx=0 fn=interceptResolutionState -> packages/puppeteer-core/src/api/HTTPRequest.ts
+    callee: 'this.interception'
+  sample=16 idx=1 fn=interceptResolutionState -> packages/puppeteer-core/src/api/HTTPRequest.ts
+    callee: 'InterceptResolutionAction.Disabled'
+  ... and 216 more ok rows
+
+Full results written to: /Users/trieyang/Desktop/DocPrism/puppeteer_navigation_results.json
