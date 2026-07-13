@@ -56,17 +56,17 @@ def uri_to_path(uri: str) -> Path:
 class Location:
     uri: str
     start_line: int
-    start_char: int
+    start_col: int
     end_line: int
-    end_char: int
+    end_col: int
 
     def to_json(self) -> Dict[str, Any]:
         return {
             "uri": self.uri,
             "path": str(uri_to_path(self.uri)),
             "range": {
-                "start": {"line0": self.start_line, "col0": self.start_char},
-                "end": {"line0": self.end_line, "col0": self.end_char},
+                "start": {"line0": self.start_line, "col0": self.start_col},
+                "end": {"line0": self.end_line, "col0": self.end_col},
             },
         }
 
@@ -81,9 +81,9 @@ def _parse_location_or_link(x: Dict[str, Any]) -> Location:
     return Location(
         uri=uri,
         start_line=rng["start"]["line"],
-        start_char=rng["start"]["character"],
+        start_col=rng["start"]["character"],
         end_line=rng["end"]["line"],
-        end_char=rng["end"]["character"],
+        end_col=rng["end"]["character"],
     )
 
 

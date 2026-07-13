@@ -1,15 +1,20 @@
 from __future__ import annotations
 
 import json
-import subprocess
 import re
-import shutil
 import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from lsp_client import GenericLSPClient, Location, file_uri, uri_to_path
+from models import SnippetSelector
+from ts_prepare_resolution import (
+    nearest_tsconfig_dir,
+    prepare_resolution,
+    ts_server_cmd as _ts_server_cmd,
+    ts_workspace_folder_uris,
+)
 
 # AST-based callee finding uses py-tree-sitter with the official grammar packages:
 #   pip install tree-sitter tree-sitter-typescript tree-sitter-javascript
@@ -48,116 +53,9 @@ except ImportError:
 _TS_LSP_CLIENTS: Dict[Tuple[Any, ...], GenericLSPClient] = {}
 
 
-def nearest_tsconfig_dir(script_path: Path, repo_root: Path) -> Optional[Path]:
-    repo = repo_root.resolve()
-    cur = script_path.resolve().parent
-    names = ("tsconfig.json", "jsconfig.json")
-    while True:
-        try:
-            cur.relative_to(repo)
-        except ValueError:
-            break
-        for cfg_name in names:
-            candidate = cur / cfg_name
-            if candidate.is_file():
-                return cur
-        if cur == repo:
-            break
-        parent = cur.parent
-        if parent == cur:
-            break
-        cur = parent
-    return None
-
-
-def ts_workspace_folder_uris(repo_root: Path, script_path: Path) -> List[str]:
-    roots: List[str] = []
-    rr = file_uri(repo_root.resolve())
-    if rr not in roots:
-        roots.append(rr)
-    pkg = nearest_tsconfig_dir(script_path, repo_root)
-    if pkg is not None:
-        u = file_uri(pkg.resolve())
-        if u not in roots:
-            roots.append(u)
-    return roots
-
-
 def _ts_lsp_client_cache_key(repo_root: Path, script_path: Path, lang_id: str) -> Tuple[Any, ...]:
     folders = ts_workspace_folder_uris(repo_root, script_path)
     return (lang_id,) + tuple(folders)
-
-
-def _ts_server_cmd() -> List[str]:
-    local = (Path("node_modules") / ".bin" / "typescript-language-server").resolve()
-    if local.exists():
-        return [str(local), "--stdio"]
-
-    path = shutil.which("typescript-language-server")
-    if path:
-        return [path, "--stdio"]
-
-    raise RuntimeError("typescript-language-server not found;")
-
-
-def _ts_navigation_resolve(
-    repo_root: Path,
-    script_path: Path,
-    line0: int,
-    col0: int,
-) -> Optional[Dict[str, Any]]:
-    """
-    Use the local ts_navigation.js helper (TypeScript compiler API) to resolve
-    a usage at (script_path, line0, col0) to its full declaration source.
-
-    Returns the parsed JSON dict from ts_navigation.js on success, or None on failure.
-    """
-    try:
-        project_root = Path(__file__).resolve().parent
-        repo_root_resolved = repo_root.resolve()
-        script_resolved = script_path.resolve()
-        rel = script_resolved.relative_to(repo_root_resolved)
-    except Exception:
-        return None
-
-    cmd = [
-        "node",
-        "ts_navigation.js",
-        str(repo_root_resolved),
-        rel.as_posix(),
-        str(line0),
-        str(col0),
-    ]
-    try:
-        proc = subprocess.run(
-            cmd,
-            cwd=str(project_root),
-            capture_output=True,
-            text=True,
-            timeout=60,
-        )
-    except Exception:
-        return None
-
-    if not proc.stdout:
-        return None
-
-    try:
-        data = json.loads(proc.stdout.strip())
-    except Exception:
-        return None
-
-    if not isinstance(data, dict) or not data.get("ok"):
-        return None
-
-    return data
-
-
-def _language_id_for_path(path: Path) -> str:
-    ext = path.suffix.lower()
-    if ext in (".ts", ".tsx", ".mts", ".cts"):
-        return "typescript"
-    return "javascript"
 
 
 def _is_comment_line(line: str) -> bool:
@@ -713,7 +611,6 @@ def _prefer_lib_global_constructor_snippet(
     lib*.d.ts models globals as interface Foo { ... } plus interface FooConstructor.
     When navigation returns the whole instance interface for a call like Date(),
     prefer FooConstructor + declare var Foo (same as _read_definition_source).
-    The ts_navigation.js fast path sets fullDefSource directly, so it must apply here too.
     """
     if usage_kind != "call" or not snippet or not symbol_name:
         return snippet
@@ -807,7 +704,7 @@ def _lsp_range_is_complete_declaration(
     symbol_name: Optional[str] = None,
 ) -> bool:
     """
-    True when textDocument/definition (or ts_navigation) range already spans a full
+    True when textDocument/definition range already spans a full
     declaration. In that case we trust the range and skip heuristic wideners that
     can swallow sibling lib globals
     """
@@ -1109,39 +1006,6 @@ def _read_definition_source(
         return _prepend_jsdoc(body, body_line)
     except Exception:
         return None
-
-# Snippet parsing
-
-
-@dataclass(frozen=True)
-class SnippetSelector:
-
-    kind: str  # "call" | "attr"
-    receiver: Optional[str]
-    name: str
-    anchor: str
-
-
-def _snippet_to_selector(snippet: str) -> SnippetSelector:
-
-    s = snippet.strip()
-    anchor = s or snippet
-
-    # Treat anything with "(" as a call-like snippet.
-    if "(" in s:
-        left = s.split("(", 1)[0].strip()
-        if "." in left:
-            recv, nm = left.rsplit(".", 1)
-            return SnippetSelector(kind="call", receiver=recv.strip() or None, name=nm.strip(), anchor=anchor)
-        return SnippetSelector(kind="call", receiver=None, name=left or s, anchor=anchor)
-
-    # No parentheses: treat "obj.prop" as attribute
-    if "." in s:
-        recv, nm = s.rsplit(".", 1)
-        return SnippetSelector(kind="attr", receiver=recv.strip() or None, name=nm.strip(), anchor=anchor)
-
-    return SnippetSelector(kind="call", receiver=None, name=s or snippet, anchor=anchor)
-
 
 def _expr_src_offset_for_selector_name(expr_src: str, selector: SnippetSelector) -> int:
     """
@@ -2174,7 +2038,7 @@ def _try_resolve_primary_go_to_source_definition(
     """
     Primary resolution: TypeScript LSP ``_typescript.goToSourceDefinition`` at the call site.
     Returns a finished ``result`` dict when this yields a usable definition; otherwise
-    ``(None, client)`` so callers can fall back to ts_navigation.js / other LSP methods.
+    ``(None, client)`` so callers can fall back to other LSP methods.
     """
     if not use_go_to_source_definition:
         return None, client
@@ -2706,55 +2570,34 @@ def resolve_from_snippet(
     server_cmd: Optional[List[str]] = None,
     use_go_to_source_definition: bool = True,
 ) -> Dict[str, Any]:
+    #---phase 1: prep, find the file and clean the callee anchor, get uri for config files---#
+    prepared = prepare_resolution(
+        repo_root=repo_root,
+        script_path=script_path,
+        tested_function=tested_function,
+        snippet=snippet,
+        anchor=anchor,
+        window=window,
+        server_cmd=server_cmd,
+        use_go_to_source_definition=use_go_to_source_definition,
+    )
+    result = prepared.result
+    if not prepared.ok or prepared.context is None:
+        return result
 
-    repo_root = repo_root.resolve()
-    script_path = script_path.resolve()
-
-    selector = _snippet_to_selector(snippet)
-    anchor_text = anchor or selector.anchor
+    ctx = prepared.context
+    repo_root = ctx.repo_root
+    script_path = ctx.file_path
+    text = ctx.text
+    selector = ctx.selector
+    anchor_text = ctx.search_text
     usage_hint = anchor_text
+    cmd = ctx.cmd
+    root_uri = ctx.root_uri
+    lang_id = ctx.lang_id
+    doc_uri = ctx.doc_uri
+    workspace_uris = ctx.workspace_uris
 
-    result: Dict[str, Any] = {
-        "ok": False,
-        "input": {
-            "repo_root": str(repo_root),
-            "script_path": str(script_path),
-            "tested_function": tested_function,
-            "snippet": snippet,
-            "anchor": anchor_text,
-            "usage": {"kind": selector.kind, "receiver": selector.receiver, "name": selector.name},
-            "selector": {"anchor": anchor_text, "window": window},
-            "go_to_source_definition_enabled": use_go_to_source_definition,
-        },
-        "error": None,
-        "matches": {"candidates": [], "anchored": [], "chosen": None},
-        "definitions_all": [],
-        "definitions_all_filtered": [],
-        "chosen_definition_reason": None,
-        "definitions": [],
-        "navigation_position": None,
-    }
-
-    if not repo_root.exists():
-        result["error"] = f"repo root not found: {repo_root}"
-        return result
-    if not script_path.exists():
-        result["error"] = f"script path not found: {script_path}"
-        return result
-
-    try:
-        text = script_path.read_text(encoding="utf-8", errors="replace")
-    except Exception as e:
-        result["error"] = f"Failed to read script: {e}"
-        return result
-
-    cmd = server_cmd or _ts_server_cmd()
-    root_uri = file_uri(repo_root)
-    lang_id = _language_id_for_path(script_path)
-    doc_uri = file_uri(script_path)
-    workspace_uris = ts_workspace_folder_uris(repo_root, script_path)
-
-    #---phase 1 done: prep, find the file and clean the callee anchor, get uri for config files in the repo---
     #---phase 2 start: find location of the callee in the file using ast---#
     client: Optional[GenericLSPClient] = None
 
@@ -2896,77 +2739,7 @@ def resolve_from_snippet(
     if primary_result is not None:
         return primary_result
 
-    # ---phase 4: TS compiler API helper (ts_navigation.js) if phase 3 didn't work--.
-    ts_nav = _ts_navigation_resolve(repo_root, script_path, line0, col0)
-    if ts_nav is not None and ts_nav.get("fullDefSource"):
-        def_path_str = ts_nav.get("definitionPath")
-        definition_range = ts_nav.get("definitionRange") or {}
-
-        if def_path_str:
-            def_path = Path(def_path_str)
-            start = definition_range.get("start") or {}
-            end = definition_range.get("end") or {}
-            loc = Location(
-                uri=file_uri(def_path),
-                start_line=int(start.get("line", 0)),
-                start_char=int(start.get("character", 0)),
-                end_line=int(end.get("line", 0)),
-                end_char=int(end.get("character", 0)),
-            )
-            cand_decl = _build_def_candidate(repo_root, loc)
-            full_def_source = _prefer_lib_global_constructor_snippet(
-                ts_nav.get("fullDefSource"),
-                def_path,
-                selector.name,
-                usage_kind=selector.kind,
-            )
-
-            declaration_surface: Optional[Dict[str, Any]] = None
-            runtime_impl: Optional[Dict[str, Any]] = None
-            #---phase 4, step 2: got declaration from external declaration surface (.d.ts / .d.cts / …): try runtime upgrade.---
-            try:
-                from ts_external_runtime_impl import should_attempt_external_runtime_resolution
-
-                if should_attempt_external_runtime_resolution(def_path, repo_root=repo_root):
-                    if client is None:
-                        client = _get_or_create_ts_lsp_client(
-                            repo_root, script_path, lang_id, cmd, root_uri, workspace_uris
-                        )
-                        client.open_document(doc_uri, text)
-                        time.sleep(0.15)
-                    _, declaration_surface, runtime_impl, ext_trace = (
-                        _try_external_declaration_runtime_upgrade(
-                            client,
-                            repo_root,
-                            cand_decl,
-                            full_def_source,
-                            selector.name,
-                        )
-                    )
-                    if ext_trace is not None and declaration_surface is not None:
-                        result["chosen_definition_reason"] = {
-                            "note": "external_runtime_resolution_after_ts_nav",
-                            "external_runtime_resolution": ext_trace,
-                        }
-            except Exception:
-                pass
-
-            outer = _build_outer_definition(
-                chosen_def=cand_decl,
-                repo_root=repo_root,
-                full_def_source=full_def_source,
-                client=None,
-                declaration_surface=declaration_surface,
-                runtime_implementation=runtime_impl,
-            )
-
-            outer_item["outer_ok"] = True
-            outer_item["outer_definition"] = outer
-            outer_item["argument_usages_resolved"] = []
-            result["definitions"] = [outer_item]
-            result["ok"] = True
-            return result
-    # phase 5: LSP go to definition / typeDefinition / implementation if ts_navigation.js failed
+    #---phase 4: LSP go to definition / typeDefinition / implementation if phase 3 didn't work---#
 
     try:
         if client is None:
@@ -3054,7 +2827,7 @@ def resolve_from_snippet(
         symbol_name_for_choice,
         usage_kind=selector.kind,
     )
-    #---phase 5: step 2---
+    #---phase 4: step 2---
     # Second hop when LSP landed on a non-definition site (import/re-export or call usage).
     # can be merged with phase 3
     # module 
@@ -3200,7 +2973,7 @@ def resolve_from_snippet(
             **(result.get("chosen_definition_reason") or {}),
             "external_runtime_resolution": ext_trace,
         }
-    #---phase 6: step 2---
+    #---phase 5: step 2---
     # After external runtime upgrade, verify symbol anchoring again. Some packages (fp-ts,
     # prisma generated clients) can still return broad top-of-file windows from runtime files.
     if (
@@ -3272,7 +3045,7 @@ def resolve_from_snippet(
         declaration_surface=declaration_surface_snapshot if upgraded_from_declaration else None,
         runtime_implementation=runtime_implementation,
     )
-    #---phase 7---- check the nested callee
+    #---phase 6---- check the nested callee
     #--- edit this to be ast separated and resurvie
     
     nested_recs: List[Dict[str, Any]] = []
