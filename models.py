@@ -39,9 +39,12 @@ class SnippetSelector:
 
 @dataclass
 class CalleeLocation:
+    """Where the callee was found in the usage file (phase 2)."""
+
     match: Position
-    calle_start: Position
+    callee_start: Position
     expr_src: str
+    pattern: str
     expr_rng: Optional[TestedRange] = None
 
 
@@ -51,6 +54,8 @@ class DefCandidate:
     path: Path
     is_d_ts: bool
     in_node_modules: bool
+    is_repo_local: bool = False
+    path_len: int = 0
 
 
 @dataclass
@@ -133,7 +138,7 @@ class ResolutionContext:
     def navigation(self) -> Position:
         if self.callee_location is None:
             raise ValueError("callee not set — run locate_callee first")
-        return self.callee_location.calle_start
+        return self.callee_location.callee_start
 
     @property
     def match(self) -> Position:
@@ -177,13 +182,22 @@ def build_match_entry(
     path: str,
     expr_src: str,
     pattern: str,
+    line_text: str = "",
 ) -> Dict[str, Any]:
+    """One usage-site candidate/chosen entry (shared JSON shape for result["matches"])."""
     return {
         "kind": selector.kind,
-        "name": selector.pretty,
+        "pretty": selector.pretty,
         "expr_src": expr_src,
-        "ref": pos.as_ref(path),
-        "pattern": pattern,
+        "ref": {
+            "path": path,
+            "line1": pos.line0 + 1,
+            "col1": pos.col0 + 1,
+            "line0": pos.line0,
+            "col0": pos.col0,
+        },
+        "line_text": line_text,
+        "meta": {"pattern": pattern},
     }
 
 
@@ -193,9 +207,12 @@ def apply_callee_to_result(
     candidates: List[Dict[str, Any]],
     chosen: Dict[str, Any],
     navigation: Position,
+    anchored: Optional[List[Dict[str, Any]]] = None,
 ) -> None:
     result["matches"]["candidates"] = candidates
     result["matches"]["chosen"] = chosen
+    if anchored is not None:
+        result["matches"]["anchored"] = anchored
     result["navigation_position"] = {
         "line0": navigation.line0,
         "col0": navigation.col0,

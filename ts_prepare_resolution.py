@@ -49,7 +49,7 @@ def snippet_to_selector(snippet: str) -> SnippetSelector:
     s = snippet.strip()
     anchor = s or snippet
 
-    # Treat anything with "(" as a call-like snippet.
+    # Treat anything with "(" as a call
     if "(" in s:
         left = s.split("(", 1)[0].strip()
         if "." in left:
@@ -67,7 +67,7 @@ def snippet_to_selector(snippet: str) -> SnippetSelector:
             anchor=anchor,
         )
 
-    # No parentheses: treat "obj.prop" as attribute access.
+    # No "(": an attribute
     if "." in s:
         recv, nm = s.rsplit(".", 1)
         return SnippetSelector(
@@ -87,24 +87,22 @@ def snippet_to_selector(snippet: str) -> SnippetSelector:
 
 def nearest_tsconfig_dir(script_path: Path, repo_root: Path) -> Optional[Path]:
     """Walk parents of script_path (within repo_root) for tsconfig/jsconfig."""
-    repo = repo_root.resolve()
-    cur = script_path.resolve().parent
-    names = ("tsconfig.json", "jsconfig.json")
-    while True:
-        try:
-            cur.relative_to(repo)
-        except ValueError:
+    repo_root = repo_root.resolve()
+    start_dir = script_path.resolve().parent
+
+    if not start_dir.is_relative_to(repo_root):
+        return None
+
+    config_names = ("tsconfig.json", "jsconfig.json")
+    directories = (start_dir, *start_dir.parents)
+
+    for directory in directories:
+        if any((directory / name).is_file() for name in config_names):
+            return directory
+
+        if directory == repo_root:
             break
-        for cfg_name in names:
-            candidate = cur / cfg_name
-            if candidate.is_file():
-                return cur
-        if cur == repo:
-            break
-        parent = cur.parent
-        if parent == cur:
-            break
-        cur = parent
+
     return None
 
 
