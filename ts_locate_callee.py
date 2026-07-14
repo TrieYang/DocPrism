@@ -1,13 +1,13 @@
 """Locate a TypeScript/JavaScript callee in the usage file (phase 2).
 
-Given a prepared ResolutionContext, find the usage site (AST first, text
-fallback second), compute the navigation cursor, and write:
+Given a prepared ResolutionContext, find the usage site via tree-sitter AST,
+compute the navigation cursor, and write:
 
   - ctx.expr_rng / ctx.callee_location
   - result["matches"] / result["navigation_position"]
 
-Does not talk to the LSP. Depends on models + shared ts_ast / ts_text_coords only
-(not on code_navigation_TypeScript).
+If tree-sitter is unavailable or no AST match is found, locate fails with an error
+(no text/substring fallback).
 """
 
 from __future__ import annotations
@@ -31,7 +31,6 @@ from ts_ast import TREE_SITTER_AVAILABLE, get_ts_parser, node_text, point_in_ran
 from ts_text_coords import (
     char_index_from_line_col,
     flat_index_to_raw_index,
-    is_comment_line,
     line_col_from_char_index,
     raw_index_to_flat_index,
 )
@@ -55,19 +54,12 @@ class LocateOutcome:
 
 @dataclass
 class TsCalleeMatch:
-    """One AST-derived candidate for the callee (line0, col0 are 0-based)."""
+    """One AST-derived candidate for the callee"""
 
     line0: int
     col0: int
     expr_src: str
     node_line0: int = 0
-
-
-def _symbol_identifier_pattern(symbol_name: str) -> str:
-    esc = re.escape(symbol_name)
-    if symbol_name.startswith("$"):
-        return rf"(?<![\w$]){esc}(?![\w$])"
-    return rf"(?<![\w$\.]){esc}(?![\w$])"
 
 
 def _strip_outer_parens(s: str) -> str:
@@ -106,33 +98,6 @@ def _normalize_anchor_for_exact_match(s: str) -> str:
     return s
 
 
-def expr_src_offset_for_selector_name(expr_src: str, selector: SnippetSelector) -> int:
-    """Offset from start of expr_src to the callee identifier."""
-    name = selector.name
-    if not name:
-        return 0
-    esc = re.escape(name)
-    recv = (selector.receiver or "").strip()
-    if recv:
-        needle = recv + "." + name
-        pos = expr_src.find(needle)
-        if pos >= 0:
-            return pos + len(recv) + 1
-    if selector.kind == "call":
-        dotted = list(re.finditer(r"\." + esc + r"(?:\s*[\(<]|\s*$)", expr_src))
-        if dotted:
-            return dotted[0].start() + 1
-        m = re.search(_symbol_identifier_pattern(name) + r"(?:\s*[\(<]|\s*$)", expr_src)
-        if m:
-            return m.start()
-    elif selector.kind == "attr":
-        dotted = list(re.finditer(r"\." + esc + r"\b", expr_src))
-        if dotted:
-            return dotted[0].start() + 1
-    idx = expr_src.find(name)
-    return idx if idx >= 0 else 0
-
-
 def clamp_position_to_source(text: str, line0: int, col0: int) -> Tuple[int, int]:
     lines_list = text.splitlines()
     if not lines_list:
@@ -143,15 +108,14 @@ def clamp_position_to_source(text: str, line0: int, col0: int) -> Tuple[int, int
     return line0, col0
 
 
-def _walk_ts_find_callees(
+def _walk_ts_find_first_callee(
     node,
     source_bytes: bytes,
     tested_rng: Optional[TestedRange],
     selector: SnippetSelector,
-    out: List[TsCalleeMatch],
-) -> None:
+) -> Optional[TsCalleeMatch]:
     if node is None:
-        return
+        return None
 
     if selector.kind == "call" and node.type == "call_expression":
         func = node.child_by_field_name("function")
@@ -178,13 +142,11 @@ def _walk_ts_find_callees(
             if name_node is not None:
                 r, c = name_node.start_point
                 if point_in_range(r, c, tested_rng):
-                    out.append(
-                        TsCalleeMatch(
-                            line0=r,
-                            col0=c,
-                            expr_src=node_text(source_bytes, node),
-                            node_line0=node.start_point[0],
-                        )
+                    return TsCalleeMatch(
+                        line0=r,
+                        col0=c,
+                        expr_src=node_text(source_bytes, node),
+                        node_line0=node.start_point[0],
                     )
 
     if selector.kind == "attr" and node.type == "member_expression":
@@ -201,38 +163,41 @@ def _walk_ts_find_callees(
                 ):
                     r, c = prop.start_point
                     if point_in_range(r, c, tested_rng):
-                        out.append(
-                            TsCalleeMatch(
-                                line0=r,
-                                col0=c,
-                                expr_src=node_text(source_bytes, node),
-                                node_line0=node.start_point[0],
-                            )
+                        return TsCalleeMatch(
+                            line0=r,
+                            col0=c,
+                            expr_src=node_text(source_bytes, node),
+                            node_line0=node.start_point[0],
                         )
 
     for i in range(node.child_count):
-        _walk_ts_find_callees(node.child(i), source_bytes, tested_rng, selector, out)
+        found = _walk_ts_find_first_callee(
+            node.child(i), source_bytes, tested_rng, selector
+        )
+        if found is not None:
+            return found
+    return None
 
 
-def find_ts_callee_nodes_ast(
+def find_ts_callee_node_ast(
     source: str,
     tested_rng: Optional[TestedRange],
     selector: SnippetSelector,
     script_path: Path,
-) -> List[TsCalleeMatch]:
+) -> Optional[TsCalleeMatch]:
     parser = get_ts_parser(script_path)
     if parser is None:
-        return []
+        return None
     try:
         source_bytes = source.encode("utf-8")
         tree = parser.parse(source_bytes)
     except Exception:
-        return []
+        return None
     if tree.root_node is None or tree.root_node.has_error:
-        return []
-    out: List[TsCalleeMatch] = []
-    _walk_ts_find_callees(tree.root_node, source_bytes, tested_rng, selector, out)
-    return out
+        return None
+    return _walk_ts_find_first_callee(
+        tree.root_node, source_bytes, tested_rng, selector
+    )
 
 
 def extract_tested_function_range_ts_ast(
@@ -265,178 +230,6 @@ def extract_tested_function_range_ts_ast(
         return None
 
     return walk(tree.root_node)
-
-
-def filter_by_anchor_strict_ts(
-    script_lines: List[str],
-    candidates: List[TsCalleeMatch],
-    anchor: str,
-    window: int,
-) -> List[TsCalleeMatch]:
-    anchor_n = _normalize_anchor_for_exact_match(anchor)
-    exact = [
-        m
-        for m in candidates
-        if anchor_n == _normalize_anchor_for_exact_match(m.expr_src)
-    ]
-    if exact:
-        return exact
-    contained = [
-        m
-        for m in candidates
-        if anchor_n and anchor_n in _normalize_anchor_for_exact_match(m.expr_src)
-    ]
-    if contained:
-        return contained
-    a2 = re.sub(r"\s+", "", anchor)
-    kept: List[TsCalleeMatch] = []
-    for m in candidates:
-        lo = max(0, m.node_line0 - window)
-        hi = min(len(script_lines), m.node_line0 + window + 1)
-        block = "\n".join(script_lines[lo:hi])
-        if a2 in re.sub(r"\s+", "", block):
-            kept.append(m)
-    return kept
-
-
-def _find_anchor_candidates_in_range(
-    source: str,
-    anchor: str,
-    *,
-    tested_rng: Optional[TestedRange],
-) -> List[Tuple[int, int, str]]:
-    if not anchor:
-        return []
-
-    lines = source.splitlines()
-    if tested_rng is not None:
-        start_line, _, end_line, _ = tested_rng
-        lo = max(0, start_line)
-        hi = min(len(lines) - 1, end_line)
-    else:
-        lo, hi = 0, len(lines) - 1
-
-    if "\n" in anchor or "\r" in anchor:
-        start_i = char_index_from_line_col(source, lo, 0)
-        if hi + 1 < len(lines):
-            end_i = char_index_from_line_col(source, hi + 1, 0)
-        else:
-            end_i = len(source)
-        out_m: List[Tuple[int, int, str]] = []
-        pos = source.find(anchor, start_i, end_i)
-        while pos >= 0:
-            line0, col0 = line_col_from_char_index(source, pos)
-            line_text = lines[line0] if 0 <= line0 < len(lines) else ""
-            out_m.append((line0, col0, line_text))
-            pos = source.find(anchor, pos + 1, end_i)
-        if out_m or "\r\n" not in source:
-            return out_m
-        flat = source.replace("\r\n", "\n")
-        s_f = raw_index_to_flat_index(source, start_i)
-        e_f = raw_index_to_flat_index(source, min(end_i, len(source)))
-        pos_f = flat.find(anchor, s_f, e_f)
-        while pos_f >= 0:
-            raw = flat_index_to_raw_index(source, pos_f)
-            line0, col0 = line_col_from_char_index(source, raw)
-            line_text = lines[line0] if 0 <= line0 < len(lines) else ""
-            out_m.append((line0, col0, line_text))
-            pos_f = flat.find(anchor, pos_f + 1, e_f)
-        return out_m
-
-    out: List[Tuple[int, int, str]] = []
-    for line0 in range(lo, hi + 1):
-        line = lines[line0]
-        if is_comment_line(line):
-            continue
-        start = 0
-        while True:
-            idx = line.find(anchor, start)
-            if idx < 0:
-                break
-            out.append((line0, idx, line))
-            start = idx + 1
-    return out
-
-
-def _find_anchor_candidates_by_core(
-    source: str,
-    selector: SnippetSelector,
-    *,
-    tested_rng: Optional[TestedRange],
-) -> List[Tuple[int, int, str]]:
-    name = selector.name
-    if not name:
-        return []
-    lines = source.splitlines()
-    if tested_rng is not None:
-        start_line, _, end_line, _ = tested_rng
-        lo = max(0, start_line)
-        hi = min(len(lines) - 1, end_line)
-    else:
-        lo, hi = 0, len(lines) - 1
-
-    out: List[Tuple[int, int, str]] = []
-    if selector.kind == "call":
-        pattern = name + "("
-        alt_pattern = "." + name + "("
-    else:
-        pattern = name
-        alt_pattern = "." + name
-
-    for line0 in range(lo, hi + 1):
-        line = lines[line0]
-        if is_comment_line(line):
-            continue
-        idx = line.find(alt_pattern)
-        if idx >= 0:
-            col0 = idx + 1
-        else:
-            idx = line.find(pattern)
-            col0 = idx
-        if idx >= 0:
-            out.append((line0, col0, line))
-    return out
-
-
-def pick_anchor_candidates_with_fallbacks(
-    text: str,
-    anchor_text: str,
-    selector: SnippetSelector,
-    tested_rng: Optional[TestedRange],
-) -> List[Tuple[int, int, str, bool]]:
-    exact = _find_anchor_candidates_in_range(text, anchor_text, tested_rng=tested_rng)
-    if exact:
-        return [(line0, col0, lt, False) for line0, col0, lt in exact]
-    exact = _find_anchor_candidates_in_range(text, anchor_text, tested_rng=None)
-    if exact:
-        return [(line0, col0, lt, False) for line0, col0, lt in exact]
-    candidates = _find_anchor_candidates_by_core(text, selector, tested_rng=tested_rng)
-    if candidates:
-        if tested_rng is not None and len(candidates) > 1:
-            start_line, _, end_line, _ = tested_rng
-            in_range = [
-                (line0, col0, lt)
-                for line0, col0, lt in candidates
-                if start_line <= line0 <= end_line
-            ]
-            if in_range:
-                return [(in_range[0][0], in_range[0][1], in_range[0][2], True)]
-        one = candidates[0]
-        return [(one[0], one[1], one[2], True)]
-    candidates = _find_anchor_candidates_by_core(text, selector, tested_rng=None)
-    if candidates:
-        if tested_rng is not None and len(candidates) > 1:
-            start_line, _, end_line, _ = tested_rng
-            in_range = [
-                (line0, col0, lt)
-                for line0, col0, lt in candidates
-                if start_line <= line0 <= end_line
-            ]
-            if in_range:
-                return [(in_range[0][0], in_range[0][1], in_range[0][2], True)]
-        one = candidates[0]
-        return [(one[0], one[1], one[2], True)]
-    return []
 
 
 def _match_snippet_for_nested_offsets(
@@ -508,33 +301,9 @@ def nested_usage_to_file_line_col(
     return line_col_from_char_index(text, target)
 
 
-def _navigation_position(
-    *,
-    text: str,
-    selector: SnippetSelector,
-    search_text: str,
-    match_pos: Position,
-    expr_src: str,
-    pattern: str,
-) -> Position:
-    line0 = match_pos.line0
-    anchor_col0 = match_pos.col0
-    if pattern in ("ast", "core_fallback"):
-        col0 = anchor_col0
-    else:
-        rel_idx = expr_src_offset_for_selector_name(expr_src, selector)
-        if "\n" in expr_src or "\r" in expr_src:
-            line0, col0 = nested_usage_to_file_line_col(
-                text,
-                expr_src,
-                line0,
-                anchor_col0,
-                rel_idx,
-                search_text,
-            )
-        else:
-            col0 = anchor_col0 + rel_idx if rel_idx >= 0 else anchor_col0
-    line0, col0 = clamp_position_to_source(text, line0, col0)
+def _navigation_position(*, text: str, match_pos: Position) -> Position:
+    """AST hits already point at the identifier; just clamp to file bounds."""
+    line0, col0 = clamp_position_to_source(text, match_pos.line0, match_pos.col0)
     return Position(line0=line0, col0=col0)
 
 
@@ -543,12 +312,16 @@ def _line_text(script_lines: List[str], line0: int) -> str:
 
 
 def locate_callee(ctx: ResolutionContext, result: Dict[str, Any]) -> LocateOutcome:
-    """Run phase 2: find the callee usage and set navigation on ctx + result."""
+    """Run phase 2: find the callee usage via AST and set navigation on ctx + result."""
+    if not TREE_SITTER_AVAILABLE:
+        return LocateOutcome(
+            result=build_failure_result(result, error="Callee not found."),
+            context=ctx,
+        )
+
     text = ctx.text
     script_path = ctx.file_path
     selector = ctx.selector
-    search_text = ctx.search_text
-    window = ctx.window
     script_lines = text.splitlines()
     path_str = str(script_path)
 
@@ -559,112 +332,35 @@ def locate_callee(ctx: ResolutionContext, result: Dict[str, Any]) -> LocateOutco
         )
     ctx.expr_rng = tested_rng
 
-    candidates: List[Dict[str, Any]] = []
-    anchored: List[Dict[str, Any]] = []
-    chosen: Optional[Dict[str, Any]] = None
-    pattern = ""
-    match_pos: Optional[Position] = None
-    expr_src = search_text
-
-    if TREE_SITTER_AVAILABLE:
-        usage_candidates = find_ts_callee_nodes_ast(
-            text, tested_rng, selector, script_path
-        )
-        if usage_candidates:
-            strict = filter_by_anchor_strict_ts(
-                script_lines, usage_candidates, search_text, window
-            )
-            if strict:
-                pattern = "ast"
-                m = strict[0]
-                match_pos = Position(line0=m.line0, col0=m.col0)
-                expr_src = m.expr_src
-                chosen = build_match_entry(
-                    selector=selector,
-                    pos=match_pos,
-                    path=path_str,
-                    expr_src=expr_src,
-                    pattern=pattern,
-                    line_text=_line_text(script_lines, m.line0),
-                )
-                candidates = [
-                    build_match_entry(
-                        selector=selector,
-                        pos=Position(line0=c.line0, col0=c.col0),
-                        path=path_str,
-                        expr_src=c.expr_src,
-                        pattern=pattern,
-                        line_text=_line_text(script_lines, c.line0),
-                    )
-                    for c in usage_candidates
-                ]
-                anchored = [chosen]
-
-    if chosen is None:
-        raw = pick_anchor_candidates_with_fallbacks(
-            text, search_text, selector, tested_rng
-        )
-        if not raw:
-            return LocateOutcome(
-                result=build_failure_result(
-                    result,
-                    error=(
-                        "No candidates found by anchor inside tested_function "
-                        "(or file if range unknown)."
-                    ),
-                ),
-                context=ctx,
-            )
-        candidates = []
-        for line0, col0, line_text, from_core in raw:
-            pat = "core_fallback" if from_core else "anchor_substring"
-            candidates.append(
-                build_match_entry(
-                    selector=selector,
-                    pos=Position(line0=line0, col0=col0),
-                    path=path_str,
-                    expr_src=search_text,
-                    pattern=pat,
-                    line_text=line_text,
-                )
-            )
-        anchored = list(candidates)
-        chosen = anchored[0]
-        pattern = chosen["meta"]["pattern"]
-        match_pos = Position(
-            line0=chosen["ref"]["line0"],
-            col0=chosen["ref"]["col0"],
-        )
-        expr_src = chosen.get("expr_src") or search_text
-
-    if chosen is None or match_pos is None:
+    m = find_ts_callee_node_ast(text, tested_rng, selector, script_path)
+    if m is None:
         return LocateOutcome(
-            result=build_failure_result(
-                result, error="No matching callee found for this snippet."
-            ),
+            result=build_failure_result(result, error="Callee not found."),
             context=ctx,
         )
 
-    navigation = _navigation_position(
-        text=text,
+    match_pos = Position(line0=m.line0, col0=m.col0)
+    chosen = build_match_entry(
         selector=selector,
-        search_text=search_text,
-        match_pos=match_pos,
-        expr_src=expr_src,
-        pattern=pattern,
+        pos=match_pos,
+        path=path_str,
+        expr_src=m.expr_src,
+        pattern="ast",
+        line_text=_line_text(script_lines, m.line0),
     )
+    navigation = _navigation_position(text=text, match_pos=match_pos)
     ctx.callee_location = CalleeLocation(
         match=match_pos,
         callee_start=navigation,
-        expr_src=expr_src,
-        pattern=pattern,
+        expr_src=m.expr_src,
+        pattern="ast",
         expr_rng=tested_rng,
     )
     apply_callee_to_result(
         result,
-        candidates=candidates,
+        candidates=[chosen],
         chosen=chosen,
         navigation=navigation,
-        anchored=anchored,
+        anchored=[chosen],
     )
     return LocateOutcome(result=result, context=ctx)

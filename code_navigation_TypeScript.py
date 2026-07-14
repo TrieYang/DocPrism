@@ -912,7 +912,7 @@ def resolve_from_snippet(
 
     ctx = prepared.context
 
-    #---phase 2: find location of the callee in the file using ast / text fallback---#
+    #---phase 2: find location of the callee in the file using ast#
     located = locate_callee(ctx, result)
     result = located.result
     if not located.ok:
