@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Tuple
 
@@ -59,15 +59,20 @@ class DefCandidate:
 
 
 @dataclass
-class StrategyResult:
-    strategy: str
+class PrimaryDefinition:
+    """Primary definition ready for nested-usage resolution."""
+
     chosen_def: DefCandidate
-    full_def_source: str
-    chosen_definition_reason: Dict[str, Any]
-    client: Optional[GenericLSPClient] = None
+    full_def_source: Optional[str]
+    symbol_name: Optional[str]
+    receiver_parent_hint: Optional[str] = None
+    usage_hint: str = ""
     declaration_surface: Optional[Dict[str, Any]] = None
     runtime_implementation: Optional[Dict[str, Any]] = None
-    definitions_all: List[Dict[str, Any]] = field(default_factory=list)
+    upgraded_from_declaration: bool = False
+    outer_definition: Optional[Dict[str, Any]] = None
+    # Shell for the final ``definitions[0]`` entry; finished by nested resolution.
+    outer_item: Optional[Dict[str, Any]] = None
 
 
 @dataclass(frozen=True)

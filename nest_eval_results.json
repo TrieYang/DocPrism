@@ -1,0 +1,871 @@
+{
+  "repo": "nest",
+  "summary": {
+    "runtime_seconds": 2.22,
+    "samples_skipped_no_callees": 0,
+    "unique_sample_ids": 1,
+    "callee_rows_total": 5,
+    "callee_rows_ok": 5,
+    "callee_rows_failed": 0,
+    "samples_all_rows_ok": 1,
+    "samples_with_any_failed_row": 0
+  },
+  "results": [
+    {
+      "sample_id": 9,
+      "callee_index": 0,
+      "tested_function": "transform",
+      "script_path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+      "callee": "this.isNumeric(value)",
+      "ok": true,
+      "input": {
+        "repo_root": "/Users/trieyang/Desktop/DocPrism/nest",
+        "file_path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+        "tested_function": "transform",
+        "callee": "this.isNumeric(value)",
+        "parsed": {
+          "kind": "call",
+          "receiver": "this",
+          "name": "isNumeric"
+        },
+        "options": {
+          "window": 3,
+          "go_to_source_definition": true
+        }
+      },
+      "error": null,
+      "matches": {
+        "candidates": [
+          {
+            "kind": "call",
+            "pretty": "this.isNumeric",
+            "expr_src": "this.isNumeric(value)",
+            "ref": {
+              "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+              "line1": 64,
+              "col1": 15,
+              "line0": 63,
+              "col0": 14
+            },
+            "line_text": "    if (!this.isNumeric(value)) {",
+            "meta": {
+              "pattern": "ast"
+            }
+          }
+        ],
+        "anchored": [
+          {
+            "kind": "call",
+            "pretty": "this.isNumeric",
+            "expr_src": "this.isNumeric(value)",
+            "ref": {
+              "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+              "line1": 64,
+              "col1": 15,
+              "line0": 63,
+              "col0": 14
+            },
+            "line_text": "    if (!this.isNumeric(value)) {",
+            "meta": {
+              "pattern": "ast"
+            }
+          }
+        ],
+        "chosen": {
+          "kind": "call",
+          "pretty": "this.isNumeric",
+          "expr_src": "this.isNumeric(value)",
+          "ref": {
+            "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+            "line1": 64,
+            "col1": 15,
+            "line0": 63,
+            "col0": 14
+          },
+          "line_text": "    if (!this.isNumeric(value)) {",
+          "meta": {
+            "pattern": "ast"
+          }
+        }
+      },
+      "definitions_all": [
+        {
+          "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+          "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+          "range": {
+            "start": {
+              "line0": 75,
+              "col0": 12
+            },
+            "end": {
+              "line0": 75,
+              "col0": 21
+            }
+          }
+        }
+      ],
+      "definitions_all_filtered": [
+        {
+          "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+          "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+          "range": {
+            "start": {
+              "line0": 75,
+              "col0": 12
+            },
+            "end": {
+              "line0": 75,
+              "col0": 21
+            }
+          }
+        }
+      ],
+      "chosen_definition_reason": {
+        "policy": [
+          "prefer_go_to_source_definition",
+          "drop_d_ts",
+          "prefer_repo_local",
+          "prefer_non_node_modules",
+          "prefer_implementation_over_declaration",
+          "tie_break_shorter_path_then_position"
+        ],
+        "dropped": {
+          "d_ts": []
+        },
+        "note": "go_to_source_definition_primary",
+        "ambiguity": {
+          "remaining": 1
+        },
+        "go_to_source_definition": true
+      },
+      "navigation_position": {
+        "line0": 63,
+        "col0": 14
+      },
+      "definitions": [
+        {
+          "outer_ok": true,
+          "outer_error": null,
+          "outer_definition": {
+            "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+            "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+            "range": {
+              "start": {
+                "line0": 75,
+                "col0": 12
+              },
+              "end": {
+                "line0": 75,
+                "col0": 21
+              }
+            },
+            "directory": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes",
+            "full_def_source": "protected isNumeric(value: string): boolean {\n    return (\n      ['string', 'number'].includes(typeof value) &&\n      !isNaN(parseFloat(value)) &&\n      isFinite(value as any)\n    );\n  }",
+            "callee_documentation": "\n```typescript\n(method) ParseFloatPipe.isNumeric(value: string): boolean\n```\n\n\n*@param* `value` — currently processed route argument  \n\n*@returns* — `true` if `value` is a valid float number",
+            "repo_relative_path": "packages/common/pipes/parse-float.pipe.ts",
+            "repo_relative_dir": "packages/common/pipes"
+          },
+          "argument_usages_resolved": []
+        }
+      ],
+      "source_definition_locations": [
+        {
+          "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+          "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+          "range": {
+            "start": {
+              "line0": 75,
+              "col0": 12
+            },
+            "end": {
+              "line0": 75,
+              "col0": 21
+            }
+          }
+        }
+      ]
+    },
+    {
+      "sample_id": 9,
+      "callee_index": 1,
+      "tested_function": "transform",
+      "script_path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+      "callee": "this.exceptionFactory(\n        'Validation failed (numeric string is expected)',\n      )",
+      "ok": true,
+      "input": {
+        "repo_root": "/Users/trieyang/Desktop/DocPrism/nest",
+        "file_path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+        "tested_function": "transform",
+        "callee": "this.exceptionFactory(\n        'Validation failed (numeric string is expected)',\n      )",
+        "parsed": {
+          "kind": "call",
+          "receiver": "this",
+          "name": "exceptionFactory"
+        },
+        "options": {
+          "window": 3,
+          "go_to_source_definition": true
+        }
+      },
+      "error": null,
+      "matches": {
+        "candidates": [
+          {
+            "kind": "call",
+            "pretty": "this.exceptionFactory",
+            "expr_src": "this.exceptionFactory(\n        'Validation failed (numeric string is expected)',\n      )",
+            "ref": {
+              "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+              "line1": 65,
+              "col1": 18,
+              "line0": 64,
+              "col0": 17
+            },
+            "line_text": "      throw this.exceptionFactory(",
+            "meta": {
+              "pattern": "ast"
+            }
+          }
+        ],
+        "anchored": [
+          {
+            "kind": "call",
+            "pretty": "this.exceptionFactory",
+            "expr_src": "this.exceptionFactory(\n        'Validation failed (numeric string is expected)',\n      )",
+            "ref": {
+              "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+              "line1": 65,
+              "col1": 18,
+              "line0": 64,
+              "col0": 17
+            },
+            "line_text": "      throw this.exceptionFactory(",
+            "meta": {
+              "pattern": "ast"
+            }
+          }
+        ],
+        "chosen": {
+          "kind": "call",
+          "pretty": "this.exceptionFactory",
+          "expr_src": "this.exceptionFactory(\n        'Validation failed (numeric string is expected)',\n      )",
+          "ref": {
+            "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+            "line1": 65,
+            "col1": 18,
+            "line0": 64,
+            "col0": 17
+          },
+          "line_text": "      throw this.exceptionFactory(",
+          "meta": {
+            "pattern": "ast"
+          }
+        }
+      },
+      "definitions_all": [
+        {
+          "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+          "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+          "range": {
+            "start": {
+              "line0": 40,
+              "col0": 12
+            },
+            "end": {
+              "line0": 40,
+              "col0": 28
+            }
+          }
+        }
+      ],
+      "definitions_all_filtered": [
+        {
+          "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+          "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+          "range": {
+            "start": {
+              "line0": 40,
+              "col0": 12
+            },
+            "end": {
+              "line0": 40,
+              "col0": 28
+            }
+          }
+        }
+      ],
+      "chosen_definition_reason": {
+        "policy": [
+          "prefer_go_to_source_definition",
+          "drop_d_ts",
+          "prefer_repo_local",
+          "prefer_non_node_modules",
+          "prefer_implementation_over_declaration",
+          "tie_break_shorter_path_then_position"
+        ],
+        "dropped": {
+          "d_ts": []
+        },
+        "note": "go_to_source_definition_primary",
+        "ambiguity": {
+          "remaining": 1
+        },
+        "go_to_source_definition": true
+      },
+      "navigation_position": {
+        "line0": 64,
+        "col0": 17
+      },
+      "definitions": [
+        {
+          "outer_ok": true,
+          "outer_error": null,
+          "outer_definition": {
+            "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+            "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+            "range": {
+              "start": {
+                "line0": 40,
+                "col0": 12
+              },
+              "end": {
+                "line0": 40,
+                "col0": 28
+              }
+            },
+            "directory": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes",
+            "full_def_source": "protected exceptionFactory: (error: string) => any",
+            "callee_documentation": "\n```typescript\n(property) ParseFloatPipe.exceptionFactory: (error: string) => any\n```\n",
+            "repo_relative_path": "packages/common/pipes/parse-float.pipe.ts",
+            "repo_relative_dir": "packages/common/pipes"
+          },
+          "argument_usages_resolved": []
+        }
+      ],
+      "source_definition_locations": [
+        {
+          "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+          "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+          "range": {
+            "start": {
+              "line0": 40,
+              "col0": 12
+            },
+            "end": {
+              "line0": 40,
+              "col0": 28
+            }
+          }
+        }
+      ]
+    },
+    {
+      "sample_id": 9,
+      "callee_index": 2,
+      "tested_function": "transform",
+      "script_path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+      "callee": "isNil(value)",
+      "ok": true,
+      "input": {
+        "repo_root": "/Users/trieyang/Desktop/DocPrism/nest",
+        "file_path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+        "tested_function": "transform",
+        "callee": "isNil(value)",
+        "parsed": {
+          "kind": "call",
+          "receiver": null,
+          "name": "isNil"
+        },
+        "options": {
+          "window": 3,
+          "go_to_source_definition": true
+        }
+      },
+      "error": null,
+      "matches": {
+        "candidates": [
+          {
+            "kind": "call",
+            "pretty": "isNil",
+            "expr_src": "isNil(value)",
+            "ref": {
+              "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+              "line1": 61,
+              "col1": 9,
+              "line0": 60,
+              "col0": 8
+            },
+            "line_text": "    if (isNil(value) && this.options?.optional) {",
+            "meta": {
+              "pattern": "ast"
+            }
+          }
+        ],
+        "anchored": [
+          {
+            "kind": "call",
+            "pretty": "isNil",
+            "expr_src": "isNil(value)",
+            "ref": {
+              "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+              "line1": 61,
+              "col1": 9,
+              "line0": 60,
+              "col0": 8
+            },
+            "line_text": "    if (isNil(value) && this.options?.optional) {",
+            "meta": {
+              "pattern": "ast"
+            }
+          }
+        ],
+        "chosen": {
+          "kind": "call",
+          "pretty": "isNil",
+          "expr_src": "isNil(value)",
+          "ref": {
+            "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+            "line1": 61,
+            "col1": 9,
+            "line0": 60,
+            "col0": 8
+          },
+          "line_text": "    if (isNil(value) && this.options?.optional) {",
+          "meta": {
+            "pattern": "ast"
+          }
+        }
+      },
+      "definitions_all": [
+        {
+          "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/packages/common/utils/shared.utils.ts",
+          "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/utils/shared.utils.ts",
+          "range": {
+            "start": {
+              "line0": 47,
+              "col0": 13
+            },
+            "end": {
+              "line0": 47,
+              "col0": 18
+            }
+          }
+        }
+      ],
+      "definitions_all_filtered": [
+        {
+          "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/packages/common/utils/shared.utils.ts",
+          "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/utils/shared.utils.ts",
+          "range": {
+            "start": {
+              "line0": 47,
+              "col0": 13
+            },
+            "end": {
+              "line0": 47,
+              "col0": 18
+            }
+          }
+        }
+      ],
+      "chosen_definition_reason": {
+        "policy": [
+          "prefer_go_to_source_definition",
+          "drop_d_ts",
+          "prefer_repo_local",
+          "prefer_non_node_modules",
+          "prefer_implementation_over_declaration",
+          "tie_break_shorter_path_then_position"
+        ],
+        "dropped": {
+          "d_ts": []
+        },
+        "note": "go_to_source_definition_primary",
+        "ambiguity": {
+          "remaining": 1
+        },
+        "go_to_source_definition": true
+      },
+      "navigation_position": {
+        "line0": 60,
+        "col0": 8
+      },
+      "definitions": [
+        {
+          "outer_ok": true,
+          "outer_error": null,
+          "outer_definition": {
+            "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/packages/common/utils/shared.utils.ts",
+            "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/utils/shared.utils.ts",
+            "range": {
+              "start": {
+                "line0": 47,
+                "col0": 13
+              },
+              "end": {
+                "line0": 47,
+                "col0": 18
+              }
+            },
+            "directory": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/utils",
+            "full_def_source": "export const isNil = (val: any): val is null | undefined =>\n  isUndefined(val) || val === null;",
+            "callee_documentation": null,
+            "repo_relative_path": "packages/common/utils/shared.utils.ts",
+            "repo_relative_dir": "packages/common/utils"
+          },
+          "argument_usages_resolved": []
+        }
+      ],
+      "source_definition_locations": [
+        {
+          "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/packages/common/utils/shared.utils.ts",
+          "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/utils/shared.utils.ts",
+          "range": {
+            "start": {
+              "line0": 47,
+              "col0": 13
+            },
+            "end": {
+              "line0": 47,
+              "col0": 18
+            }
+          }
+        }
+      ]
+    },
+    {
+      "sample_id": 9,
+      "callee_index": 3,
+      "tested_function": "transform",
+      "script_path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+      "callee": "parseFloat(value)",
+      "ok": true,
+      "input": {
+        "repo_root": "/Users/trieyang/Desktop/DocPrism/nest",
+        "file_path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+        "tested_function": "transform",
+        "callee": "parseFloat(value)",
+        "parsed": {
+          "kind": "call",
+          "receiver": null,
+          "name": "parseFloat"
+        },
+        "options": {
+          "window": 3,
+          "go_to_source_definition": true
+        }
+      },
+      "error": null,
+      "matches": {
+        "candidates": [
+          {
+            "kind": "call",
+            "pretty": "parseFloat",
+            "expr_src": "parseFloat(value)",
+            "ref": {
+              "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+              "line1": 69,
+              "col1": 12,
+              "line0": 68,
+              "col0": 11
+            },
+            "line_text": "    return parseFloat(value);",
+            "meta": {
+              "pattern": "ast"
+            }
+          }
+        ],
+        "anchored": [
+          {
+            "kind": "call",
+            "pretty": "parseFloat",
+            "expr_src": "parseFloat(value)",
+            "ref": {
+              "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+              "line1": 69,
+              "col1": 12,
+              "line0": 68,
+              "col0": 11
+            },
+            "line_text": "    return parseFloat(value);",
+            "meta": {
+              "pattern": "ast"
+            }
+          }
+        ],
+        "chosen": {
+          "kind": "call",
+          "pretty": "parseFloat",
+          "expr_src": "parseFloat(value)",
+          "ref": {
+            "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+            "line1": 69,
+            "col1": 12,
+            "line0": 68,
+            "col0": 11
+          },
+          "line_text": "    return parseFloat(value);",
+          "meta": {
+            "pattern": "ast"
+          }
+        }
+      },
+      "definitions_all": [
+        {
+          "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/node_modules/typescript/lib/lib.es5.d.ts",
+          "path": "/Users/trieyang/Desktop/DocPrism/nest/node_modules/typescript/lib/lib.es5.d.ts",
+          "range": {
+            "start": {
+              "line0": 47,
+              "col0": 17
+            },
+            "end": {
+              "line0": 47,
+              "col0": 27
+            }
+          }
+        }
+      ],
+      "definitions_all_filtered": [
+        {
+          "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/node_modules/typescript/lib/lib.es5.d.ts",
+          "path": "/Users/trieyang/Desktop/DocPrism/nest/node_modules/typescript/lib/lib.es5.d.ts",
+          "range": {
+            "start": {
+              "line0": 47,
+              "col0": 17
+            },
+            "end": {
+              "line0": 47,
+              "col0": 27
+            }
+          }
+        }
+      ],
+      "chosen_definition_reason": {
+        "policy": [
+          "prefer_go_to_source_definition",
+          "drop_d_ts",
+          "prefer_repo_local",
+          "prefer_non_node_modules",
+          "prefer_implementation_over_declaration",
+          "tie_break_shorter_path_then_position"
+        ],
+        "dropped": {
+          "d_ts": [
+            "/Users/trieyang/Desktop/DocPrism/nest/node_modules/typescript/lib/lib.es5.d.ts"
+          ]
+        },
+        "note": "type_or_signature_surface_kept_stub",
+        "ambiguity": {
+          "remaining": 1
+        },
+        "type_or_signature_surface": true
+      },
+      "navigation_position": {
+        "line0": 68,
+        "col0": 11
+      },
+      "definitions": [
+        {
+          "outer_ok": true,
+          "outer_error": null,
+          "outer_definition": {
+            "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/node_modules/typescript/lib/lib.es5.d.ts",
+            "path": "/Users/trieyang/Desktop/DocPrism/nest/node_modules/typescript/lib/lib.es5.d.ts",
+            "range": {
+              "start": {
+                "line0": 47,
+                "col0": 17
+              },
+              "end": {
+                "line0": 47,
+                "col0": 27
+              }
+            },
+            "directory": "/Users/trieyang/Desktop/DocPrism/nest/node_modules/typescript/lib",
+            "full_def_source": "declare function parseFloat(string: string): number;",
+            "callee_documentation": "\n```typescript\nfunction parseFloat(string: string): number\n```\nConverts a string to a floating-point number.\n\n*@param* `string` — A string that contains a floating-point number.",
+            "repo_relative_path": "node_modules/typescript/lib/lib.es5.d.ts",
+            "repo_relative_dir": "node_modules/typescript/lib"
+          },
+          "argument_usages_resolved": []
+        }
+      ]
+    },
+    {
+      "sample_id": 9,
+      "callee_index": 4,
+      "tested_function": "transform",
+      "script_path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+      "callee": "this.options",
+      "ok": true,
+      "input": {
+        "repo_root": "/Users/trieyang/Desktop/DocPrism/nest",
+        "file_path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+        "tested_function": "transform",
+        "callee": "this.options",
+        "parsed": {
+          "kind": "attr",
+          "receiver": "this",
+          "name": "options"
+        },
+        "options": {
+          "window": 3,
+          "go_to_source_definition": true
+        }
+      },
+      "error": null,
+      "matches": {
+        "candidates": [
+          {
+            "kind": "attr",
+            "pretty": "this.options",
+            "expr_src": "this.options",
+            "ref": {
+              "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+              "line1": 61,
+              "col1": 30,
+              "line0": 60,
+              "col0": 29
+            },
+            "line_text": "    if (isNil(value) && this.options?.optional) {",
+            "meta": {
+              "pattern": "ast"
+            }
+          }
+        ],
+        "anchored": [
+          {
+            "kind": "attr",
+            "pretty": "this.options",
+            "expr_src": "this.options",
+            "ref": {
+              "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+              "line1": 61,
+              "col1": 30,
+              "line0": 60,
+              "col0": 29
+            },
+            "line_text": "    if (isNil(value) && this.options?.optional) {",
+            "meta": {
+              "pattern": "ast"
+            }
+          }
+        ],
+        "chosen": {
+          "kind": "attr",
+          "pretty": "this.options",
+          "expr_src": "this.options",
+          "ref": {
+            "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+            "line1": 61,
+            "col1": 30,
+            "line0": 60,
+            "col0": 29
+          },
+          "line_text": "    if (isNil(value) && this.options?.optional) {",
+          "meta": {
+            "pattern": "ast"
+          }
+        }
+      },
+      "definitions_all": [
+        {
+          "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+          "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+          "range": {
+            "start": {
+              "line0": 42,
+              "col0": 45
+            },
+            "end": {
+              "line0": 42,
+              "col0": 52
+            }
+          }
+        }
+      ],
+      "definitions_all_filtered": [
+        {
+          "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+          "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+          "range": {
+            "start": {
+              "line0": 42,
+              "col0": 45
+            },
+            "end": {
+              "line0": 42,
+              "col0": 52
+            }
+          }
+        }
+      ],
+      "chosen_definition_reason": {
+        "policy": [
+          "prefer_go_to_source_definition",
+          "drop_d_ts",
+          "prefer_repo_local",
+          "prefer_non_node_modules",
+          "prefer_implementation_over_declaration",
+          "tie_break_shorter_path_then_position"
+        ],
+        "dropped": {
+          "d_ts": []
+        },
+        "note": "go_to_source_definition_primary",
+        "ambiguity": {
+          "remaining": 1
+        },
+        "go_to_source_definition": true
+      },
+      "navigation_position": {
+        "line0": 60,
+        "col0": 29
+      },
+      "definitions": [
+        {
+          "outer_ok": true,
+          "outer_error": null,
+          "outer_definition": {
+            "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+            "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+            "range": {
+              "start": {
+                "line0": 42,
+                "col0": 45
+              },
+              "end": {
+                "line0": 42,
+                "col0": 52
+              }
+            },
+            "directory": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes",
+            "full_def_source": "@Optional() protected readonly options?: ParseFloatPipeOptions",
+            "callee_documentation": "\n```typescript\n(property) ParseFloatPipe.options?: ParseFloatPipeOptions | undefined\n```\n",
+            "repo_relative_path": "packages/common/pipes/parse-float.pipe.ts",
+            "repo_relative_dir": "packages/common/pipes"
+          },
+          "argument_usages_resolved": []
+        }
+      ],
+      "source_definition_locations": [
+        {
+          "uri": "file:///Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+          "path": "/Users/trieyang/Desktop/DocPrism/nest/packages/common/pipes/parse-float.pipe.ts",
+          "range": {
+            "start": {
+              "line0": 42,
+              "col0": 45
+            },
+            "end": {
+              "line0": 42,
+              "col0": 52
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

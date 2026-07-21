@@ -1,4 +1,4 @@
-"""Shared TypeScript definition-selection helpers for phase 3/4 resolution."""
+"""Shared TypeScript definition-selection helpers."""
 
 from __future__ import annotations
 
@@ -25,82 +25,6 @@ def _get_referenced_type_on_line(line: str) -> Optional[Tuple[str, int]]:
     if not m:
         return None
     return (m.group(1), m.start(1))
-
-
-def _find_constructor_snippet(lines: List[str], symbol_name: str) -> Optional[str]:
-    """
-    When LSP points into an instance interface (e.g. Date, Array, Map) at a method,
-    the user usually wanted the callable/constructor. TypeScript lib uses the pattern
-    interface Foo { ... } and interface FooConstructor { new (...): Foo; ... }; declare var Foo.
-    Find FooConstructor and return the constructor overloads plus 'declare var Foo'.
-    Works for any symbol (Date, Array, Map, Set, Promise, Object, RegExp, Error, etc.).
-    """
-    if not symbol_name:
-        return None
-    esc = re.escape(symbol_name)
-    constructor_interface_re = re.compile(
-        r"\binterface\s+" + esc + r"Constructor\s*\{"
-    )
-    declare_var_re = re.compile(r"declare\s+var\s+" + esc + r"\s*:")
-    new_returns_re = re.compile(r"\)\s*:\s*" + esc + r"\s*;")
-
-    in_constructor = False
-    brace_depth = 0
-    snippet: List[str] = []
-    for i, line in enumerate(lines):
-        if constructor_interface_re.search(line):
-            in_constructor = True
-            brace_depth = 0
-            snippet = []
-        if in_constructor:
-            for ch in line:
-                if ch == "{":
-                    brace_depth += 1
-                elif ch == "}":
-                    brace_depth -= 1
-            snippet.append(line)
-            if brace_depth == 0:
-                for j in range(i + 1, min(i + 5, len(lines))):
-                    if lines[j].strip() and declare_var_re.search(lines[j]):
-                        snippet.append(lines[j])
-                        break
-                break
-    if not snippet:
-        return None
-    out: List[str] = []
-    for line in snippet:
-        s = line.strip()
-        if re.search(r"new\s*\(", s) and new_returns_re.search(s):
-            out.append(line)
-        elif declare_var_re.search(line):
-            out.append(line)
-    return "\n".join(out) if out else "\n".join(snippet)
-
-
-def _prefer_lib_global_constructor_snippet(
-    snippet: Optional[str],
-    def_path: Path,
-    symbol_name: Optional[str],
-    *,
-    usage_kind: str,
-) -> Optional[str]:
-    """
-    lib*.d.ts models globals as interface Foo { ... } plus interface FooConstructor.
-    When navigation returns the whole instance interface for a call like Date(),
-    prefer FooConstructor + declare var Foo (same as _read_definition_source).
-    """
-    if usage_kind != "call" or not snippet or not symbol_name:
-        return snippet
-    if "new (" in snippet:
-        return snippet
-    if not re.search(r"\)\s*:\s*\w+\s*;", snippet):
-        return snippet
-    try:
-        lines = def_path.read_text(encoding="utf-8", errors="replace").splitlines()
-    except Exception:
-        return snippet
-    constructor_snippet = _find_constructor_snippet(lines, symbol_name)
-    return constructor_snippet if constructor_snippet else snippet
 
 
 def _definition_location_is_call_site_ast(path: Path, loc: Location) -> bool:

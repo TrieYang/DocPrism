@@ -1,0 +1,623 @@
+Running code_navigation_TypeScript on n8n.json ...
+Repo root: /Users/trieyang/Desktop/DocPrism/n8n
+
+======================================================================
+SUMMARY
+======================================================================
+Repo:           n8n
+Process pool:   max_workers=3
+Runtime:        57.94s
+Samples skipped (no extractable callees): 3
+Callees extracted (raw): 428
+Callees skipped (duplicate text): 68
+Samples (ids with rows): 95
+Callee rows:      360 total, 225 ok, 135 failed
+Row pass rate:    62.5%
+Samples all ok:   30 / 95 (every callee row succeeded for that sample)
+
+--- OK rows (first 30) ---
+  sample=1 idx=5 fn=createNewFolder -> cypress/pages/notifications.ts
+    callee: 'successToast()'
+  sample=2 idx=0 fn=estimateBatchSize -> (no path)
+    callee: 'Object.keys(doc.metadata)'
+  sample=2 idx=1 fn=estimateBatchSize -> (no path)
+    callee: 'Math.ceil(calculatedSize)'
+  sample=3 idx=0 fn=calculateVectorStoreSize -> (no path)
+    callee: 'JSON.stringify(vector.metadata)'
+  sample=3 idx=1 fn=calculateVectorStoreSize -> (no path)
+    callee: 'Math.ceil(storeSize)'
+  sample=4 idx=0 fn=getVectorStore -> (no path)
+    callee: 'this.vectorStoreBuffer.get(memoryKey)'
+  sample=4 idx=2 fn=getVectorStore -> (no path)
+    callee: 'this.vectorStoreBuffer.set(memoryKey, vectorStoreInstance)'
+  sample=4 idx=3 fn=getVectorStore -> (no path)
+    callee: 'this.storeMetadata.set(memoryKey, {\n\t\t\t\tsize: 0,\n\t\t\t\tcreated…'
+  sample=4 idx=4 fn=getVectorStore -> (no path)
+    callee: 'this.storeMetadata.get(memoryKey)'
+  sample=4 idx=6 fn=getVectorStore -> packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/MemoryVectorStoreManager.ts
+    callee: 'this.vectorStoreBuffer'
+  sample=4 idx=7 fn=getVectorStore -> packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/MemoryVectorStoreManager.ts
+    callee: 'this.embeddings'
+  sample=4 idx=8 fn=getVectorStore -> packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/MemoryVectorStoreManager.ts
+    callee: 'this.storeMetadata'
+  sample=5 idx=3 fn=clearStoreMetadata -> packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/MemoryVectorStoreManager.ts
+    callee: 'this.memoryUsageBytes'
+  sample=6 idx=0 fn=cleanupInactiveStores -> (no path)
+    callee: 'this.storeMetadata.entries()'
+  sample=6 idx=1 fn=cleanupInactiveStores -> packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/StoreCleanupService.ts
+    callee: 'this.isStoreInactive(metadata)'
+  sample=6 idx=2 fn=cleanupInactiveStores -> (no path)
+    callee: 'this.vectorStores.delete(key)'
+  sample=6 idx=3 fn=cleanupInactiveStores -> (no path)
+    callee: 'this.storeMetadata.delete(key)'
+  sample=6 idx=4 fn=cleanupInactiveStores -> packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/StoreCleanupService.ts
+    callee: "this.onCleanup(removedStores, freedBytes, 'ttl')"
+  sample=6 idx=5 fn=cleanupInactiveStores -> packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/StoreCleanupService.ts
+    callee: 'this.inactiveTtlMs'
+  sample=6 idx=7 fn=cleanupInactiveStores -> packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/StoreCleanupService.ts
+    callee: 'this.vectorStores'
+  sample=6 idx=8 fn=cleanupInactiveStores -> packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/types.ts
+    callee: 'metadata.size'
+  sample=6 idx=9 fn=cleanupInactiveStores -> packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/StoreCleanupService.ts
+    callee: 'this.oldestStoreKeys'
+  sample=7 idx=0 fn=cleanupOldestStores -> (no path)
+    callee: 'this.storeMetadata.values()'
+  sample=7 idx=1 fn=cleanupOldestStores -> packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/StoreCleanupService.ts
+    callee: 'this.cleanupInactiveStores()'
+  sample=7 idx=2 fn=cleanupOldestStores -> (no path)
+    callee: 'Date.now()'
+  sample=7 idx=4 fn=cleanupOldestStores -> (no path)
+    callee: 'this.storeMetadata.has(key)'
+  sample=7 idx=5 fn=cleanupOldestStores -> packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/StoreCleanupService.ts
+    callee: 'this.maxMemorySizeBytes'
+  sample=7 idx=8 fn=cleanupOldestStores -> packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/StoreCleanupService.ts
+    callee: 'this.lastSortTime'
+  sample=7 idx=9 fn=cleanupOldestStores -> packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/StoreCleanupService.ts
+    callee: 'this.CACHE_TTL_MS'
+  sample=8 idx=0 fn=supplyData -> packages/@n8n/nodes-langchain/nodes/vector_store/shared/createVectorStoreNode/operations/retrieveOperation.ts
+    callee: 'handleRetrieveOperation(this, args, embeddings, itemIndex)'
+  ... and 195 more ok rows
+
+--- FAILED rows ---
+  sample=1 idx=0 fn=createNewFolder
+    callee: "cy.intercept('POST', '/rest/projects/**')"
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/cypress/composables/folders.ts
+  sample=1 idx=1 fn=createNewFolder
+    callee: "cy.get('[role=dialog]')"
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/cypress/composables/folders.ts
+  sample=1 idx=2 fn=createNewFolder
+    callee: "cy.get('input.el-input__inner')"
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/cypress/composables/folders.ts
+  sample=1 idx=3 fn=createNewFolder
+    callee: "cy.get('button.btn--confirm')"
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/cypress/composables/folders.ts
+  sample=1 idx=4 fn=createNewFolder
+    callee: "cy.wait('@createFolder')"
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/cypress/composables/folders.ts
+  sample=4 idx=1 fn=getVectorStore
+    callee: 'MemoryVectorStore.fromExistingIndex(this.embeddings)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/MemoryVectorStoreManager.ts
+  sample=4 idx=5 fn=getVectorStore
+    callee: 'Date()'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/MemoryVectorStoreManager.ts
+  sample=8 idx=2 fn=supplyData
+    callee: 'NodeOperationError(\n\t\t\t\tthis.getNode(),\n\t\t\t\t\'Only the "retrieve" and "re'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/@n8n/nodes-langchain/nodes/vector_store/shared/createVectorStoreNode/createVectorStoreNode.ts
+  sample=8 idx=3 fn=supplyData
+    callee: 'NodeConnectionTypes.AiEmbedding'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/@n8n/nodes-langchain/nodes/vector_store/shared/createVectorStoreNode/createVectorStoreNode.ts
+  sample=9 idx=0 fn=getFormatInstructions
+    callee: 'this.outputParser.getFormatInstructions()'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/@n8n/nodes-langchain/utils/output_parsers/N8nOutputFixingParser.ts
+  sample=10 idx=0 fn=markNeedsAllNodes
+    callee: 'Set()'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/@n8n/task-runner/src/js-task-runner/built-ins-parser/built-ins-parser-state.ts
+  sample=13 idx=5 fn=cancelTaskRequests
+    callee: 'TaskCancelledError(reason)'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/@n8n/task-runner/src/task-runner.ts
+  sample=14 idx=0 fn=stopExecution
+    callee: 'ExecutionCancelledError(executionId)'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/active-executions.ts
+  sample=15 idx=2 fn=finalizeExecution
+    callee: "this.logger.debug('Execution finalized', { executionId })"
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/active-executions.ts
+  sample=16 idx=2 fn=getActiveExecutions
+    callee: 'data.executionData'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/active-executions.ts
+  sample=16 idx=3 fn=getActiveExecutions
+    callee: 'data.startedAt'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/active-executions.ts
+  sample=16 idx=4 fn=getActiveExecutions
+    callee: 'workflowData.id'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/active-executions.ts
+  sample=16 idx=5 fn=getActiveExecutions
+    callee: 'data.status'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/active-executions.ts
+  sample=17 idx=0 fn=addActiveWorkflows
+    callee: 'this.workflowRepository.getAllActiveIds()'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/active-workflow-manager.ts
+  sample=17 idx=1 fn=addActiveWorkflows
+    callee: "this.logger.info(' ================================')"
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/active-workflow-manager.ts
+  sample=17 idx=2 fn=addActiveWorkflows
+    callee: "this.logger.info('   Start Active Workflows:')"
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/active-workflow-manager.ts
+  sample=17 idx=5 fn=addActiveWorkflows
+    callee: "this.logger.debug('Finished activating workflows (startup)')"
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/active-workflow-manager.ts
+  sample=18 idx=2 fn=countTriggers
+    callee: 'name.includes'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/active-workflow-manager.ts
+  sample=19 idx=0 fn=removeWorkflowTriggersAndPollers
+    callee: 'this.activeWorkflows.isActive(workflowId)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/active-workflow-manager.ts
+  sample=19 idx=1 fn=removeWorkflowTriggersAndPollers
+    callee: 'this.activeWorkflows.remove(workflowId)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/active-workflow-manager.ts
+  sample=19 idx=2 fn=removeWorkflowTriggersAndPollers
+    callee: 'this.logger.debug(`Removed triggers and pollers for workflow "${workflow'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/active-workflow-manager.ts
+  sample=20 idx=0 fn=jwtExpiration
+    callee: "config.get('userManagement.jwtSessionDurationHours')"
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/auth/auth.service.ts
+  sample=21 idx=0 fn=stopProcess
+    callee: 'process.exit(0)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/commands/execute-batch.ts
+  sample=21 idx=1 fn=stopProcess
+    callee: 'Container.get(ActiveExecutions)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/commands/execute-batch.ts
+  sample=22 idx=1 fn=openBrowser
+    callee: 'this.logger.info(\n\t\t\t\t`\\nWas not able to open URL in browser. Please ope'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/commands/start.ts
+  sample=23 idx=0 fn=stopProcess
+    callee: "this.logger.info('\\nStopping n8n...')"
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/commands/webhook.ts
+  sample=24 idx=0 fn=stopProcess
+    callee: "this.logger.info('Stopping worker...')"
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/commands/worker.ts
+  sample=25 idx=0 fn=initOrchestration
+    callee: 'Container.get(OrchestrationService)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/commands/worker.ts
+  sample=25 idx=1 fn=initOrchestration
+    callee: 'Container.get(PubSubHandler)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/commands/worker.ts
+  sample=25 idx=2 fn=initOrchestration
+    callee: 'Container.get(Subscriber)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/commands/worker.ts
+  sample=25 idx=3 fn=initOrchestration
+    callee: "this.logger.scoped(['scaling', 'pubsub'])"
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/commands/worker.ts
+  sample=27 idx=0 fn=getCredentialWithoutUser
+    callee: 'this.credentialsRepository.findOneBy({ id: credentialId })'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/controllers/oauth/abstract-oauth.controller.ts
+  sample=28 idx=1 fn=decrypt
+    callee: "this.errorReporter.error(error, {\n\t\t\t\t\tlevel: 'error',\n\t\t\t\t\textra: { cre"
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/credentials/credentials.service.ts
+  sample=29 idx=2 fn=getCredentialsProperties
+    callee: 'NodeHelpers.mergeNodeProperties(combineProperties, mergeCredentialProper'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/credentials-helper.ts
+  sample=29 idx=3 fn=getCredentialsProperties
+    callee: 'NodeHelpers.mergeNodeProperties(combineProperties, credentialTypeData.pr'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/credentials-helper.ts
+  sample=29 idx=4 fn=getCredentialsProperties
+    callee: "UnexpectedError('Unknown credential type', { tags: { credentialType: typ"
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/credentials-helper.ts
+  sample=30 idx=0 fn=isDynamic
+    callee: "this.webhookPath.split('/')"
+    error:  file not found: /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/entities/webhook-entity.ts
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/entities/webhook-entity.ts
+  sample=31 idx=0 fn=up
+    callee: "escape.tableName('execution_entity')"
+    error:  file not found: /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/migrations/common/1693554410387-DisallowOrphanExecutions.ts
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/migrations/common/1693554410387-DisallowOrphanExecutions.ts
+  sample=32 idx=0 fn=findAllCredentialsForWorkflow
+    callee: 'this.findBy({\n\t\t\tshared: { project: { sharedWorkflows: { workflowId } } '
+    error:  file not found: /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/repositories/credentials.repository.ts
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/repositories/credentials.repository.ts
+  sample=33 idx=0 fn=findAllCredentialsForProject
+    callee: 'this.findBy({ shared: { projectId } })'
+    error:  file not found: /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/repositories/credentials.repository.ts
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/repositories/credentials.repository.ts
+  sample=34 idx=0 fn=findCredentialsForUser
+    callee: "this.roleService.rolesWithScope('project', scopes)"
+    error:  file not found: /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/repositories/credentials.repository.ts
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/repositories/credentials.repository.ts
+  sample=35 idx=0 fn=createNewExecution
+    callee: 'stringify(dataObj)'
+    error:  file not found: /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/repositories/execution.repository.ts
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/repositories/execution.repository.ts
+  sample=36 idx=0 fn=getInProgressExecutionIds
+    callee: "this.find({\n\t\t\tselect: ['id'],\n\t\t\twhere: { status: In(['new', 'running']"
+    error:  file not found: /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/repositories/execution.repository.ts
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/repositories/execution.repository.ts
+  sample=37 idx=0 fn=findProjectRole
+    callee: 'this.findOneBy({ projectId, userId })'
+    error:  file not found: /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/repositories/project-relation.repository.ts
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/repositories/project-relation.repository.ts
+  sample=38 idx=0 fn=countUsersByRole
+    callee: 'this.createQueryBuilder()'
+    error:  file not found: /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/repositories/project-relation.repository.ts
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/repositories/project-relation.repository.ts
+  sample=39 idx=0 fn=findPersonalOwnerForWorkflow
+    callee: "this.findOne({\n\t\t\twhere: {\n\t\t\t\tprojectRelations: {\n\t\t\t\t\trole: 'project:p"
+    error:  file not found: /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/repositories/user.repository.ts
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/databases/repositories/user.repository.ts
+  sample=41 idx=1 fn=recoverFromLogs
+    callee: "this.logger.info('[Recovery] Logs available, amended execution', {\n\t\t\tex"
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/executions/execution-recovery.service.ts
+  sample=41 idx=2 fn=recoverFromLogs
+    callee: 'this.executionRepository.updateExistingExecution(executionId, amendedExe'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/executions/execution-recovery.service.ts
+  sample=42 idx=0 fn=checkConnection
+    callee: 'this.fetchSecretsNamesPage()'
+    error:  file not found: /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/external-secrets.ee/providers/aws-secrets/aws-secrets-client.ts
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/external-secrets.ee/providers/aws-secrets/aws-secrets-client.ts
+  sample=44 idx=1 fn=getClient
+    callee: 'this.client.startTLS(tlsOptions)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/ldap.ee/ldap.service.ee.ts
+  sample=44 idx=2 fn=getClient
+    callee: "UnexpectedError('Service cannot be used without setting the property con"
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/ldap.ee/ldap.service.ee.ts
+  sample=44 idx=4 fn=getClient
+    callee: 'Client(ldapOptions)'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/ldap.ee/ldap.service.ee.ts
+  sample=45 idx=1 fn=validUser
+    callee: 'this.client.bind(dn, password)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/ldap.ee/ldap.service.ee.ts
+  sample=45 idx=2 fn=validUser
+    callee: 'this.client.unbind()'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/ldap.ee/ldap.service.ee.ts
+  sample=47 idx=0 fn=supportsProxyAuth
+    callee: 'this.types.credentials.find((t) => t.name === name)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/load-nodes-and-credentials.ts
+  sample=47 idx=1 fn=supportsProxyAuth
+    callee: 'this.logger.warn(\n\t\t\t\t\t`Failed to load Custom API options for the node "'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/load-nodes-and-credentials.ts
+  sample=47 idx=4 fn=supportsProxyAuth
+    callee: 'credentials.find'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/load-nodes-and-credentials.ts
+  sample=48 idx=0 fn=injectCustomApiCallOptions
+    callee: 'this.types.nodes.forEach((node: INodeTypeDescription) => {\n\t\t\tconst isLa'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/load-nodes-and-credentials.ts
+  sample=48 idx=4 fn=injectCustomApiCallOptions
+    callee: 'nodes.forEach'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/load-nodes-and-credentials.ts
+  sample=49 idx=0 fn=createAiTools
+    callee: 'this.types.nodes.filter((nodeType) => nodeType.usableAsTool)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/load-nodes-and-credentials.ts
+  sample=49 idx=2 fn=createAiTools
+    callee: 'this.types.nodes.push(wrapped)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/load-nodes-and-credentials.ts
+  sample=49 idx=6 fn=createAiTools
+    callee: 'nodes.filter'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/load-nodes-and-credentials.ts
+  sample=49 idx=7 fn=createAiTools
+    callee: 'nodes.push'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/load-nodes-and-credentials.ts
+  sample=50 idx=5 fn=compactRawToHour
+    callee: 'metadata.tableName'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/modules/insights/insights-compaction.service.ts
+  sample=52 idx=0 fn=setupPushServer
+    callee: 'WSServer({ noServer: true })'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/push/index.ts
+  sample=52 idx=2 fn=setupPushServer
+    callee: 'ServerResponse(request)'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/push/index.ts
+  sample=55 idx=8 fn=scheduleQueueMetrics
+    callee: 'endpoints.metrics'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/scaling/scaling.service.ts
+  sample=56 idx=1 fn=setHash
+    callee: 'this.cache.store.hset(key, hash)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/services/cache/cache.service.ts
+  sample=56 idx=6 fn=setHash
+    callee: 'store.hset'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/services/cache/cache.service.ts
+  sample=57 idx=0 fn=findOneUser
+    callee: 'this.authUserRepository.findOne(filter)'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/services/hooks.service.ts
+  sample=57 idx=1 fn=findOneUser
+    callee: 'this.authUserRepository'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/services/hooks.service.ts
+  sample=59 idx=0 fn=findProjectsWorkflowIsIn
+    callee: 'this.sharedWorkflowRepository.findProjectIds(workflowId)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/services/project.service.ee.ts
+  sample=63 idx=0 fn=createGrantToken
+    callee: 'taskBrokerAuthRequestBodySchema.safeParseAsync(req.body)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/task-runners/task-broker/auth/task-broker-auth.controller.ts
+  sample=63 idx=3 fn=createGrantToken
+    callee: 'BadRequestError(result.error.errors[0].code)'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/task-runners/task-broker/auth/task-broker-auth.controller.ts
+  sample=63 idx=4 fn=createGrantToken
+    callee: 'ForbiddenError()'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/task-runners/task-broker/auth/task-broker-auth.controller.ts
+  sample=66 idx=0 fn=setupWsServer
+    callee: 'a.ok(authToken)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/task-runners/task-broker/task-broker-server.ts
+  sample=66 idx=1 fn=setupWsServer
+    callee: 'a.ok(this.server)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/task-runners/task-broker/task-broker-server.ts
+  sample=66 idx=2 fn=setupWsServer
+    callee: "this.server.on('upgrade', this.handleUpgradeRequest)"
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/task-runners/task-broker/task-broker-server.ts
+  sample=66 idx=4 fn=setupWsServer
+    callee: 'WSServer({\n\t\t\tnoServer: true,\n\t\t\tmaxPayload: this.globalConfig.taskRunne'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/task-runners/task-broker/task-broker-server.ts
+  sample=66 idx=8 fn=setupWsServer
+    callee: 'taskRunners.maxPayload'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/task-runners/task-broker/task-broker-server.ts
+  sample=67 idx=4 fn=filterObjectByNodeNames
+    callee: 'hasOwnProperty.call'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/task-runners/task-managers/data-request-response-stripper.ts
+  sample=69 idx=0 fn=forceRestart
+    callee: "this.process.kill('SIGKILL')"
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/task-runners/task-runner-process.ts
+  sample=70 idx=1 fn=init
+    callee: 'this.stopTracking()'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/wait-tracker.ts
+  sample=70 idx=3 fn=init
+    callee: 'this.orchestrationService'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/wait-tracker.ts
+  sample=70 idx=4 fn=init
+    callee: 'multiMainSetup.on'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/wait-tracker.ts
+  sample=71 idx=0 fn=findDynamicWebhook
+    callee: 'this.webhookRepository.findBy({\n\t\t\twebhookId: uuidSegment,\n\t\t\tmethod,\n\t\t'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/webhooks/webhook.service.ts
+  sample=71 idx=1 fn=findDynamicWebhook
+    callee: 'Set(otherSegments)'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/webhooks/webhook.service.ts
+  sample=72 idx=0 fn=transferAll
+    callee: 'this.sharedWorkflowRepository.makeOwner(ownedWorkflowIds, toProjectId, t'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/workflows/workflow.service.ts
+  sample=72 idx=1 fn=transferAll
+    callee: 'this.sharedWorkflowRepository.deleteByIds(ownedWorkflowIds, fromProjectI'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/cli/src/workflows/workflow.service.ts
+  sample=76 idx=1 fn=createTool
+    callee: 'makeDescription(node, nodeType)'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/core/src/execution-engine/node-execution-context/utils/create-node-as-tool.ts
+  sample=76 idx=3 fn=createTool
+    callee: 'DynamicStructuredTool({\n\t\tname,\n\t\tdescription,\n\t\tschema,\n\t\tfunc: async ('
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/core/src/execution-engine/node-execution-context/utils/create-node-as-tool.ts
+  sample=76 idx=5 fn=createTool
+    callee: 'nodeType.description'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/core/src/execution-engine/node-execution-context/utils/create-node-as-tool.ts
+  sample=76 idx=6 fn=createTool
+    callee: 'z.infer'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/core/src/execution-engine/node-execution-context/utils/create-node-as-tool.ts
+  sample=79 idx=0 fn=ensureInputData
+    callee: 'nodeExecutionStack.push(executionData)'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/core/src/execution-engine/workflow-execute.ts
+  sample=79 idx=3 fn=ensureInputData
+    callee: 'main.length'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/core/src/execution-engine/workflow-execute.ts
+  sample=81 idx=8 fn=loadCredentialFromFile
+    callee: 'credentials.push'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/core/src/nodes-loader/directory-loader.ts
+  sample=82 idx=3 fn=getVersionedNodeTypeAll
+    callee: 'version.toString()'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/core/src/nodes-loader/directory-loader.ts
+  sample=83 idx=1 fn=addCodex
+    callee: 'codex.categories.concat(CUSTOM_NODES_CATEGORY)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/core/src/nodes-loader/directory-loader.ts
+  sample=83 idx=2 fn=addCodex
+    callee: 'this.logger.debug(`No codex available for: ${node.description.name}`)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/core/src/nodes-loader/directory-loader.ts
+  sample=83 idx=4 fn=addCodex
+    callee: 'codex.categories'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/core/src/nodes-loader/directory-loader.ts
+  sample=84 idx=6 fn=sendMessage
+    callee: 'messages.value.push(newMessage)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatMessaging.ts
+  sample=84 idx=8 fn=sendMessage
+    callee: "Error(locale.baseText('chat.window.chat.provideMessage'))"
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatMessaging.ts
+  sample=84 idx=13 fn=sendMessage
+    callee: 'previousMessageIndex.value'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatMessaging.ts
+  sample=84 idx=14 fn=sendMessage
+    callee: 'chatTrigger.value'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatMessaging.ts
+  sample=84 idx=15 fn=sendMessage
+    callee: 'sessionId.value'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatMessaging.ts
+  sample=84 idx=16 fn=sendMessage
+    callee: 'messages.value'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatMessaging.ts
+  sample=85 idx=0 fn=setConnectedNode
+    callee: 'workflow.value.getChildNodes(triggerNode.name)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatTrigger.ts
+  sample=85 idx=1 fn=setConnectedNode
+    callee: 'NodeHelpers.getNodeInputs(workflow.value, storeNode, nodeType)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatTrigger.ts
+  sample=85 idx=2 fn=setConnectedNode
+    callee: 'NodeHelpers.getConnectionTypes(inputs)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatTrigger.ts
+  sample=85 idx=3 fn=setConnectedNode
+    callee: 'NodeHelpers.getNodeOutputs(workflow.value, storeNode, nodeType)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatTrigger.ts
+  sample=85 idx=4 fn=setConnectedNode
+    callee: 'NodeHelpers.getConnectionTypes(outputs)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatTrigger.ts
+  sample=85 idx=5 fn=setConnectedNode
+    callee: 'workflow.value.getParentNodes(storeNode.name)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatTrigger.ts
+  sample=85 idx=9 fn=setConnectedNode
+    callee: 'chatTriggerNode.value'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatTrigger.ts
+  sample=85 idx=10 fn=setConnectedNode
+    callee: 'workflow.value'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatTrigger.ts
+  sample=85 idx=11 fn=setConnectedNode
+    callee: 'storeNode.type'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatTrigger.ts
+  sample=85 idx=12 fn=setConnectedNode
+    callee: 'storeNode.typeVersion'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatTrigger.ts
+  sample=85 idx=13 fn=setConnectedNode
+    callee: 'NodeConnectionTypes.AiLanguageModel'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatTrigger.ts
+  sample=85 idx=14 fn=setConnectedNode
+    callee: 'NodeConnectionTypes.Main'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatTrigger.ts
+  sample=85 idx=16 fn=setConnectedNode
+    callee: 'connectedNode.value'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatTrigger.ts
+  sample=87 idx=2 fn=checkMaxNodesOfTypeReached
+    callee: "Error(\n\t\t\t\ti18n.baseText('nodeView.showMessage.showMaxNodeTypeError.mess"
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/composables/useCanvasOperations.ts
+  sample=88 idx=3 fn=handleDrop
+    callee: 'isDragging.value'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/composables/useFolders.ts
+  sample=88 idx=4 fn=handleDrop
+    callee: 'foldersStore.draggedElement'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/composables/useFolders.ts
+  sample=89 idx=0 fn=uniqueNodeName
+    callee: 'canvasNames.has(originalName)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/composables/useUniqueNodeName.ts
+  sample=89 idx=2 fn=uniqueNodeName
+    callee: 'canvasNames.has(unique)'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/composables/useUniqueNodeName.ts
+  sample=89 idx=7 fn=uniqueNodeName
+    callee: "Error('Failed to find match for unique name')"
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/composables/useUniqueNodeName.ts
+  sample=90 idx=1 fn=inputLabelDisplayName
+    callee: 'deriveMiddleKey(path, parameter)'
+    error:  Callee not found.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/plugins/i18n/index.ts
+  sample=91 idx=1 fn=onMessage
+    callee: 'onMessageReceivedHandlers.value.forEach((handler) => handler(receivedDat'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/stores/pushConnection.store.ts
+  sample=91 idx=2 fn=onMessage
+    callee: 'onMessageReceivedHandlers.value'
+    error:  No definition found from TypeScript LSP.
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/frontend/editor-ui/src/stores/pushConnection.store.ts
+  sample=98 idx=0 fn=getParameterDependencies
+    callee: 'Object.values(displayOptions)'
+    error:  file not found: /Users/trieyang/Desktop/DocPrism/n8n/packages/workflow/src/NodeHelpers.ts
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/workflow/src/NodeHelpers.ts
+  sample=99 idx=0 fn=nodeGetter
+    callee: 'name.toString()'
+    error:  file not found: /Users/trieyang/Desktop/DocPrism/n8n/packages/workflow/src/WorkflowDataProxy.ts
+    file:   /Users/trieyang/Desktop/DocPrism/n8n/packages/workflow/src/WorkflowDataProxy.ts
+
+Full results written to: /Users/trieyang/Desktop/DocPrism/n8n_eval_results.json

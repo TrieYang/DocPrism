@@ -1,0 +1,702 @@
+[
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/cypress/composables/folders.ts",
+    "doc": "/**\n * Utils\n */\n/**\n * Types folder name in the prompt and waits for the folder to be created\n * @param name\n */",
+    "code": "function createNewFolder(name: string) {\n\tcy.intercept('POST', '/rest/projects/**').as('createFolder');\n\tcy.get('[role=dialog]')\n\t\t.filter(':visible')\n\t\t.within(() => {\n\t\t\tcy.get('input.el-input__inner').type(name, { delay: 50 });\n\t\t\tcy.get('button.btn--confirm').click();\n\t\t});\n\tcy.wait('@createFolder');\n\tsuccessToast().should('exist');\n}",
+    "old_id": 1,
+    "id": 1
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/MemoryCalculator.ts",
+    "doc": "/**\n\t * Fast batch size estimation for multiple documents\n\t */",
+    "code": "estimateBatchSize(documents: Document[]): number {\n\t\tif (documents.length === 0) return 0;\n\n\t\tlet totalContentSize = 0;\n\t\tlet totalMetadataSize = 0;\n\n\t\t// Single pass through documents for content and metadata estimation\n\t\tfor (const doc of documents) {\n\t\t\tif (doc.pageContent) {\n\t\t\t\ttotalContentSize += doc.pageContent.length * CHAR_SIZE_BYTES;\n\t\t\t}\n\n\t\t\t// Metadata size estimation\n\t\t\tif (doc.metadata) {\n\t\t\t\t// For simple objects, estimate based on key count\n\t\t\t\tconst metadataKeys = Object.keys(doc.metadata).length;\n\t\t\t\tif (metadataKeys > 0) {\n\t\t\t\t\t// For each key, estimate the key name plus a typical value\n\t\t\t\t\t// plus some overhead for object structure\n\t\t\t\t\ttotalMetadataSize += metadataKeys * AVG_METADATA_SIZE_BYTES;\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\t// Fixed size components (embedding vectors and overhead)\n\t\t// Each embedding is a fixed-size array of floating point numbers\n\t\tconst embeddingSize = documents.length * EMBEDDING_SIZE_BYTES;\n\n\t\t// Object overhead, each vector is stored with additional JS object structure\n\t\tconst overhead = documents.length * VECTOR_OVERHEAD_BYTES;\n\n\t\t// Calculate total batch size with a safety factor to avoid underestimation\n\t\tconst calculatedSize = totalContentSize + totalMetadataSize + embeddingSize + overhead;\n\n\t\treturn Math.ceil(calculatedSize);\n\t}",
+    "old_id": 20,
+    "id": 2
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/MemoryCalculator.ts",
+    "doc": "/**\n\t * Calculate the size of a vector store by examining its contents\n\t */",
+    "code": "calculateVectorStoreSize(vectorStore: MemoryVectorStore): number {\n\t\tif (!vectorStore.memoryVectors || vectorStore.memoryVectors.length === 0) {\n\t\t\treturn 0;\n\t\t}\n\n\t\tlet storeSize = 0;\n\n\t\t// Calculate size of each vector\n\t\tfor (const vector of vectorStore.memoryVectors) {\n\t\t\t// Size of embedding (float64 array)\n\t\t\tstoreSize += vector.embedding.length * FLOAT_SIZE_BYTES;\n\n\t\t\t// Size of content string (2 bytes per character in JS)\n\t\t\tstoreSize += vector.content ? vector.content.length * CHAR_SIZE_BYTES : 0;\n\n\t\t\t// Estimate metadata size\n\t\t\tif (vector.metadata) {\n\t\t\t\t// Use a more accurate calculation for metadata\n\t\t\t\tconst metadataStr = JSON.stringify(vector.metadata);\n\t\t\t\tstoreSize += metadataStr.length * CHAR_SIZE_BYTES;\n\t\t\t}\n\n\t\t\t// Add overhead for object structure\n\t\t\tstoreSize += VECTOR_OVERHEAD_BYTES;\n\t\t}\n\n\t\treturn Math.ceil(storeSize);\n\t}",
+    "old_id": 21,
+    "id": 3
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/MemoryVectorStoreManager.ts",
+    "doc": "/**\n\t * Get or create a vector store by key\n\t */",
+    "code": "async getVectorStore(memoryKey: string): Promise<MemoryVectorStore> {\n\t\tlet vectorStoreInstance = this.vectorStoreBuffer.get(memoryKey);\n\n\t\tif (!vectorStoreInstance) {\n\t\t\tvectorStoreInstance = await MemoryVectorStore.fromExistingIndex(this.embeddings);\n\t\t\tthis.vectorStoreBuffer.set(memoryKey, vectorStoreInstance);\n\n\t\t\tthis.storeMetadata.set(memoryKey, {\n\t\t\t\tsize: 0,\n\t\t\t\tcreatedAt: new Date(),\n\t\t\t\tlastAccessed: new Date(),\n\t\t\t});\n\t\t} else {\n\t\t\tconst metadata = this.storeMetadata.get(memoryKey);\n\t\t\tif (metadata) {\n\t\t\t\tmetadata.lastAccessed = new Date();\n\t\t\t}\n\t\t}\n\n\t\treturn vectorStoreInstance;\n\t}",
+    "old_id": 24,
+    "id": 4
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/MemoryVectorStoreManager.ts",
+    "doc": "/**\n\t * Reset a store's metadata when it's cleared\n\t */",
+    "code": "protected clearStoreMetadata(memoryKey: string): void {\n\t\tconst metadata = this.storeMetadata.get(memoryKey);\n\t\tif (metadata) {\n\t\t\tthis.memoryUsageBytes -= metadata.size;\n\t\t\tmetadata.size = 0;\n\t\t\tmetadata.lastAccessed = new Date();\n\t\t}\n\t}",
+    "old_id": 25,
+    "id": 5
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/StoreCleanupService.ts",
+    "doc": "/**\n\t * Remove vector stores that haven't been accessed for longer than TTL\n\t */",
+    "code": "cleanupInactiveStores(): void {\n\t\t// Skip if TTL is disabled\n\t\tif (this.inactiveTtlMs <= 0) {\n\t\t\treturn;\n\t\t}\n\n\t\tlet freedBytes = 0;\n\t\tconst removedStores: string[] = [];\n\n\t\t// Find and remove inactive stores\n\t\tfor (const [key, metadata] of this.storeMetadata.entries()) {\n\t\t\tif (this.isStoreInactive(metadata)) {\n\t\t\t\t// Remove this inactive store\n\t\t\t\tthis.vectorStores.delete(key);\n\t\t\t\tfreedBytes += metadata.size;\n\t\t\t\tremovedStores.push(key);\n\t\t\t}\n\t\t}\n\n\t\t// Remove from metadata after iteration to avoid concurrent modification\n\t\tfor (const key of removedStores) {\n\t\t\tthis.storeMetadata.delete(key);\n\t\t}\n\n\t\t// Invalidate cache if we removed any stores\n\t\tif (removedStores.length > 0) {\n\t\t\tthis.oldestStoreKeys = [];\n\t\t\tthis.onCleanup(removedStores, freedBytes, 'ttl');\n\t\t}\n\t}",
+    "old_id": 31,
+    "id": 6
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/@n8n/nodes-langchain/nodes/vector_store/shared/MemoryManager/StoreCleanupService.ts",
+    "doc": "/**\n\t * Remove the oldest vector stores to free up memory\n\t */",
+    "code": "cleanupOldestStores(requiredBytes: number): void {\n\t\t// Skip if memory limit is disabled\n\t\tif (this.maxMemorySizeBytes <= 0) {\n\t\t\treturn;\n\t\t}\n\n\t\t// Calculate current total memory usage\n\t\tlet currentMemoryUsage = 0;\n\t\tfor (const metadata of this.storeMetadata.values()) {\n\t\t\tcurrentMemoryUsage += metadata.size;\n\t\t}\n\n\t\t// First, try to clean up inactive stores\n\t\tthis.cleanupInactiveStores();\n\n\t\t// Recalculate memory usage after inactive cleanup\n\t\tcurrentMemoryUsage = 0;\n\t\tfor (const metadata of this.storeMetadata.values()) {\n\t\t\tcurrentMemoryUsage += metadata.size;\n\t\t}\n\n\t\t// If no more cleanup needed, return early\n\t\tif (currentMemoryUsage + requiredBytes <= this.maxMemorySizeBytes) {\n\t\t\treturn;\n\t\t}\n\n\t\tconst now = Date.now();\n\n\t\t// Reuse cached ordering if available and not stale\n\t\tif (this.oldestStoreKeys.length === 0 || now - this.lastSortTime > this.CACHE_TTL_MS) {\n\t\t\t// Collect and sort store keys by age\n\t\t\tconst stores: Array<[string, number]> = [];\n\n\t\t\tfor (const [key, metadata] of this.storeMetadata.entries()) {\n\t\t\t\tstores.push([key, metadata.createdAt.getTime()]);\n\t\t\t}\n\n\t\t\t// Sort by creation time (oldest first)\n\t\t\tstores.sort((a, b) => a[1] - b[1]);\n\n\t\t\t// Extract just the keys\n\t\t\tthis.oldestStoreKeys = stores.map(([key]) => key);\n\t\t\tthis.lastSortTime = now;\n\t\t}\n\n\t\tlet freedBytes = 0;\n\t\tconst removedStores: string[] = [];\n\n\t\t// Remove stores in order until we have enough space\n\t\tfor (const key of this.oldestStoreKeys) {\n\t\t\t// Skip if store no longer exists\n\t\t\tif (!this.storeMetadata.has(key)) continue;\n\n\t\t\t// Stop if we've freed enough space\n\t\t\tif (currentMemoryUsage - freedBytes + requiredBytes <= this.maxMemorySizeBytes) {\n\t\t\t\tbreak;\n\t\t\t}\n\n\t\t\tconst metadata = this.storeMetadata.get(key);\n\t\t\tif (metadata) {\n\t\t\t\tthis.vectorStores.delete(key);\n\t\t\t\tfreedBytes += metadata.size;\n\t\t\t\tremovedStores.push(key);\n\t\t\t}\n\t\t}\n\n\t\t// Remove from metadata after iteration to avoid concurrent modification\n\t\tfor (const key of removedStores) {\n\t\t\tthis.storeMetadata.delete(key);\n\t\t}\n\n\t\t// Update our cache if we removed stores\n\t\tif (removedStores.length > 0) {\n\t\t\t// Filter out removed stores from cached keys\n\t\t\tthis.oldestStoreKeys = this.oldestStoreKeys.filter((key) => !removedStores.includes(key));\n\t\t\tthis.onCleanup(removedStores, freedBytes, 'memory');\n\t\t}\n\t}",
+    "old_id": 32,
+    "id": 7
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/@n8n/nodes-langchain/nodes/vector_store/shared/createVectorStoreNode/createVectorStoreNode.ts",
+    "doc": "/**\n\t\t * Method to supply data to AI nodes\n\t\t * Supports 'retrieve' and 'retrieve-as-tool' operation modes\n\t\t */",
+    "code": "async supplyData(this: ISupplyDataFunctions, itemIndex: number): Promise<SupplyData> {\n\t\t\tconst mode = this.getNodeParameter('mode', 0) as NodeOperationMode;\n\n\t\t\t// Get the embeddings model connected to this node\n\t\t\tconst embeddings = (await this.getInputConnectionData(\n\t\t\t\tNodeConnectionTypes.AiEmbedding,\n\t\t\t\t0,\n\t\t\t)) as Embeddings;\n\n\t\t\t// Handle each supply data operation mode with dedicated modules\n\t\t\tif (mode === 'retrieve') {\n\t\t\t\treturn await handleRetrieveOperation(this, args, embeddings, itemIndex);\n\t\t\t}\n\n\t\t\tif (mode === 'retrieve-as-tool') {\n\t\t\t\treturn await handleRetrieveAsToolOperation(this, args, embeddings, itemIndex);\n\t\t\t}\n\n\t\t\tthrow new NodeOperationError(\n\t\t\t\tthis.getNode(),\n\t\t\t\t'Only the \"retrieve\" and \"retrieve-as-tool\" operation mode is supported to supply data',\n\t\t\t);\n\t\t}",
+    "old_id": 34,
+    "id": 8
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/@n8n/nodes-langchain/utils/output_parsers/N8nOutputFixingParser.ts",
+    "doc": "/**\n\t * Method to get the format instructions for the parser.\n\t * @returns The format instructions for the parser.\n\t */",
+    "code": "getFormatInstructions() {\n\t\treturn this.outputParser.getFormatInstructions();\n\t}",
+    "old_id": 36,
+    "id": 9
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/@n8n/task-runner/src/js-task-runner/built-ins-parser/built-ins-parser-state.ts",
+    "doc": "/**\n\t * Marks that all nodes are needed, including input data\n\t */",
+    "code": "markNeedsAllNodes() {\n\t\tthis.needsAllNodes = true;\n\t\tthis.needs$input = true;\n\t\tthis.neededNodeNames = new Set();\n\t}",
+    "old_id": 37,
+    "id": 10
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/@n8n/task-runner/src/js-task-runner/built-ins-parser/built-ins-parser.ts",
+    "doc": "/**\n\t * Parses which built-in variables are accessed in the given code\n\t */",
+    "code": "parseUsedBuiltIns(code: string): Result<BuiltInsParserState, Error> {\n\t\treturn toResult(() => {\n\t\t\tconst wrappedCode = `async function VmCodeWrapper() { ${code} }`;\n\t\t\tconst ast = parse(wrappedCode, { ecmaVersion: 2025, sourceType: 'module' });\n\n\t\t\treturn this.identifyBuiltInsByWalkingAst(ast);\n\t\t});\n\t}",
+    "old_id": 38,
+    "id": 11
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/@n8n/task-runner/src/node-types.ts",
+    "doc": "/** Filter out node type versions that are already registered. */",
+    "code": "onlyUnknown(nodeTypes: NeededNodeType[]) {\n\t\treturn nodeTypes.filter(({ name, version }) => {\n\t\t\tconst existingVersions = this.nodeTypesByVersion.get(name);\n\n\t\t\tif (!existingVersions) return true;\n\n\t\t\treturn !existingVersions.has(version);\n\t\t});\n\t}",
+    "old_id": 41,
+    "id": 12
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/@n8n/task-runner/src/task-runner.ts",
+    "doc": "/**\n\t * Cancels all node type and data requests made by the given task\n\t */",
+    "code": "private cancelTaskRequests(taskId: string, reason: string) {\n\t\tfor (const [requestId, request] of this.dataRequests.entries()) {\n\t\t\tif (request.taskId === taskId) {\n\t\t\t\trequest.reject(new TaskCancelledError(reason));\n\t\t\t\tthis.dataRequests.delete(requestId);\n\t\t\t}\n\t\t}\n\n\t\tfor (const [requestId, request] of this.nodeTypesRequests.entries()) {\n\t\t\tif (request.taskId === taskId) {\n\t\t\t\trequest.reject(new TaskCancelledError(reason));\n\t\t\t\tthis.nodeTypesRequests.delete(requestId);\n\t\t\t}\n\t\t}\n\t}",
+    "old_id": 45,
+    "id": 13
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/active-executions.ts",
+    "doc": "/** Cancel the execution promise and reject its post-execution promise. */",
+    "code": "stopExecution(executionId: string): void {\n\t\tconst execution = this.activeExecutions[executionId];\n\t\tif (execution === undefined) {\n\t\t\t// There is no execution running with that id\n\t\t\treturn;\n\t\t}\n\t\tconst error = new ExecutionCancelledError(executionId);\n\t\texecution.responsePromise?.reject(error);\n\t\tif (execution.status === 'waiting') {\n\t\t\t// A waiting execution will not have a valid workflowExecution or postExecutePromise\n\t\t\t// So we can't rely on the `.finally` on the postExecutePromise for the execution removal\n\t\t\tdelete this.activeExecutions[executionId];\n\t\t} else {\n\t\t\texecution.workflowExecution?.cancel();\n\t\t\texecution.postExecutePromise.reject(error);\n\t\t}\n\t\tthis.logger.debug('Execution cancelled', { executionId });\n\t}",
+    "old_id": 52,
+    "id": 14
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/active-executions.ts",
+    "doc": "/** Resolve the post-execution promise in an execution. */",
+    "code": "finalizeExecution(executionId: string, fullRunData?: IRun) {\n\t\tif (!this.has(executionId)) return;\n\t\tconst execution = this.getExecutionOrFail(executionId);\n\t\texecution.postExecutePromise.resolve(fullRunData);\n\t\tthis.logger.debug('Execution finalized', { executionId });\n\t}",
+    "old_id": 53,
+    "id": 15
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/active-executions.ts",
+    "doc": "/**\n\t * Returns all the currently active executions\n\t */",
+    "code": "getActiveExecutions(): IExecutionsCurrentSummary[] {\n\t\tconst returnData: IExecutionsCurrentSummary[] = [];\n\n\t\tlet data;\n\n\t\tfor (const id of Object.keys(this.activeExecutions)) {\n\t\t\tdata = this.activeExecutions[id];\n\t\t\treturnData.push({\n\t\t\t\tid,\n\t\t\t\tretryOf: data.executionData.retryOf ?? undefined,\n\t\t\t\tstartedAt: data.startedAt,\n\t\t\t\tmode: data.executionData.executionMode,\n\t\t\t\tworkflowId: data.executionData.workflowData.id,\n\t\t\t\tstatus: data.status,\n\t\t\t});\n\t\t}\n\n\t\treturn returnData;\n\t}",
+    "old_id": 56,
+    "id": 16
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/active-workflow-manager.ts",
+    "doc": "/**\n\t * Register as active in memory all workflows stored as `active`,\n\t * only on instance init or (in multi-main setup) on leadership change.\n\t */",
+    "code": "async addActiveWorkflows(activationMode: 'init' | 'leadershipChange') {\n\t\tconst dbWorkflowIds = await this.workflowRepository.getAllActiveIds();\n\n\t\tif (dbWorkflowIds.length === 0) return;\n\n\t\tif (this.instanceSettings.isLeader) {\n\t\t\tthis.logger.info(' ================================');\n\t\t\tthis.logger.info('   Start Active Workflows:');\n\t\t\tthis.logger.info(' ================================');\n\t\t}\n\n\t\tconst batches = chunk(dbWorkflowIds, this.workflowsConfig.activationBatchSize);\n\n\t\tfor (const batch of batches) {\n\t\t\tconst activationPromises = batch.map(async (dbWorkflowId) => {\n\t\t\t\tawait this.activateWorkflow(dbWorkflowId, activationMode);\n\t\t\t});\n\n\t\t\tawait Promise.all(activationPromises);\n\t\t}\n\n\t\tthis.logger.debug('Finished activating workflows (startup)');\n\t}",
+    "old_id": 62,
+    "id": 17
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/active-workflow-manager.ts",
+    "doc": "/**\n\t * Count all triggers in the workflow, excluding Manual Trigger.\n\t */",
+    "code": "private countTriggers(workflow: Workflow, additionalData: IWorkflowExecuteAdditionalData) {\n\t\tconst triggerFilter = (nodeType: INodeType) =>\n\t\t\t!!nodeType.trigger && !nodeType.description.name.includes('manualTrigger');\n\n\t\t// Retrieve unique webhooks as some nodes have multiple webhooks\n\t\tconst workflowWebhooks = WebhookHelpers.getWorkflowWebhooks(\n\t\t\tworkflow,\n\t\t\tadditionalData,\n\t\t\tundefined,\n\t\t\ttrue,\n\t\t);\n\n\t\tconst uniqueWebhooks = workflowWebhooks.reduce<Set<string>>((acc, webhook) => {\n\t\t\tacc.add(webhook.node);\n\t\t\treturn acc;\n\t\t}, new Set());\n\n\t\treturn (\n\t\t\tworkflow.queryNodes(triggerFilter).length +\n\t\t\tworkflow.getPollNodes().length +\n\t\t\tuniqueWebhooks.size\n\t\t);\n\t}",
+    "old_id": 64,
+    "id": 18
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/active-workflow-manager.ts",
+    "doc": "/**\n\t * Stop running active triggers and pollers for a workflow.\n\t */",
+    "code": "async removeWorkflowTriggersAndPollers(workflowId: WorkflowId) {\n\t\tif (!this.activeWorkflows.isActive(workflowId)) return;\n\n\t\tconst wasRemoved = await this.activeWorkflows.remove(workflowId);\n\n\t\tif (wasRemoved) {\n\t\t\tthis.logger.debug(`Removed triggers and pollers for workflow \"${workflowId}\"`, {\n\t\t\t\tworkflowId,\n\t\t\t});\n\t\t}\n\t}",
+    "old_id": 68,
+    "id": 19
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/auth/auth.service.ts",
+    "doc": "/** How many **seconds** is an issued JWT valid for */",
+    "code": "get jwtExpiration() {\n\t\treturn config.get('userManagement.jwtSessionDurationHours') * Time.hours.toSeconds;\n\t}",
+    "old_id": 72,
+    "id": 20
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/commands/execute-batch.ts",
+    "doc": "/**\n\t * Gracefully handles exit.\n\t * @param {boolean} skipExit Whether to skip exit or number according to received signal\n\t */",
+    "code": "async stopProcess(skipExit: boolean | number = false) {\n\t\tif (ExecuteBatch.cancelled) {\n\t\t\tprocess.exit(0);\n\t\t}\n\n\t\tExecuteBatch.cancelled = true;\n\n\t\tawait Container.get(ActiveExecutions).shutdown(true);\n\n\t\t// We may receive true but when called from `process.on`\n\t\t// we get the signal (SIGINT, etc.)\n\t\tif (skipExit !== true) {\n\t\t\tprocess.exit(0);\n\t\t}\n\t}",
+    "old_id": 75,
+    "id": 21
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/commands/start.ts",
+    "doc": "/**\n\t * Opens the UI in browser\n\t */",
+    "code": "private openBrowser() {\n\t\tconst editorUrl = this.getEditorUrl();\n\n\t\topen(editorUrl, { wait: true }).catch(() => {\n\t\t\tthis.logger.info(\n\t\t\t\t`\\nWas not able to open URL in browser. Please open manually by visiting:\\n${editorUrl}\\n`,\n\t\t\t);\n\t\t});\n\t}",
+    "old_id": 76,
+    "id": 22
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/commands/webhook.ts",
+    "doc": "/**\n\t * Stops n8n in a graceful way.\n\t * Make for example sure that all the webhooks from third party services\n\t * get removed.\n\t */",
+    "code": "async stopProcess() {\n\t\tthis.logger.info('\\nStopping n8n...');\n\n\t\ttry {\n\t\t\tawait this.externalHooks?.run('n8n.stop');\n\n\t\t\tawait Container.get(ActiveExecutions).shutdown();\n\t\t} catch (error) {\n\t\t\tawait this.exitWithCrash('There was an error shutting down n8n.', error);\n\t\t}\n\n\t\tawait this.exitSuccessFully();\n\t}",
+    "old_id": 79,
+    "id": 23
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/commands/worker.ts",
+    "doc": "/**\n\t * Stop n8n in a graceful way.\n\t * Make for example sure that all the webhooks from third party services\n\t * get removed.\n\t */",
+    "code": "async stopProcess() {\n\t\tthis.logger.info('Stopping worker...');\n\n\t\ttry {\n\t\t\tawait this.externalHooks?.run('n8n.stop');\n\t\t} catch (error) {\n\t\t\tawait this.exitWithCrash('Error shutting down worker', error);\n\t\t}\n\n\t\tawait this.exitSuccessFully();\n\t}",
+    "old_id": 80,
+    "id": 24
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/commands/worker.ts",
+    "doc": "/**\n\t * Initializes the redis connection\n\t * A publishing connection to redis is created to publish events to the event log\n\t * A subscription connection to redis is created to subscribe to commands from the main process\n\t * The subscription connection adds a handler to handle the command messages\n\t */",
+    "code": "async initOrchestration() {\n\t\tawait Container.get(OrchestrationService).init();\n\n\t\tContainer.get(PubSubHandler).init();\n\t\tawait Container.get(Subscriber).subscribe('n8n.commands');\n\n\t\tthis.logger.scoped(['scaling', 'pubsub']).debug('Pubsub setup completed');\n\t}",
+    "old_id": 81,
+    "id": 25
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/concurrency/concurrency-control.service.ts",
+    "doc": "/**\n\t * Remove an execution from the production queue, releasing capacity back.\n\t */",
+    "code": "remove({ mode, executionId }: { mode: ExecutionMode; executionId: string }) {\n\t\tif (!this.isEnabled || this.isUnlimited(mode)) return;\n\n\t\tthis.getQueue(mode)?.remove(executionId);\n\t}",
+    "old_id": 85,
+    "id": 26
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/controllers/oauth/abstract-oauth.controller.ts",
+    "doc": "/** Get a credential without user check */",
+    "code": "protected async getCredentialWithoutUser(credentialId: string): Promise<ICredentialsDb | null> {\n\t\treturn await this.credentialsRepository.findOneBy({ id: credentialId });\n\t}",
+    "old_id": 88,
+    "id": 27
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/credentials/credentials.service.ts",
+    "doc": "/**\n\t * Decrypts the credentials data and redacts the content by default.\n\t *\n\t * If `includeRawData` is set to true it will not redact the data.\n\t */",
+    "code": "decrypt(credential: CredentialsEntity, includeRawData = false) {\n\t\tconst coreCredential = createCredentialsFromCredentialsEntity(credential);\n\t\ttry {\n\t\t\tconst data = coreCredential.getData();\n\t\t\tif (includeRawData) {\n\t\t\t\treturn data;\n\t\t\t}\n\t\t\treturn this.redact(data, credential);\n\t\t} catch (error) {\n\t\t\tif (error instanceof CredentialDataError) {\n\t\t\t\tthis.errorReporter.error(error, {\n\t\t\t\t\tlevel: 'error',\n\t\t\t\t\textra: { credentialId: credential.id },\n\t\t\t\t\ttags: { credentialType: credential.type },\n\t\t\t\t});\n\t\t\t\treturn {};\n\t\t\t}\n\t\t\tthrow error;\n\t\t}\n\t}",
+    "old_id": 90,
+    "id": 28
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/credentials-helper.ts",
+    "doc": "/**\n\t * Returns all the properties of the credentials with the given name\n\t */",
+    "code": "getCredentialsProperties(type: string): INodeProperties[] {\n\t\tconst credentialTypeData = this.credentialTypes.getByName(type);\n\n\t\tif (credentialTypeData === undefined) {\n\t\t\tthrow new UnexpectedError('Unknown credential type', { tags: { credentialType: type } });\n\t\t}\n\n\t\tif (credentialTypeData.extends === undefined) {\n\t\t\t// Manually add the special OAuth parameter which stores\n\t\t\t// data like access- and refresh-token\n\t\t\tif (['oAuth1Api', 'oAuth2Api'].includes(type)) {\n\t\t\t\treturn [\n\t\t\t\t\t...credentialTypeData.properties,\n\t\t\t\t\t{\n\t\t\t\t\t\tdisplayName: 'oauthTokenData',\n\t\t\t\t\t\tname: 'oauthTokenData',\n\t\t\t\t\t\ttype: 'json',\n\t\t\t\t\t\trequired: false,\n\t\t\t\t\t\tdefault: {},\n\t\t\t\t\t},\n\t\t\t\t];\n\t\t\t}\n\n\t\t\treturn credentialTypeData.properties;\n\t\t}\n\n\t\tconst combineProperties = [] as INodeProperties[];\n\t\tfor (const credentialsTypeName of credentialTypeData.extends) {\n\t\t\tconst mergeCredentialProperties = this.getCredentialsProperties(credentialsTypeName);\n\t\t\tNodeHelpers.mergeNodeProperties(combineProperties, mergeCredentialProperties);\n\t\t}\n\n\t\t// The properties defined on the parent credentials take precedence\n\t\tNodeHelpers.mergeNodeProperties(combineProperties, credentialTypeData.properties);\n\n\t\treturn combineProperties;\n\t}",
+    "old_id": 96,
+    "id": 29
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/databases/entities/webhook-entity.ts",
+    "doc": "/**\n\t * Whether the webhook has at least one dynamic path segment, e.g. `:id` in `<uuid>/user/:id/posts`.\n\t */",
+    "code": "get isDynamic() {\n\t\treturn this.webhookPath.split('/').some((s) => s.startsWith(':'));\n\t}",
+    "old_id": 99,
+    "id": 30
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/databases/migrations/common/1693554410387-DisallowOrphanExecutions.ts",
+    "doc": "/**\n\t * Ensure all executions point to a workflow.\n\t */",
+    "code": "async up({ escape, schemaBuilder: { addNotNull }, runQuery }: MigrationContext) {\n\t\tconst executionEntity = escape.tableName('execution_entity');\n\t\tconst workflowId = escape.columnName('workflowId');\n\n\t\tawait runQuery(`DELETE FROM ${executionEntity} WHERE ${workflowId} IS NULL;`);\n\n\t\tawait addNotNull('execution_entity', 'workflowId');\n\t}",
+    "old_id": 100,
+    "id": 31
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/databases/repositories/credentials.repository.ts",
+    "doc": "/**\n\t * Find all credentials that are part of any project that the workflow is\n\t * part of.\n\t *\n\t * This is useful to for finding credentials that can be used in the\n\t * workflow.\n\t */",
+    "code": "async findAllCredentialsForWorkflow(workflowId: string): Promise<CredentialsEntity[]> {\n\t\treturn await this.findBy({\n\t\t\tshared: { project: { sharedWorkflows: { workflowId } } },\n\t\t});\n\t}",
+    "old_id": 104,
+    "id": 32
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/databases/repositories/credentials.repository.ts",
+    "doc": "/**\n\t * Find all credentials that are part of that project.\n\t *\n\t * This is useful for finding credentials that can be used in workflows that\n\t * are part of this project.\n\t */",
+    "code": "async findAllCredentialsForProject(projectId: string): Promise<CredentialsEntity[]> {\n\t\treturn await this.findBy({ shared: { projectId } });\n\t}",
+    "old_id": 105,
+    "id": 33
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/databases/repositories/credentials.repository.ts",
+    "doc": "/**\n\t * Find all credentials that the user has access to taking the scopes into\n\t * account.\n\t *\n\t * This also returns `credentials.shared` which is useful for constructing\n\t * all scopes the user has for the credential using `RoleService.addScopes`.\n\t **/",
+    "code": "async findCredentialsForUser(user: User, scopes: Scope[]) {\n\t\tlet where: FindOptionsWhere<CredentialsEntity> = {};\n\n\t\tif (!user.hasGlobalScope(scopes, { mode: 'allOf' })) {\n\t\t\tconst projectRoles = this.roleService.rolesWithScope('project', scopes);\n\t\t\tconst credentialRoles = this.roleService.rolesWithScope('credential', scopes);\n\t\t\twhere = {\n\t\t\t\t...where,\n\t\t\t\tshared: {\n\t\t\t\t\trole: In(credentialRoles),\n\t\t\t\t\tproject: {\n\t\t\t\t\t\tprojectRelations: {\n\t\t\t\t\t\t\trole: In(projectRoles),\n\t\t\t\t\t\t\tuserId: user.id,\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t};\n\t\t}\n\n\t\treturn await this.find({ where, relations: { shared: true } });\n\t}",
+    "old_id": 106,
+    "id": 34
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/databases/repositories/execution.repository.ts",
+    "doc": "/**\n\t * Insert a new execution and its execution data using a transaction.\n\t */",
+    "code": "async createNewExecution(execution: CreateExecutionPayload): Promise<string> {\n\t\tconst { data: dataObj, workflowData: currentWorkflow, ...rest } = execution;\n\t\tconst { connections, nodes, name, settings } = currentWorkflow ?? {};\n\t\tconst workflowData = { connections, nodes, name, settings, id: currentWorkflow.id };\n\t\tconst data = stringify(dataObj);\n\n\t\tconst { type: dbType, sqlite: sqliteConfig } = this.globalConfig.database;\n\t\tif (dbType === 'sqlite' && sqliteConfig.poolSize === 0) {\n\t\t\t// TODO: Delete this block of code once the sqlite legacy (non-pooling) driver is dropped.\n\t\t\t// In the non-pooling sqlite driver we can't use transactions, because that creates nested transactions under highly concurrent loads, leading to errors in the database\n\t\t\tconst { identifiers: inserted } = await this.insert({ ...rest, createdAt: new Date() });\n\t\t\tconst { id: executionId } = inserted[0] as { id: string };\n\t\t\tawait this.executionDataRepository.insert({ executionId, workflowData, data });\n\t\t\treturn String(executionId);\n\t\t} else {\n\t\t\t// All other database drivers should create executions and execution-data atomically\n\t\t\treturn await this.manager.transaction(async (transactionManager) => {\n\t\t\t\tconst { identifiers: inserted } = await transactionManager.insert(ExecutionEntity, {\n\t\t\t\t\t...rest,\n\t\t\t\t\tcreatedAt: new Date(),\n\t\t\t\t});\n\t\t\t\tconst { id: executionId } = inserted[0] as { id: string };\n\t\t\t\tawait this.executionDataRepository.createExecutionDataForExecution(\n\t\t\t\t\t{ executionId, workflowData, data },\n\t\t\t\t\ttransactionManager,\n\t\t\t\t);\n\t\t\t\treturn String(executionId);\n\t\t\t});\n\t\t}\n\t}",
+    "old_id": 107,
+    "id": 35
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/databases/repositories/execution.repository.ts",
+    "doc": "/**\n\t * Retrieve a batch of execution IDs with `new` or `running` status, in most recent order.\n\t */",
+    "code": "async getInProgressExecutionIds(batchSize: number) {\n\t\tconst executions = await this.find({\n\t\t\tselect: ['id'],\n\t\t\twhere: { status: In(['new', 'running']) },\n\t\t\torder: { startedAt: 'DESC' },\n\t\t\ttake: batchSize,\n\t\t});\n\n\t\treturn executions.map(({ id }) => id);\n\t}",
+    "old_id": 110,
+    "id": 36
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/databases/repositories/project-relation.repository.ts",
+    "doc": "/**\n\t * Find the role of a user in a project.\n\t */",
+    "code": "async findProjectRole({ userId, projectId }: { userId: string; projectId: string }) {\n\t\tconst relation = await this.findOneBy({ projectId, userId });\n\n\t\treturn relation?.role ?? null;\n\t}",
+    "old_id": 112,
+    "id": 37
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/databases/repositories/project-relation.repository.ts",
+    "doc": "/** Counts the number of users in each role, e.g. `{ admin: 2, member: 6, owner: 1 }` */",
+    "code": "async countUsersByRole() {\n\t\tconst rows = (await this.createQueryBuilder()\n\t\t\t.select(['role', 'COUNT(role) as count'])\n\t\t\t.groupBy('role')\n\t\t\t.execute()) as Array<{ role: ProjectRole; count: string }>;\n\t\treturn rows.reduce(\n\t\t\t(acc, row) => {\n\t\t\t\tacc[row.role] = parseInt(row.count, 10);\n\t\t\t\treturn acc;\n\t\t\t},\n\t\t\t{} as Record<ProjectRole, number>,\n\t\t);\n\t}",
+    "old_id": 113,
+    "id": 38
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/databases/repositories/user.repository.ts",
+    "doc": "/**\n\t * Find the user that owns the personal project that owns the workflow.\n\t *\n\t * Returns null if the workflow does not exist or is owned by a team project.\n\t */",
+    "code": "async findPersonalOwnerForWorkflow(workflowId: string): Promise<User | null> {\n\t\treturn await this.findOne({\n\t\t\twhere: {\n\t\t\t\tprojectRelations: {\n\t\t\t\t\trole: 'project:personalOwner',\n\t\t\t\t\tproject: { sharedWorkflows: { workflowId, role: 'workflow:owner' } },\n\t\t\t\t},\n\t\t\t},\n\t\t});\n\t}",
+    "old_id": 121,
+    "id": 39
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/execution-lifecycle/execution-lifecycle-hooks.ts",
+    "doc": "/** This should ideally be added before any other `workflowExecuteAfter` hook to ensure all hooks get the same execution status */",
+    "code": "function hookFunctionsFinalizeExecutionStatus(hooks: ExecutionLifecycleHooks) {\n\thooks.addHandler('workflowExecuteAfter', (fullRunData) => {\n\t\tfullRunData.status = determineFinalExecutionStatus(fullRunData);\n\t});\n}",
+    "old_id": 131,
+    "id": 40
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/executions/execution-recovery.service.ts",
+    "doc": "/**\n\t * Recover key properties of a truncated execution using event logs.\n\t */",
+    "code": "async recoverFromLogs(executionId: string, messages: EventMessageTypes[]) {\n\t\tif (this.instanceSettings.isFollower) return;\n\n\t\tconst amendedExecution = await this.amend(executionId, messages);\n\n\t\tif (!amendedExecution) return null;\n\n\t\tthis.logger.info('[Recovery] Logs available, amended execution', {\n\t\t\texecutionId: amendedExecution.id,\n\t\t});\n\n\t\tawait this.executionRepository.updateExistingExecution(executionId, amendedExecution);\n\n\t\tawait this.runHooks(amendedExecution);\n\n\t\tthis.push.once('editorUiConnected', async () => {\n\t\t\tawait sleep(1000);\n\t\t\tthis.push.broadcast({ type: 'executionRecovered', data: { executionId } });\n\t\t});\n\n\t\treturn amendedExecution;\n\t}",
+    "old_id": 132,
+    "id": 41
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/external-secrets.ee/providers/aws-secrets/aws-secrets-client.ts",
+    "doc": "/**\n\t * Check whether the client can connect to AWS Secrets Manager.\n\t */",
+    "code": "async checkConnection(): ConnectionTestResult {\n\t\ttry {\n\t\t\tawait this.fetchSecretsNamesPage();\n\t\t\treturn [true];\n\t\t} catch (e) {\n\t\t\tconst error = e instanceof Error ? e : new Error(`${e}`);\n\t\t\treturn [false, error.message];\n\t\t}\n\t}",
+    "old_id": 138,
+    "id": 42
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/ldap.ee/ldap.service.ee.ts",
+    "doc": "/** Set the LDAP configuration and expire the current client */",
+    "code": "setConfig(ldapConfig: LdapConfig) {\n\t\tthis.config = ldapConfig;\n\t\tthis.client = undefined;\n\t\t// If user disabled synchronization in the UI and there a job schedule,\n\t\t// stop it\n\t\tif (this.syncTimer && !this.config.synchronizationEnabled) {\n\t\t\tthis.stopSync();\n\t\t\t// If instance crashed with a job scheduled, once the server starts\n\t\t\t// again, reschedule it.\n\t\t} else if (!this.syncTimer && this.config.synchronizationEnabled) {\n\t\t\tthis.scheduleSync();\n\t\t\t// If job scheduled and the run interval got updated in the UI\n\t\t\t// stop the current one and schedule a new one with the new internal\n\t\t} else if (this.syncTimer && this.config.synchronizationEnabled) {\n\t\t\tthis.stopSync();\n\t\t\tthis.scheduleSync();\n\t\t}\n\t}",
+    "old_id": 141,
+    "id": 43
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/ldap.ee/ldap.service.ee.ts",
+    "doc": "/**\n\t * Get new/existing LDAP client,\n\t * depending on whether the credentials\n\t * were updated or not\n\t */",
+    "code": "private async getClient() {\n\t\tif (this.config === undefined) {\n\t\t\tthrow new UnexpectedError('Service cannot be used without setting the property config');\n\t\t}\n\t\tif (this.client === undefined) {\n\t\t\tconst url = formatUrl(\n\t\t\t\tthis.config.connectionUrl,\n\t\t\t\tthis.config.connectionPort,\n\t\t\t\tthis.config.connectionSecurity,\n\t\t\t);\n\t\t\tconst ldapOptions: ClientOptions = { url };\n\t\t\tconst tlsOptions: ConnectionOptions = {};\n\n\t\t\tif (this.config.connectionSecurity !== 'none') {\n\t\t\t\tObject.assign(tlsOptions, {\n\t\t\t\t\trejectUnauthorized: !this.config.allowUnauthorizedCerts,\n\t\t\t\t});\n\t\t\t\tif (this.config.connectionSecurity === 'tls') {\n\t\t\t\t\tldapOptions.tlsOptions = tlsOptions;\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tthis.client = new Client(ldapOptions);\n\t\t\tif (this.config.connectionSecurity === 'startTls') {\n\t\t\t\tawait this.client.startTLS(tlsOptions);\n\t\t\t}\n\t\t}\n\t}",
+    "old_id": 144,
+    "id": 44
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/ldap.ee/ldap.service.ee.ts",
+    "doc": "/**\n\t * Attempt binding with the user's credentials\n\t */",
+    "code": "async validUser(dn: string, password: string): Promise<void> {\n\t\tawait this.getClient();\n\t\tif (this.client) {\n\t\t\tawait this.client.bind(dn, password);\n\t\t\tawait this.client.unbind();\n\t\t}\n\t}",
+    "old_id": 147,
+    "id": 45
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/ldap.ee/ldap.service.ee.ts",
+    "doc": "/** Get users that are in the database but not in the LDAP server */",
+    "code": "private getUsersToDisable(remoteAdUsers: LdapUser[], localLdapIds: string[]): string[] {\n\t\tconst remoteAdUserIds = remoteAdUsers.map((adUser) => adUser[this.config.ldapIdAttribute]);\n\t\treturn localLdapIds.filter((user) => !remoteAdUserIds.includes(user));\n\t}",
+    "old_id": 152,
+    "id": 46
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/load-nodes-and-credentials.ts",
+    "doc": "/**\n\t * Whether any of the node's credential types may be used to\n\t * make a request from a node other than itself.\n\t */",
+    "code": "private supportsProxyAuth(description: INodeTypeDescription) {\n\t\tif (!description.credentials) return false;\n\n\t\treturn description.credentials.some(({ name }) => {\n\t\t\tconst credType = this.types.credentials.find((t) => t.name === name);\n\t\t\tif (!credType) {\n\t\t\t\tthis.logger.warn(\n\t\t\t\t\t`Failed to load Custom API options for the node \"${description.name}\": Unknown credential name \"${name}\"`,\n\t\t\t\t);\n\t\t\t\treturn false;\n\t\t\t}\n\t\t\tif (credType.authenticate !== undefined) return true;\n\n\t\t\treturn (\n\t\t\t\tArray.isArray(credType.extends) &&\n\t\t\t\tcredType.extends.some((parentType) =>\n\t\t\t\t\t['oAuth2Api', 'googleOAuth2Api', 'oAuth1Api'].includes(parentType),\n\t\t\t\t)\n\t\t\t);\n\t\t});\n\t}",
+    "old_id": 155,
+    "id": 47
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/load-nodes-and-credentials.ts",
+    "doc": "/**\n\t * Inject a `Custom API Call` option into `resource` and `operation`\n\t * parameters in a latest-version node that supports proxy auth.\n\t */",
+    "code": "private injectCustomApiCallOptions() {\n\t\tthis.types.nodes.forEach((node: INodeTypeDescription) => {\n\t\t\tconst isLatestVersion =\n\t\t\t\tnode.defaultVersion === undefined || node.defaultVersion === node.version;\n\n\t\t\tif (isLatestVersion) {\n\t\t\t\tif (!this.supportsProxyAuth(node)) return;\n\n\t\t\t\tnode.properties.forEach((p) => {\n\t\t\t\t\tif (\n\t\t\t\t\t\t['resource', 'operation'].includes(p.name) &&\n\t\t\t\t\t\tArray.isArray(p.options) &&\n\t\t\t\t\t\tp.options[p.options.length - 1].name !== CUSTOM_API_CALL_NAME\n\t\t\t\t\t) {\n\t\t\t\t\t\tp.options.push({\n\t\t\t\t\t\t\tname: CUSTOM_API_CALL_NAME,\n\t\t\t\t\t\t\tvalue: CUSTOM_API_CALL_KEY,\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\t\t});\n\t}",
+    "old_id": 156,
+    "id": 48
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/load-nodes-and-credentials.ts",
+    "doc": "/**\n\t * This creates all AI Agent tools by duplicating the node descriptions for\n\t * all nodes that are marked as `usableAsTool`. It basically modifies the\n\t * description. The actual wrapping happens in the langchain code for getting\n\t * the connected tools.\n\t */",
+    "code": "createAiTools() {\n\t\tconst usableNodes: Array<INodeTypeBaseDescription | INodeTypeDescription> =\n\t\t\tthis.types.nodes.filter((nodeType) => nodeType.usableAsTool);\n\n\t\tfor (const usableNode of usableNodes) {\n\t\t\tconst description =\n\t\t\t\ttypeof usableNode.usableAsTool === 'object'\n\t\t\t\t\t? ({\n\t\t\t\t\t\t\t...deepCopy(usableNode),\n\t\t\t\t\t\t\t...usableNode.usableAsTool?.replacements,\n\t\t\t\t\t\t} as INodeTypeBaseDescription)\n\t\t\t\t\t: deepCopy(usableNode);\n\t\t\tconst wrapped = this.convertNodeToAiTool({ description }).description;\n\n\t\t\tthis.types.nodes.push(wrapped);\n\t\t\tthis.known.nodes[wrapped.name] = { ...this.known.nodes[usableNode.name] };\n\n\t\t\tconst credentialNames = Object.entries(this.known.credentials)\n\t\t\t\t.filter(([_, credential]) => credential?.supportedNodes?.includes(usableNode.name))\n\t\t\t\t.map(([credentialName]) => credentialName);\n\n\t\t\tcredentialNames.forEach((name) =>\n\t\t\t\tthis.known.credentials[name]?.supportedNodes?.push(wrapped.name),\n\t\t\t);\n\t\t}\n\t}",
+    "old_id": 157,
+    "id": 49
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/modules/insights/insights-compaction.service.ts",
+    "doc": "/**\n\t * Compacts raw data to hourly aggregates\n\t */",
+    "code": "async compactRawToHour() {\n\t\t// Build the query to gather raw insights data for the batch\n\t\tconst batchQuery = this.insightsRawRepository.getRawInsightsBatchQuery(\n\t\t\tthis.insightsConfig.compactionBatchSize,\n\t\t);\n\n\t\treturn await this.insightsByPeriodRepository.compactSourceDataIntoInsightPeriod({\n\t\t\tsourceBatchQuery: batchQuery,\n\t\t\tsourceTableName: this.insightsRawRepository.metadata.tableName,\n\t\t\tperiodUnitToCompactInto: 'hour',\n\t\t});\n\t}",
+    "old_id": 163,
+    "id": 50
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/modules/insights/insights-compaction.service.ts",
+    "doc": "/**\n\t * Compacts hourly data to daily aggregates\n\t */",
+    "code": "async compactHourToDay() {\n\t\t// get hour data query for batching\n\t\tconst batchQuery = this.insightsByPeriodRepository.getPeriodInsightsBatchQuery({\n\t\t\tperiodUnitToCompactFrom: 'hour',\n\t\t\tcompactionBatchSize: this.insightsConfig.compactionBatchSize,\n\t\t\tmaxAgeInDays: this.insightsConfig.compactionHourlyToDailyThresholdDays,\n\t\t});\n\n\t\treturn await this.insightsByPeriodRepository.compactSourceDataIntoInsightPeriod({\n\t\t\tsourceBatchQuery: batchQuery,\n\t\t\tperiodUnitToCompactInto: 'day',\n\t\t});\n\t}",
+    "old_id": 164,
+    "id": 51
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/push/index.ts",
+    "doc": "/** Sets up the main express app to upgrade websocket connections */",
+    "code": "setupPushServer(restEndpoint: string, server: Server, app: Application) {\n\t\tif (this.useWebSockets) {\n\t\t\tconst wsServer = new WSServer({ noServer: true });\n\t\t\tserver.on('upgrade', (request: WebSocketPushRequest, socket, upgradeHead) => {\n\t\t\t\tif (parseUrl(request.url).pathname === `/${restEndpoint}/push`) {\n\t\t\t\t\twsServer.handleUpgrade(request, socket, upgradeHead, (ws) => {\n\t\t\t\t\t\trequest.ws = ws;\n\n\t\t\t\t\t\tconst response = new ServerResponse(request);\n\t\t\t\t\t\tresponse.writeHead = (statusCode) => {\n\t\t\t\t\t\t\tif (statusCode > 200) ws.close();\n\t\t\t\t\t\t\treturn response;\n\t\t\t\t\t\t};\n\n\t\t\t\t\t\t// @ts-expect-error `handle` isn't documented\n\t\t\t\t\t\t// eslint-disable-next-line @typescript-eslint/no-unsafe-call\n\t\t\t\t\t\tapp.handle(request, response);\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t});\n\t\t}\n\t}",
+    "old_id": 166,
+    "id": 52
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/push/index.ts",
+    "doc": "/** Sets up the push endppoint that the frontend connects to. */",
+    "code": "setupPushHandler(restEndpoint: string, app: Application) {\n\t\tapp.use(\n\t\t\t`/${restEndpoint}/push`,\n\t\t\t// eslint-disable-next-line @typescript-eslint/unbound-method\n\t\t\tthis.authService.authMiddleware,\n\t\t\t(req: SSEPushRequest | WebSocketPushRequest, res: PushResponse) =>\n\t\t\t\tthis.handleRequest(req, res),\n\t\t);\n\t}",
+    "old_id": 167,
+    "id": 53
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/response-helper.ts",
+    "doc": "/**\n * Checks if the given error is a ResponseError. It can be either an\n * instance of ResponseError or an error which has the same properties.\n * The latter case is for external hooks.\n */",
+    "code": "function isResponseError(error: Error): error is ResponseError {\n\tif (error instanceof ResponseError) {\n\t\treturn true;\n\t}\n\n\tif (error instanceof Error) {\n\t\treturn (\n\t\t\t'httpStatusCode' in error &&\n\t\t\ttypeof error.httpStatusCode === 'number' &&\n\t\t\t'errorCode' in error &&\n\t\t\ttypeof error.errorCode === 'number'\n\t\t);\n\t}\n\n\treturn false;\n}",
+    "old_id": 171,
+    "id": 54
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/scaling/scaling.service.ts",
+    "doc": "/** Set up an interval to collect queue metrics and emit them in an event. */",
+    "code": "private scheduleQueueMetrics() {\n\t\tif (!this.isQueueMetricsEnabled || this.queueMetricsInterval) return;\n\n\t\tthis.queueMetricsInterval = setInterval(async () => {\n\t\t\tconst pendingJobCounts = await this.getPendingJobCounts();\n\n\t\t\tthis.eventService.emit('job-counts-updated', {\n\t\t\t\t...pendingJobCounts, // active, waiting\n\t\t\t\t...this.jobCounters, // completed, failed\n\t\t\t});\n\n\t\t\tthis.jobCounters.completed = 0;\n\t\t\tthis.jobCounters.failed = 0;\n\t\t}, this.globalConfig.endpoints.metrics.queueMetricsInterval * Time.seconds.toMilliseconds);\n\t}",
+    "old_id": 177,
+    "id": 55
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/services/cache/cache.service.ts",
+    "doc": "/**\n\t * Set or append to a [Redis hash](https://redis.io/docs/data-types/hashes/)\n\t * stored under a key in the cache. If in-memory, the hash is a regular JS object.\n\t */",
+    "code": "async setHash(key: string, hash: Hash) {\n\t\tif (!this.cache) await this.init();\n\n\t\tif (!key?.length) return;\n\n\t\tfor (const hashKey in hash) {\n\t\t\tif (hash[hashKey] === undefined || hash[hashKey] === null) return;\n\t\t}\n\n\t\tif (this.cache.kind === 'redis') {\n\t\t\tawait this.cache.store.hset(key, hash);\n\t\t\treturn;\n\t\t}\n\n\t\tconst hashObject: Hash = (await this.get(key)) ?? {};\n\n\t\tObject.assign(hashObject, hash);\n\n\t\tawait this.set(key, hashObject);\n\t}",
+    "old_id": 181,
+    "id": 56
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/services/hooks.service.ts",
+    "doc": "/**\n\t * Find user in the instance\n\t * 1. To know whether the instance owner is already setup\n\t * 2. To know when to update the user's profile also in cloud\n\t */",
+    "code": "async findOneUser(filter: FindOneOptions<AuthUser>) {\n\t\treturn await this.authUserRepository.findOne(filter);\n\t}",
+    "old_id": 185,
+    "id": 57
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/services/import.service.ts",
+    "doc": "/**\n\t * Convert a node's credentials from old format `{ <nodeType>: <credentialName> }`\n\t * to new format: `{ <nodeType>: { id: string | null, name: <credentialName> } }`\n\t */",
+    "code": "private toNewCredentialFormat(node: INode) {\n\t\tif (!node.credentials) return;\n\n\t\tfor (const [type, name] of Object.entries(node.credentials)) {\n\t\t\tif (typeof name !== 'string') continue;\n\n\t\t\tconst nodeCredential: INodeCredentialsDetails = { id: null, name };\n\n\t\t\tconst match = this.dbCredentials.find((c) => c.name === name && c.type === type);\n\n\t\t\tif (match) nodeCredential.id = match.id;\n\n\t\t\tnode.credentials[type] = nodeCredential;\n\t\t}\n\t}",
+    "old_id": 193,
+    "id": 58
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/services/project.service.ee.ts",
+    "doc": "/**\n\t * Find all the projects where a workflow is accessible,\n\t * along with the roles of a user in those projects.\n\t */",
+    "code": "async findProjectsWorkflowIsIn(workflowId: string) {\n\t\treturn await this.sharedWorkflowRepository.findProjectIds(workflowId);\n\t}",
+    "old_id": 196,
+    "id": 59
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/services/redis-client.service.ts",
+    "doc": "/**\n\t * Ensure prefix is wrapped in curly braces for Redis cluster.\n\t * See: https://github.com/OptimalBits/bull/blob/develop/PATTERNS.md\n\t */",
+    "code": "toValidPrefix(prefix: string) {\n\t\tif (this.clusterNodes().length > 0) {\n\t\t\tif (!prefix.startsWith('{')) prefix = '{' + prefix;\n\t\t\tif (!prefix.endsWith('}')) prefix += '}';\n\t\t}\n\n\t\treturn prefix;\n\t}",
+    "old_id": 201,
+    "id": 60
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/services/role.service.ts",
+    "doc": "/**\n\t * Find all distinct scopes in a set of project roles.\n\t */",
+    "code": "getScopesBy(projectRoles: Set<ProjectRole>) {\n\t\treturn [...projectRoles].reduce<Set<Scope>>((acc, projectRole) => {\n\t\t\tfor (const scope of PROJECT_SCOPE_MAP[projectRole] ?? []) {\n\t\t\t\tacc.add(scope);\n\t\t\t}\n\n\t\t\treturn acc;\n\t\t}, new Set());\n\t}",
+    "old_id": 203,
+    "id": 61
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/services/tag.service.ts",
+    "doc": "/**\n\t * Sort tags based on the order of the tag IDs in the request.\n\t */",
+    "code": "sortByRequestOrder(tags: TagEntity[], { requestOrder }: { requestOrder: string[] }) {\n\t\tconst tagMap = tags.reduce<Record<string, TagEntity>>((acc, tag) => {\n\t\t\tacc[tag.id] = tag;\n\t\t\treturn acc;\n\t\t}, {});\n\n\t\treturn requestOrder.map((tagId) => tagMap[tagId]);\n\t}",
+    "old_id": 204,
+    "id": 62
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/task-runners/task-broker/auth/task-broker-auth.controller.ts",
+    "doc": "/**\n\t * Validates the provided auth token and creates and responds with a grant token,\n\t * which can be used to initiate a task runner connection.\n\t */",
+    "code": "async createGrantToken(req: AuthlessRequest) {\n\t\tconst result = await taskBrokerAuthRequestBodySchema.safeParseAsync(req.body);\n\t\tif (!result.success) {\n\t\t\tthrow new BadRequestError(result.error.errors[0].code);\n\t\t}\n\n\t\tconst { token: authToken } = result.data;\n\t\tif (!this.authService.isValidAuthToken(authToken)) {\n\t\t\tthrow new ForbiddenError();\n\t\t}\n\n\t\tconst grantToken = await this.authService.createGrantToken();\n\t\treturn {\n\t\t\ttoken: grantToken,\n\t\t};\n\t}",
+    "old_id": 214,
+    "id": 63
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/task-runners/task-broker/auth/task-broker-auth.service.ts",
+    "doc": "/**\n\t * @returns grant token that can be used to establish a task runner connection\n\t */",
+    "code": "async createGrantToken() {\n\t\tconst grantToken = this.generateGrantToken();\n\n\t\tconst key = this.cacheKeyForGrantToken(grantToken);\n\t\tawait this.cacheService.set(key, '1', this.grantTokenTtl);\n\n\t\treturn grantToken;\n\t}",
+    "old_id": 216,
+    "id": 64
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/task-runners/task-broker/auth/task-broker-auth.service.ts",
+    "doc": "/**\n\t * Checks if the given `grantToken` is a valid token and marks it as\n\t * used.\n\t */",
+    "code": "async tryConsumeGrantToken(grantToken: string) {\n\t\tconst key = this.cacheKeyForGrantToken(grantToken);\n\t\tconst consumed = await this.cacheService.get<string>(key);\n\t\t// Not found from cache --> Invalid token\n\t\tif (consumed === undefined) return false;\n\n\t\tawait this.cacheService.delete(key);\n\t\treturn true;\n\t}",
+    "old_id": 217,
+    "id": 65
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/task-runners/task-broker/task-broker-server.ts",
+    "doc": "/** Creates WebSocket server for handling upgrade requests */",
+    "code": "private setupWsServer() {\n\t\tconst { authToken } = this.globalConfig.taskRunners;\n\t\ta.ok(authToken);\n\t\ta.ok(this.server);\n\n\t\tthis.wsServer = new WSServer({\n\t\t\tnoServer: true,\n\t\t\tmaxPayload: this.globalConfig.taskRunners.maxPayload,\n\t\t});\n\t\tthis.server.on('upgrade', this.handleUpgradeRequest);\n\n\t\tthis.taskBrokerWsServer.start();\n\t}",
+    "old_id": 219,
+    "id": 66
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/task-runners/task-managers/data-request-response-stripper.ts",
+    "doc": "/**\n\t * Assuming the given `obj` is an object where the keys are node names,\n\t * filters the object to only include the node names that are requested.\n\t */",
+    "code": "private filterObjectByNodeNames<T extends Record<string, unknown>>(obj: T): T {\n\t\tif (this.stripParams.dataOfNodes === 'all') {\n\t\t\treturn obj;\n\t\t}\n\n\t\tconst filteredObj: T = {} as T;\n\n\t\tfor (const nodeName in obj) {\n\t\t\tif (!Object.prototype.hasOwnProperty.call(obj, nodeName)) {\n\t\t\t\tcontinue;\n\t\t\t}\n\n\t\t\tif (this.requestedNodeNames.has(nodeName)) {\n\t\t\t\tfilteredObj[nodeName] = obj[nodeName];\n\t\t\t}\n\t\t}\n\n\t\treturn filteredObj;\n\t}",
+    "old_id": 222,
+    "id": 67
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/task-runners/task-runner-process.ts",
+    "doc": "/** Promise that resolves when the process has exited */",
+    "code": "get runPromise() {\n\t\treturn this._runPromise;\n\t}",
+    "old_id": 224,
+    "id": 68
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/task-runners/task-runner-process.ts",
+    "doc": "/** Force-restart a runner suspected of being unresponsive. */",
+    "code": "async forceRestart() {\n\t\tif (!this.process) return;\n\n\t\tthis.process.kill('SIGKILL');\n\n\t\tawait this._runPromise;\n\t}",
+    "old_id": 225,
+    "id": 69
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/wait-tracker.ts",
+    "doc": "/**\n\t * @important Requires `OrchestrationService` to be initialized.\n\t */",
+    "code": "init() {\n\t\tconst { isLeader, isMultiMain } = this.instanceSettings;\n\n\t\tif (isLeader) this.startTracking();\n\n\t\tif (isMultiMain) {\n\t\t\tthis.orchestrationService.multiMainSetup\n\t\t\t\t.on('leader-takeover', () => this.startTracking())\n\t\t\t\t.on('leader-stepdown', () => this.stopTracking());\n\t\t}\n\t}",
+    "old_id": 226,
+    "id": 70
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/webhooks/webhook.service.ts",
+    "doc": "/**\n\t * Find a matching webhook with one or more dynamic path segments, e.g. `<uuid>/user/:id/posts`.\n\t * It is mandatory for dynamic webhooks to have `<uuid>/` at the base.\n\t */",
+    "code": "private async findDynamicWebhook(method: Method, path: string) {\n\t\tconst [uuidSegment, ...otherSegments] = path.split('/');\n\n\t\tconst dynamicWebhooks = await this.webhookRepository.findBy({\n\t\t\twebhookId: uuidSegment,\n\t\t\tmethod,\n\t\t\tpathLength: otherSegments.length,\n\t\t});\n\n\t\tif (dynamicWebhooks.length === 0) return null;\n\n\t\tconst requestSegments = new Set(otherSegments);\n\n\t\tconst { webhook } = dynamicWebhooks.reduce<{\n\t\t\twebhook: WebhookEntity | null;\n\t\t\tmaxMatches: number;\n\t\t}>(\n\t\t\t(acc, dw) => {\n\t\t\t\tconst allStaticSegmentsMatch = dw.staticSegments.every((s) => requestSegments.has(s));\n\n\t\t\t\tif (allStaticSegmentsMatch && dw.staticSegments.length > acc.maxMatches) {\n\t\t\t\t\tacc.maxMatches = dw.staticSegments.length;\n\t\t\t\t\tacc.webhook = dw;\n\t\t\t\t\treturn acc;\n\t\t\t\t} else if (dw.staticSegments.length === 0 && !acc.webhook) {\n\t\t\t\t\tacc.webhook = dw; // edge case: if path is `:var`, match on anything\n\t\t\t\t}\n\n\t\t\t\treturn acc;\n\t\t\t},\n\t\t\t{ webhook: null, maxMatches: 0 },\n\t\t);\n\n\t\treturn webhook;\n\t}",
+    "old_id": 229,
+    "id": 71
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/cli/src/workflows/workflow.service.ts",
+    "doc": "/**\n\t * Transfers all workflows owned by a project to another one.\n\t * This has only been tested for personal projects. It may need to be amended\n\t * for team projects.\n\t **/",
+    "code": "async transferAll(fromProjectId: string, toProjectId: string, trx?: EntityManager) {\n\t\ttrx = trx ?? this.workflowRepository.manager;\n\n\t\t// Get all shared workflows for both projects.\n\t\tconst allSharedWorkflows = await trx.findBy(SharedWorkflow, {\n\t\t\tprojectId: In([fromProjectId, toProjectId]),\n\t\t});\n\t\tconst sharedWorkflowsOfFromProject = allSharedWorkflows.filter(\n\t\t\t(sw) => sw.projectId === fromProjectId,\n\t\t);\n\n\t\t// For all workflows that the from-project owns transfer the ownership to\n\t\t// the to-project.\n\t\t// This will override whatever relationship the to-project already has to\n\t\t// the resources at the moment.\n\n\t\tconst ownedWorkflowIds = sharedWorkflowsOfFromProject\n\t\t\t.filter((sw) => sw.role === 'workflow:owner')\n\t\t\t.map((sw) => sw.workflowId);\n\n\t\tawait this.sharedWorkflowRepository.makeOwner(ownedWorkflowIds, toProjectId, trx);\n\n\t\t// Delete the relationship to the from-project.\n\t\tawait this.sharedWorkflowRepository.deleteByIds(ownedWorkflowIds, fromProjectId, trx);\n\n\t\t// Transfer relationships that are not `workflow:owner`.\n\t\t// This will NOT override whatever relationship the from-project already\n\t\t// has to the resource at the moment.\n\t\tconst sharedWorkflowIdsOfTransferee = allSharedWorkflows\n\t\t\t.filter((sw) => sw.projectId === toProjectId)\n\t\t\t.map((sw) => sw.workflowId);\n\n\t\t// All resources that are shared with the from-project, but not with the\n\t\t// to-project.\n\t\tconst sharedWorkflowsToTransfer = sharedWorkflowsOfFromProject.filter(\n\t\t\t(sw) =>\n\t\t\t\tsw.role !== 'workflow:owner' && !sharedWorkflowIdsOfTransferee.includes(sw.workflowId),\n\t\t);\n\n\t\tawait trx.insert(\n\t\t\tSharedWorkflow,\n\t\t\tsharedWorkflowsToTransfer.map((sw) => ({\n\t\t\t\tworkflowId: sw.workflowId,\n\t\t\t\tprojectId: toProjectId,\n\t\t\t\trole: sw.role,\n\t\t\t})),\n\t\t);\n\t}",
+    "old_id": 236,
+    "id": 72
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/core/src/binary-data/object-store/object-store.service.ee.ts",
+    "doc": "/**\n\t * List objects with a common prefix in the configured bucket.\n\t */",
+    "code": "async list(prefix: string) {\n\t\tconst items = [];\n\n\t\tlet isTruncated;\n\t\tlet nextPageToken;\n\n\t\tdo {\n\t\t\tconst listPage = await this.getListPage(prefix, nextPageToken);\n\n\t\t\tif (listPage.contents?.length > 0) items.push(...listPage.contents);\n\n\t\t\tisTruncated = listPage.isTruncated;\n\t\t\tnextPageToken = listPage.nextContinuationToken;\n\t\t} while (isTruncated && nextPageToken);\n\n\t\treturn items;\n\t}",
+    "old_id": 242,
+    "id": 73
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/core/src/credentials.ts",
+    "doc": "/**\n\t * Update parts of the credential data.\n\t * This decrypts the data, modifies it, and then re-encrypts the updated data back to a string.\n\t */",
+    "code": "updateData(toUpdate: Partial<T>, toDelete: Array<keyof T> = []) {\n\t\tconst updatedData: T = { ...this.getData(), ...toUpdate };\n\t\tfor (const key of toDelete) {\n\t\t\tdelete updatedData[key];\n\t\t}\n\t\tthis.setData(updatedData);\n\t}",
+    "old_id": 244,
+    "id": 74
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/core/src/execution-engine/active-workflows.ts",
+    "doc": "/**\n\t * Returns the IDs of the currently active workflows in memory.\n\t */",
+    "code": "allActiveWorkflows() {\n\t\treturn Object.keys(this.activeWorkflows);\n\t}",
+    "old_id": 249,
+    "id": 75
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/core/src/execution-engine/node-execution-context/utils/create-node-as-tool.ts",
+    "doc": "/**\n * Creates a DynamicStructuredTool from a node.\n * @returns A DynamicStructuredTool instance.\n */",
+    "code": "function createTool(options: CreateNodeAsToolOptions) {\n\tconst { node, nodeType, handleToolInvocation } = options;\n\tconst schema = getSchema(node);\n\tconst description = makeDescription(node, nodeType);\n\tconst nodeName = nodeNameToToolName(node);\n\tconst name = nodeName || nodeType.description.name;\n\n\treturn new DynamicStructuredTool({\n\t\tname,\n\t\tdescription,\n\t\tschema,\n\t\tfunc: async (toolArgs: z.infer<typeof schema>) => await handleToolInvocation(toolArgs),\n\t});\n}",
+    "old_id": 256,
+    "id": 76
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/core/src/execution-engine/partial-execution-utils/directed-graph.ts",
+    "doc": "/**\n\t * Returns a set of nodes whose names match the provided array of names.\n\t *\n\t * Only nodes that exist in the graph will be included in the result.\n\t */",
+    "code": "getNodesByNames(names: string[]) {\n\t\tconst nodes: Set<INode> = new Set();\n\n\t\tfor (const name of names) {\n\t\t\tconst node = this.nodes.get(name);\n\n\t\t\tif (node) {\n\t\t\t\tnodes.add(node);\n\t\t\t}\n\t\t}\n\n\t\treturn nodes;\n\t}",
+    "old_id": 257,
+    "id": 77
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/core/src/execution-engine/partial-execution-utils/directed-graph.ts",
+    "doc": "/**\n\t * Like `Array.prototype.find` but for directed graphs.\n\t *\n\t * Starting from, and including, the `from` node this calls the provided\n\t * predicate function with every child node until the predicate function\n\t * returns true.\n\t *\n\t * The search is depth first, meaning every branch is exhausted before the\n\t * next branch is tried.\n\t *\n\t * The first node for which the predicate function returns true is returned.\n\t *\n\t * If the graph is exhausted and the predicate function never returned true,\n\t * undefined is returned instead.\n\t */",
+    "code": "depthFirstSearch({ from, fn }: { from: INode; fn: (node: INode) => boolean }): INode | undefined {\n\t\treturn this.depthFirstSearchRecursive(from, fn, new Set());\n\t}",
+    "old_id": 260,
+    "id": 78
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/core/src/execution-engine/workflow-execute.ts",
+    "doc": "/**\n\t * This method determines if a specific node has incoming connections and verifies if execution data is available for all required inputs.\n\t * If any required input data is missing, the node execution is deferred by pushing it back onto the execution stack.\n\t *\n\t * @param workflow - The workflow containing the node and connections.\n\t * @param executionNode - The node being checked.\n\t * @param executionData - The data available for executing the node.\n\t * @returns `true` if the node has the required input data and can execute immediately, otherwise `false`.\n\t */",
+    "code": "ensureInputData(workflow: Workflow, executionNode: INode, executionData: IExecuteData): boolean {\n\t\tconst inputConnections = workflow.connectionsByDestinationNode[executionNode.name]?.main ?? [];\n\t\tfor (let connectionIndex = 0; connectionIndex < inputConnections.length; connectionIndex++) {\n\t\t\tconst highestNodes = workflow.getHighestNode(executionNode.name, connectionIndex);\n\t\t\tif (highestNodes.length === 0) {\n\t\t\t\t// If there is no valid incoming node (if all are disabled)\n\t\t\t\t// then ignore that it has inputs and simply execute it as it is without\n\t\t\t\t// any data\n\t\t\t\treturn true;\n\t\t\t}\n\n\t\t\tif (!executionData.data.hasOwnProperty('main')) {\n\t\t\t\t// ExecutionData does not even have the connection set up so can\n\t\t\t\t// not have that data, so add it again to be executed later\n\t\t\t\tthis.runExecutionData.executionData!.nodeExecutionStack.push(executionData);\n\t\t\t\treturn false;\n\t\t\t}\n\n\t\t\tif (this.forceInputNodeExecution(workflow)) {\n\t\t\t\t// Check if it has the data for all the inputs\n\t\t\t\t// The most nodes just have one but merge node for example has two and data\n\t\t\t\t// of both inputs has to be available to be able to process the node.\n\t\t\t\tif (\n\t\t\t\t\texecutionData.data.main.length < connectionIndex ||\n\t\t\t\t\texecutionData.data.main[connectionIndex] === null\n\t\t\t\t) {\n\t\t\t\t\t// Does not have the data of the connections so add back to stack\n\t\t\t\t\tthis.runExecutionData.executionData!.nodeExecutionStack.push(executionData);\n\t\t\t\t\treturn false;\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\treturn true;\n\t}",
+    "old_id": 264,
+    "id": 79
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/core/src/instance-settings/instance-settings.ts",
+    "doc": "/** Whether this `main` instance is running in multi-main mode. */",
+    "code": "get isMultiMain() {\n\t\treturn this.instanceType === 'main' && this.isMultiMainEnabled && this.isMultiMainLicensed;\n\t}",
+    "old_id": 266,
+    "id": 80
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/core/src/nodes-loader/directory-loader.ts",
+    "doc": "/** Loads a credential class from a file, and fixes icons */",
+    "code": "loadCredentialFromFile(filePath: string): void {\n\t\tconst tempCredential = this.loadClass<ICredentialType>(filePath);\n\t\t// Add serializer method \"toJSON\" to the class so that authenticate method (if defined)\n\t\t// gets mapped to the authenticate attribute before it is sent to the client.\n\t\t// The authenticate property is used by the client to decide whether or not to\n\t\t// include the credential type in the predefined credentials (HTTP node)\n\t\tObject.assign(tempCredential, { toJSON });\n\n\t\tthis.fixIconPaths(tempCredential, filePath);\n\n\t\tconst credentialType = tempCredential.name;\n\t\tthis.known.credentials[credentialType] = {\n\t\t\tclassName: tempCredential.constructor.name,\n\t\t\tsourcePath: filePath,\n\t\t\textends: tempCredential.extends,\n\t\t\tsupportedNodes: this.nodesByCredential[credentialType],\n\t\t};\n\n\t\tthis.credentialTypes[credentialType] = {\n\t\t\ttype: tempCredential,\n\t\t\tsourcePath: filePath,\n\t\t};\n\n\t\tthis.types.credentials.push(tempCredential);\n\t}",
+    "old_id": 272,
+    "id": 81
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/core/src/nodes-loader/directory-loader.ts",
+    "doc": "/**\n\t * Returns an array of all versions of a node type.\n\t * For non-versioned nodes, returns an array with just that node.\n\t * For versioned nodes, returns all available versions.\n\t */",
+    "code": "getVersionedNodeTypeAll(object: IVersionedNodeType | INodeType): INodeType[] {\n\t\tif ('nodeVersions' in object) {\n\t\t\tconst nodeVersions = Object.values(object.nodeVersions).map((element) => {\n\t\t\t\telement.description.name = object.description.name;\n\t\t\t\telement.description.codex = object.description.codex;\n\t\t\t\treturn element;\n\t\t\t});\n\t\t\treturn uniqBy(nodeVersions.reverse(), (node) => {\n\t\t\t\tconst { version } = node.description;\n\t\t\t\treturn Array.isArray(version) ? version.join(',') : version.toString();\n\t\t\t});\n\t\t}\n\t\treturn [object];\n\t}",
+    "old_id": 274,
+    "id": 82
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/core/src/nodes-loader/directory-loader.ts",
+    "doc": "/**\n\t * Adds a node codex `categories` and `subcategories` (if defined)\n\t * to a node description `codex` property.\n\t */",
+    "code": "private addCodex(node: INodeType | IVersionedNodeType, filePath: string) {\n\t\tconst isCustom = this.packageName === 'CUSTOM';\n\t\ttry {\n\t\t\tlet codex;\n\n\t\t\tif (!isCustom) {\n\t\t\t\tcodex = node.description.codex;\n\t\t\t}\n\n\t\t\tif (codex === undefined) {\n\t\t\t\tcodex = this.getCodex(filePath);\n\t\t\t}\n\n\t\t\tif (isCustom) {\n\t\t\t\tcodex.categories = codex.categories\n\t\t\t\t\t? codex.categories.concat(CUSTOM_NODES_CATEGORY)\n\t\t\t\t\t: [CUSTOM_NODES_CATEGORY];\n\t\t\t}\n\n\t\t\tnode.description.codex = codex;\n\t\t} catch {\n\t\t\tthis.logger.debug(`No codex available for: ${node.description.name}`);\n\n\t\t\tif (isCustom) {\n\t\t\t\tnode.description.codex = {\n\t\t\t\t\tcategories: [CUSTOM_NODES_CATEGORY],\n\t\t\t\t};\n\t\t\t}\n\t\t}\n\t}",
+    "old_id": 276,
+    "id": 83
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatMessaging.ts",
+    "doc": "/** Sends a message to the chat */",
+    "code": "async function sendMessage(message: string, files?: File[]) {\n\t\tpreviousMessageIndex.value = 0;\n\t\tif (message.trim() === '' && (!files || files.length === 0)) {\n\t\t\tshowError(\n\t\t\t\tnew Error(locale.baseText('chat.window.chat.provideMessage')),\n\t\t\t\tlocale.baseText('chat.window.chat.emptyChatMessage'),\n\t\t\t);\n\t\t\treturn;\n\t\t}\n\n\t\tconst pinnedChatData = usePinnedData(chatTrigger.value);\n\t\tif (pinnedChatData.hasData.value) {\n\t\t\tconst confirmResult = await useMessage().confirm(\n\t\t\t\tlocale.baseText('chat.window.chat.unpinAndExecute.description'),\n\t\t\t\tlocale.baseText('chat.window.chat.unpinAndExecute.title'),\n\t\t\t\t{\n\t\t\t\t\tconfirmButtonText: locale.baseText('chat.window.chat.unpinAndExecute.confirm'),\n\t\t\t\t\tcancelButtonText: locale.baseText('chat.window.chat.unpinAndExecute.cancel'),\n\t\t\t\t},\n\t\t\t);\n\n\t\t\tif (!(confirmResult === MODAL_CONFIRM)) return;\n\n\t\t\tpinnedChatData.unsetData('unpin-and-send-chat-message-modal');\n\t\t}\n\n\t\tconst newMessage: ChatMessage & { sessionId: string } = {\n\t\t\ttext: message,\n\t\t\tsender: 'user',\n\t\t\tsessionId: sessionId.value,\n\t\t\tid: uuid(),\n\t\t\tfiles,\n\t\t};\n\t\tmessages.value.push(newMessage);\n\n\t\tawait startWorkflowWithMessage(newMessage.text, files);\n\t}",
+    "old_id": 280,
+    "id": 84
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/frontend/editor-ui/src/components/CanvasChat/composables/useChatTrigger.ts",
+    "doc": "/** Sets the connected node after finding the trigger */",
+    "code": "function setConnectedNode() {\n\t\tconst triggerNode = chatTriggerNode.value;\n\n\t\tif (!triggerNode) {\n\t\t\treturn;\n\t\t}\n\n\t\tconst chatChildren = workflow.value.getChildNodes(triggerNode.name);\n\n\t\tconst chatRootNode = chatChildren\n\t\t\t.reverse()\n\t\t\t.map((nodeName: string) => getNodeByName(nodeName))\n\t\t\t.filter((n): n is INodeUi => n !== null)\n\t\t\t// Reverse the nodes to match the last node logs first\n\t\t\t.reverse()\n\t\t\t.find((storeNode: INodeUi): boolean => {\n\t\t\t\t// Skip summarization nodes\n\t\t\t\tif (storeNode.type === CHAIN_SUMMARIZATION_LANGCHAIN_NODE_TYPE) return false;\n\t\t\t\tconst nodeType = getNodeType(storeNode.type, storeNode.typeVersion);\n\n\t\t\t\tif (!nodeType) return false;\n\n\t\t\t\t// Check if node is an AI agent or chain based on its metadata\n\t\t\t\tconst isAgent =\n\t\t\t\t\tnodeType.codex?.subcategories?.[AI_SUBCATEGORY]?.includes(AI_CATEGORY_AGENTS);\n\t\t\t\tconst isChain =\n\t\t\t\t\tnodeType.codex?.subcategories?.[AI_SUBCATEGORY]?.includes(AI_CATEGORY_CHAINS);\n\n\t\t\t\t// Handle custom AI Langchain Code nodes that could act as chains or agents\n\t\t\t\tlet isCustomChainOrAgent = false;\n\t\t\t\tif (nodeType.name === AI_CODE_NODE_TYPE) {\n\t\t\t\t\t// Get node connection types for inputs and outputs\n\t\t\t\t\tconst inputs = NodeHelpers.getNodeInputs(workflow.value, storeNode, nodeType);\n\t\t\t\t\tconst inputTypes = NodeHelpers.getConnectionTypes(inputs);\n\n\t\t\t\t\tconst outputs = NodeHelpers.getNodeOutputs(workflow.value, storeNode, nodeType);\n\t\t\t\t\tconst outputTypes = NodeHelpers.getConnectionTypes(outputs);\n\n\t\t\t\t\t// Validate if node has required AI connection types\n\t\t\t\t\tif (\n\t\t\t\t\t\tinputTypes.includes(NodeConnectionTypes.AiLanguageModel) &&\n\t\t\t\t\t\tinputTypes.includes(NodeConnectionTypes.Main) &&\n\t\t\t\t\t\toutputTypes.includes(NodeConnectionTypes.Main)\n\t\t\t\t\t) {\n\t\t\t\t\t\tisCustomChainOrAgent = true;\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\t// Skip if node is not an AI component\n\t\t\t\tif (!isAgent && !isChain && !isCustomChainOrAgent) return false;\n\n\t\t\t\t// Check if this node is connected to the trigger node\n\t\t\t\tconst parentNodes = workflow.value.getParentNodes(storeNode.name);\n\t\t\t\tconst isChatChild = parentNodes.some(\n\t\t\t\t\t(parentNodeName) => parentNodeName === triggerNode.name,\n\t\t\t\t);\n\n\t\t\t\t// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing\n\t\t\t\tconst result = Boolean(isChatChild && (isAgent || isChain || isCustomChainOrAgent));\n\t\t\t\treturn result;\n\t\t\t});\n\t\tconnectedNode.value = chatRootNode ?? null;\n\t}",
+    "old_id": 282,
+    "id": 85
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/frontend/editor-ui/src/composables/useAIAssistantHelpers.ts",
+    "doc": "/**\n\t * Processes node object before sending it to AI assistant\n\t * - Removes unnecessary properties\n\t * - Extracts expressions from the parameters and resolves them\n\t * @param node original node object\n\t * @param propsToRemove properties to remove from the node object\n\t * @returns processed node\n\t */",
+    "code": "function processNodeForAssistant(node: INode, propsToRemove: string[]): INode {\n\t\t// Make a copy of the node object so we don't modify the original\n\t\tconst nodeForLLM = deepCopy(node);\n\t\tpropsToRemove.forEach((key) => {\n\t\t\tdelete nodeForLLM[key as keyof INode];\n\t\t});\n\t\tconst resolvedParameters = workflowHelpers.getNodeParametersWithResolvedExpressions(\n\t\t\tnodeForLLM.parameters,\n\t\t);\n\t\tnodeForLLM.parameters = resolvedParameters;\n\t\treturn nodeForLLM;\n\t}",
+    "old_id": 298,
+    "id": 86
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/frontend/editor-ui/src/composables/useCanvasOperations.ts",
+    "doc": "/**\n\t * Check if maximum allowed number of this type of node has been reached\n\t */",
+    "code": "function checkMaxNodesOfTypeReached(nodeTypeDescription: INodeTypeDescription) {\n\t\tif (\n\t\t\tnodeTypeDescription.maxNodes !== undefined &&\n\t\t\tworkflowHelpers.getNodeTypeCount(nodeTypeDescription.name) >= nodeTypeDescription.maxNodes\n\t\t) {\n\t\t\tthrow new Error(\n\t\t\t\ti18n.baseText('nodeView.showMessage.showMaxNodeTypeError.message', {\n\t\t\t\t\tadjustToNumber: nodeTypeDescription.maxNodes,\n\t\t\t\t\tinterpolate: { nodeTypeDataDisplayName: nodeTypeDescription.displayName },\n\t\t\t\t}),\n\t\t\t);\n\t\t}\n\t}",
+    "old_id": 300,
+    "id": 87
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/frontend/editor-ui/src/composables/useFolders.ts",
+    "doc": "/**\n\t * Get the drag or drop target element from the event target and store\n\t * @param event\n\t * @returns {\n\t * \tdraggedResource: DragTarget | undefined;\n\t * \tdropTarget: DropTarget | undefined;\n\t * }\n\t */",
+    "code": "function handleDrop(event: MouseEvent): {\n\t\tdraggedResource?: DragTarget;\n\t\tdropTarget?: DropTarget;\n\t} {\n\t\tconst eventTarget = event.target as HTMLElement;\n\t\tif (!eventTarget || !isDragging.value) return {};\n\t\tevent.preventDefault();\n\n\t\t// Save previous dragged element before cancelling the drag event\n\t\tconst draggedResourceId = foldersStore.draggedElement?.id;\n\t\tconst draggedResourceType = foldersStore.draggedElement?.type;\n\t\tconst draggedResourceName = foldersStore.draggedElement?.name;\n\t\tif (!draggedResourceId || !draggedResourceType || !draggedResourceName) return {};\n\t\tonDragEnd();\n\n\t\tconst dropTarget = getDragAndDropTarget(eventTarget);\n\t\tif (!dropTarget || !isDropTarget(dropTarget)) return {};\n\n\t\treturn {\n\t\t\tdraggedResource: {\n\t\t\t\ttype: draggedResourceType,\n\t\t\t\tid: draggedResourceId,\n\t\t\t\tname: draggedResourceName,\n\t\t\t},\n\t\t\tdropTarget: {\n\t\t\t\ttype: dropTarget.type,\n\t\t\t\tid: dropTarget.id,\n\t\t\t\tname: dropTarget.name,\n\t\t\t},\n\t\t};\n\t}",
+    "old_id": 305,
+    "id": 88
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/frontend/editor-ui/src/composables/useUniqueNodeName.ts",
+    "doc": "/**\n\t * Create a unique node name from an original name, based on the names of\n\t * all nodes on canvas and any extra names that cannot be used.\n\t */",
+    "code": "function uniqueNodeName(originalName: string, extraNames: string[] = []) {\n\t\tconst { canvasNames } = useWorkflowsStore();\n\n\t\tconst isUnique = !canvasNames.has(originalName) && !extraNames.includes(originalName);\n\n\t\tif (isUnique) return originalName;\n\n\t\tconst nsn = numberSuffixedNames().find((nsn) => originalName.startsWith(nsn));\n\n\t\t// edge case, number suffix as part of name: S3 -> S31 -> S32\n\n\t\tif (nsn) {\n\t\t\tlet unique = '';\n\t\t\tlet index = 1;\n\n\t\t\tconst remainder = originalName.split(nsn).pop();\n\n\t\t\tconst lastChar = remainder?.[remainder.length - 1];\n\n\t\t\tif (lastChar && Number.isInteger(Number(lastChar))) {\n\t\t\t\tindex = parseInt(lastChar, 10);\n\t\t\t\toriginalName = originalName.slice(0, -1);\n\t\t\t}\n\n\t\t\tunique = originalName;\n\n\t\t\twhile (canvasNames.has(unique) || extraNames.includes(unique)) {\n\t\t\t\tunique = originalName + index++;\n\t\t\t}\n\n\t\t\treturn unique;\n\t\t}\n\n\t\t// edge case, all-number name: 123 -> 123-1 -> 123-2\n\n\t\tif (/^\\d+-?\\d*$/.test(originalName)) {\n\t\t\tlet unique = '';\n\t\t\tlet index = 1;\n\n\t\t\tconst match = originalName.match(/(?<base>\\d+)-?(?<suffix>\\d*)/);\n\n\t\t\tif (!match?.groups) {\n\t\t\t\tthrow new Error('Failed to find match for unique name');\n\t\t\t}\n\n\t\t\tif (match?.groups?.suffix !== '') {\n\t\t\t\tindex = parseInt(match.groups.suffix, 10);\n\t\t\t}\n\n\t\t\tunique = match.groups.base;\n\n\t\t\twhile (canvasNames.has(unique) || extraNames.includes(unique)) {\n\t\t\t\tunique = match.groups.base + '-' + index++;\n\t\t\t}\n\n\t\t\treturn unique;\n\t\t}\n\n\t\t// normal case: A -> A1 -> A2\n\n\t\tlet unique = '';\n\t\tlet index = 1;\n\n\t\tconst match = originalName.match(/(?<base>.*\\D+)(?<suffix>\\d*)/);\n\n\t\tif (!match?.groups) {\n\t\t\tthrow new Error('Failed to find match for unique name');\n\t\t}\n\n\t\tif (match?.groups?.suffix !== '') {\n\t\t\tindex = parseInt(match.groups.suffix, 10);\n\t\t}\n\n\t\tunique = match.groups.base;\n\n\t\twhile (canvasNames.has(unique) || extraNames.includes(unique)) {\n\t\t\tunique = match.groups.base + index++;\n\t\t}\n\n\t\treturn unique;\n\t}",
+    "old_id": 315,
+    "id": 89
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/frontend/editor-ui/src/plugins/i18n/index.ts",
+    "doc": "/**\n\t\t\t * Display name for an input label, whether top-level or nested.\n\t\t\t */",
+    "code": "inputLabelDisplayName(parameter: INodeProperties | INodePropertyCollection, path: string) {\n\t\t\t\tconst middleKey = deriveMiddleKey(path, parameter);\n\n\t\t\t\treturn context.dynamicRender({\n\t\t\t\t\tkey: `${initialKey}.${middleKey}.displayName`,\n\t\t\t\t\tfallback: parameter.displayName,\n\t\t\t\t});\n\t\t\t}",
+    "old_id": 329,
+    "id": 90
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/frontend/editor-ui/src/stores/pushConnection.store.ts",
+    "doc": "/**\n\t * Process a newly received message\n\t */",
+    "code": "async function onMessage(data: unknown) {\n\t\tlet receivedData: PushMessage;\n\t\ttry {\n\t\t\treceivedData = JSON.parse(data as string);\n\t\t} catch (error) {\n\t\t\treturn;\n\t\t}\n\n\t\tonMessageReceivedHandlers.value.forEach((handler) => handler(receivedData));\n\t}",
+    "old_id": 337,
+    "id": 91
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/nodes-base/nodes/Google/Sheet/v1/GoogleSheet.ts",
+    "doc": "/**\n\t * Clears values from a sheet\n\t *\n\t */",
+    "code": "async clearData(range: string): Promise<object> {\n\t\tconst body = {\n\t\t\tspreadsheetId: this.id,\n\t\t\trange,\n\t\t};\n\n\t\tconst response = await googleApiRequest.call(\n\t\t\tthis.executeFunctions,\n\t\t\t'POST',\n\t\t\t`/v4/spreadsheets/${this.id}/values/${range}:clear`,\n\t\t\tbody,\n\t\t);\n\n\t\treturn response;\n\t}",
+    "old_id": 349,
+    "id": 92
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/nodes-base/nodes/Google/Sheet/v1/GoogleSheet.ts",
+    "doc": "/**\n\t * Sets values in one or more ranges of a spreadsheet.\n\t */",
+    "code": "async spreadsheetBatchUpdate(requests: IDataObject[]) {\n\t\tconst body = {\n\t\t\trequests,\n\t\t};\n\n\t\tconst response = await googleApiRequest.call(\n\t\t\tthis.executeFunctions,\n\t\t\t'POST',\n\t\t\t`/v4/spreadsheets/${this.id}:batchUpdate`,\n\t\t\tbody,\n\t\t);\n\n\t\treturn response;\n\t}",
+    "old_id": 351,
+    "id": 93
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/nodes-base/nodes/Google/Sheet/v2/helpers/GoogleSheet.ts",
+    "doc": "/**\n\t * Returns the sheets in a Spreadsheet\n\t */",
+    "code": "async spreadsheetGetSheets() {\n\t\tconst query = {\n\t\t\tfields: 'sheets.properties',\n\t\t};\n\n\t\tconst response = await apiRequest.call(\n\t\t\tthis.executeFunctions,\n\t\t\t'GET',\n\t\t\t`/v4/spreadsheets/${this.id}`,\n\t\t\t{},\n\t\t\tquery,\n\t\t);\n\n\t\treturn response;\n\t}",
+    "old_id": 354,
+    "id": 94
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/nodes-base/nodes/Onfleet/OnfleetTrigger.node.ts",
+    "doc": "/**\n\t * Triggered function when an Onfleet webhook is executed\n\t */",
+    "code": "async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {\n\t\tconst req = this.getRequestObject();\n\t\tif (this.getWebhookName() === 'setup') {\n\t\t\t/* -------------------------------------------------------------------------- */\n\t\t\t/*                             Validation request                             */\n\t\t\t/* -------------------------------------------------------------------------- */\n\t\t\tconst res = this.getResponseObject();\n\t\t\tres.status(200).send(req.query.check);\n\t\t\treturn { noWebhookResponse: true };\n\t\t}\n\n\t\tconst returnData: IDataObject = this.getBodyData();\n\n\t\treturn {\n\t\t\tworkflowData: [this.helpers.returnJsonArray(returnData)],\n\t\t};\n\t}",
+    "old_id": 359,
+    "id": 95
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/nodes-base/nodes/Pipedrive/Pipedrive.node.ts",
+    "doc": "/**\n * Add the additional fields to the body\n *\n * @param {IDataObject} body The body object to add fields to\n * @param {IDataObject} additionalFields The fields to add\n */",
+    "code": "function addAdditionalFields(body: IDataObject, additionalFields: IDataObject) {\n\tfor (const key of Object.keys(additionalFields)) {\n\t\tif (\n\t\t\tkey === 'customProperties' &&\n\t\t\t(additionalFields.customProperties as IDataObject).property !== undefined\n\t\t) {\n\t\t\tfor (const customProperty of (additionalFields.customProperties as IDataObject)\n\t\t\t\t.property! as CustomProperty[]) {\n\t\t\t\tbody[customProperty.name] = customProperty.value;\n\t\t\t}\n\t\t} else {\n\t\t\tbody[key] = additionalFields[key];\n\t\t}\n\t}\n}",
+    "old_id": 360,
+    "id": 96
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/nodes-base/utils/connection-pool-manager.ts",
+    "doc": "/**\n\t * Gets or creates a connection pool for the given options.\n\t * Updates the last used timestamp for existing connections.\n\t */",
+    "code": "async getConnection<T>(options: GetConnectionOption<T>): Promise<T> {\n\t\tconst key = this.makeKey(options);\n\n\t\tlet value = this.map.get(key);\n\t\tif (!value) {\n\t\t\tvalue = {\n\t\t\t\tpool: await options.fallBackHandler(),\n\t\t\t\tcleanUpHandler: options.cleanUpHandler,\n\t\t\t} as Registration<unknown>;\n\t\t}\n\n\t\tthis.map.set(key, { ...value, lastUsed: Date.now() });\n\t\treturn value.pool as T;\n\t}",
+    "old_id": 370,
+    "id": 97
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/workflow/src/NodeHelpers.ts",
+    "doc": "/**\n * Returns which parameters are dependent on which\n */",
+    "code": "function getParameterDependencies(nodePropertiesArray: INodeProperties[]): IParameterDependencies {\n\tconst dependencies: IParameterDependencies = {};\n\n\tfor (const nodeProperties of nodePropertiesArray) {\n\t\tconst { name, displayOptions } = nodeProperties;\n\n\t\tif (!dependencies[name]) {\n\t\t\tdependencies[name] = [];\n\t\t}\n\n\t\tif (!displayOptions) {\n\t\t\t// Does not have any dependencies\n\t\t\tcontinue;\n\t\t}\n\n\t\tfor (const displayRule of Object.values(displayOptions)) {\n\t\t\tfor (const parameterName of Object.keys(displayRule)) {\n\t\t\t\tif (!dependencies[name].includes(parameterName)) {\n\t\t\t\t\tif (parameterName.charAt(0) === '@') {\n\t\t\t\t\t\t// Is a special parameter so can be skipped\n\t\t\t\t\t\tcontinue;\n\t\t\t\t\t}\n\t\t\t\t\tdependencies[name].push(parameterName);\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\n\treturn dependencies;\n}",
+    "old_id": 376,
+    "id": 98
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/workflow/src/WorkflowDataProxy.ts",
+    "doc": "/**\n\t * Returns a proxy to query data of all nodes\n\t *\n\t * @private\n\t */",
+    "code": "private nodeGetter() {\n\t\tconst that = this;\n\t\treturn new Proxy(\n\t\t\t{},\n\t\t\t{\n\t\t\t\thas: () => true,\n\t\t\t\tget(_, name) {\n\t\t\t\t\tif (name === 'isProxy') return true;\n\n\t\t\t\t\tconst nodeName = name.toString();\n\n\t\t\t\t\tif (that.workflow.getNode(nodeName) === null) {\n\t\t\t\t\t\tthrow new ExpressionError(\"Referenced node doesn't exist\", {\n\t\t\t\t\t\t\trunIndex: that.runIndex,\n\t\t\t\t\t\t\titemIndex: that.itemIndex,\n\t\t\t\t\t\t\tnodeCause: nodeName,\n\t\t\t\t\t\t\tdescriptionKey: 'nodeNotFound',\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\n\t\t\t\t\treturn that.nodeDataGetter(nodeName);\n\t\t\t\t},\n\t\t\t},\n\t\t);\n\t}",
+    "old_id": 393,
+    "id": 99
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/n8n/packages/workflow/src/errors/abstract/node.error.ts",
+    "doc": "/**\n\t * Preserve the original error message before setting the new one\n\t */",
+    "code": "protected addToMessages(message: string): void {\n\t\tif (message && !this.messages.includes(message)) {\n\t\t\tthis.messages.push(message);\n\t\t}\n\t}",
+    "old_id": 395,
+    "id": 100
+  }
+]

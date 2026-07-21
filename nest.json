@@ -1,0 +1,660 @@
+[
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/integration/graphql-code-first/src/recipes/recipes.service.ts",
+    "doc": "/**\n   * MOCK\n   * Put some real business logic here\n   * Left for demonstration purposes\n   */",
+    "code": "async create(data: NewRecipeInput): Promise<Recipe> {\n    return {\n      id: 3,\n    } as any;\n  }",
+    "old_id": 1,
+    "id": 1
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/common/exceptions/http.exception.ts",
+    "doc": "/**\n   * Configures error chaining support\n   *\n   * @see https://nodejs.org/en/blog/release/v16.9.0/#error-cause\n   * @see https://github.com/microsoft/TypeScript/issues/45167\n   */",
+    "code": "public initCause(): void {\n    if (this.options?.cause) {\n      this.cause = this.options.cause;\n      return;\n    }\n  }",
+    "old_id": 2,
+    "id": 2
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/common/module-utils/configurable-module.builder.ts",
+    "doc": "/**\n   * Dynamic modules must expose public static methods that let you pass in\n   * configuration parameters (control the module's behavior from the outside).\n   * Some frequently used names that you may have seen in other modules are:\n   * \"forRoot\", \"forFeature\", \"register\", \"configure\".\n   *\n   * This method \"setClassMethodName\" lets you specify the name of the\n   * method that will be auto-generated.\n   *\n   * @param key name of the method\n   */",
+    "code": "setClassMethodName<StaticMethodKey extends string>(key: StaticMethodKey) {\n    const builder = new ConfigurableModuleBuilder<\n      ModuleOptions,\n      StaticMethodKey,\n      FactoryClassMethodKey,\n      ExtraModuleDefinitionOptions\n    >(this.options, this as any);\n    builder.staticMethodKey = key;\n    return builder;\n  }",
+    "old_id": 3,
+    "id": 3
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/common/pipes/file/parse-file.pipe.ts",
+    "doc": "/**\n   * @returns list of validators used in this pipe.\n   */",
+    "code": "getValidators() {\n    return this.validators;\n  }",
+    "old_id": 4,
+    "id": 4
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/common/pipes/parse-array.pipe.ts",
+    "doc": "/**\n   * Method that accesses and performs optional transformation on argument for\n   * in-flight requests.\n   *\n   * @param value currently processed route argument\n   * @param metadata contains metadata about the currently processed route argument\n   */",
+    "code": "async transform(value: any, metadata: ArgumentMetadata): Promise<any> {\n    if (!value && !this.options.optional) {\n      throw this.exceptionFactory(VALIDATION_ERROR_MESSAGE);\n    } else if (isNil(value) && this.options.optional) {\n      return value;\n    }\n\n    if (!Array.isArray(value)) {\n      if (!isString(value)) {\n        throw this.exceptionFactory(VALIDATION_ERROR_MESSAGE);\n      } else {\n        try {\n          value = value\n            .trim()\n            .split(this.options.separator || DEFAULT_ARRAY_SEPARATOR);\n        } catch {\n          throw this.exceptionFactory(VALIDATION_ERROR_MESSAGE);\n        }\n      }\n    }\n    if (this.options.items) {\n      const validationMetadata: ArgumentMetadata = {\n        metatype: this.options.items,\n        type: 'query',\n      };\n\n      const isExpectedTypePrimitive = this.isExpectedTypePrimitive();\n      const toClassInstance = (item: any, index?: number) => {\n        if (this.options.items !== String) {\n          try {\n            item = JSON.parse(item);\n          } catch {\n            // Do nothing\n          }\n        }\n        if (isExpectedTypePrimitive) {\n          return this.validatePrimitive(item, index);\n        }\n        return this.validationPipe.transform(item, validationMetadata);\n      };\n      if (this.options.stopAtFirstError === false) {\n        // strict compare to \"false\" to make sure\n        // that this option is disabled by default\n        let errors: string[] = [];\n\n        const targetArray = value as Array<unknown>;\n        for (let i = 0; i < targetArray.length; i++) {\n          try {\n            targetArray[i] = await toClassInstance(targetArray[i]);\n          } catch (err) {\n            let message: string[] | string;\n            if (err.getResponse) {\n              const response = err.getResponse();\n              if (Array.isArray(response.message)) {\n                message = response.message.map(\n                  (item: string) => `[${i}] ${item}`,\n                );\n              } else {\n                message = `[${i}] ${response.message}`;\n              }\n            } else {\n              message = err;\n            }\n            errors = errors.concat(message);\n          }\n        }\n        if (errors.length > 0) {\n          throw this.exceptionFactory(errors as any);\n        }\n        return targetArray;\n      } else {\n        value = await Promise.all(value.map(toClassInstance));\n      }\n    }\n    return value;\n  }",
+    "old_id": 5,
+    "id": 5
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/common/pipes/parse-bool.pipe.ts",
+    "doc": "/**\n   * @param value currently processed route argument\n   * @returns `true` if `value` is said 'true', ie., if it is equal to the boolean\n   * `true` or the string `\"true\"`\n   */",
+    "code": "protected isTrue(value: string | boolean): boolean {\n    return value === true || value === 'true';\n  }",
+    "old_id": 6,
+    "id": 6
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/common/pipes/parse-bool.pipe.ts",
+    "doc": "/**\n   * @param value currently processed route argument\n   * @returns `true` if `value` is said 'false', ie., if it is equal to the boolean\n   * `false` or the string `\"false\"`\n   */",
+    "code": "protected isFalse(value: string | boolean): boolean {\n    return value === false || value === 'false';\n  }",
+    "old_id": 7,
+    "id": 7
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/common/pipes/parse-enum.pipe.ts",
+    "doc": "/**\n   * Method that accesses and performs optional transformation on argument for\n   * in-flight requests.\n   *\n   * @param value currently processed route argument\n   * @param metadata contains metadata about the currently processed route argument\n   */",
+    "code": "async transform(value: T, metadata: ArgumentMetadata): Promise<T> {\n    if (isNil(value) && this.options?.optional) {\n      return value;\n    }\n    if (!this.isEnum(value)) {\n      throw this.exceptionFactory(\n        'Validation failed (enum string is expected)',\n      );\n    }\n    return value;\n  }",
+    "old_id": 8,
+    "id": 8
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/common/pipes/parse-float.pipe.ts",
+    "doc": "/**\n   * Method that accesses and performs optional transformation on argument for\n   * in-flight requests.\n   *\n   * @param value currently processed route argument\n   * @param metadata contains metadata about the currently processed route argument\n   */",
+    "code": "async transform(value: string, metadata: ArgumentMetadata): Promise<number> {\n    if (isNil(value) && this.options?.optional) {\n      return value;\n    }\n    if (!this.isNumeric(value)) {\n      throw this.exceptionFactory(\n        'Validation failed (numeric string is expected)',\n      );\n    }\n    return parseFloat(value);\n  }",
+    "old_id": 9,
+    "id": 9
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/common/pipes/parse-float.pipe.ts",
+    "doc": "/**\n   * @param value currently processed route argument\n   * @returns `true` if `value` is a valid float number\n   */",
+    "code": "protected isNumeric(value: string): boolean {\n    return (\n      ['string', 'number'].includes(typeof value) &&\n      !isNaN(parseFloat(value)) &&\n      isFinite(value as any)\n    );\n  }",
+    "old_id": 10,
+    "id": 10
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/common/pipes/parse-int.pipe.ts",
+    "doc": "/**\n   * Method that accesses and performs optional transformation on argument for\n   * in-flight requests.\n   *\n   * @param value currently processed route argument\n   * @param metadata contains metadata about the currently processed route argument\n   */",
+    "code": "async transform(value: string, metadata: ArgumentMetadata): Promise<number> {\n    if (isNil(value) && this.options?.optional) {\n      return value;\n    }\n    if (!this.isNumeric(value)) {\n      throw this.exceptionFactory(\n        'Validation failed (numeric string is expected)',\n      );\n    }\n    return parseInt(value, 10);\n  }",
+    "old_id": 11,
+    "id": 11
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/common/pipes/parse-int.pipe.ts",
+    "doc": "/**\n   * @param value currently processed route argument\n   * @returns `true` if `value` is a valid integer number\n   */",
+    "code": "protected isNumeric(value: string): boolean {\n    return (\n      ['string', 'number'].includes(typeof value) &&\n      /^-?\\d+$/.test(value) &&\n      isFinite(value as any)\n    );\n  }",
+    "old_id": 12,
+    "id": 12
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/common/services/console-logger.service.ts",
+    "doc": "/**\n   * Set log levels\n   * @param levels log levels\n   */",
+    "code": "setLogLevels(levels: LogLevel[]) {\n    if (!this.options) {\n      this.options = {};\n    }\n    this.options.logLevels = levels;\n  }",
+    "old_id": 13,
+    "id": 13
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/common/services/console-logger.service.ts",
+    "doc": "/**\n   * Set logger context\n   * @param context context\n   */",
+    "code": "setContext(context: string) {\n    this.context = context;\n  }",
+    "old_id": 14,
+    "id": 14
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/common/services/console-logger.service.ts",
+    "doc": "/**\n   * Resets the logger context to the value that was passed in the constructor.\n   */",
+    "code": "resetContext() {\n    this.context = this.originalContext;\n  }",
+    "old_id": 15,
+    "id": 15
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/common/services/logger.service.ts",
+    "doc": "/**\n   * Print buffered logs and detach buffer.\n   */",
+    "code": "static flush() {\n    this.isBufferAttached = false;\n    this.logBuffer.forEach(item =>\n      item.methodRef(...(item.arguments as [string])),\n    );\n    this.logBuffer = [];\n  }",
+    "old_id": 16,
+    "id": 16
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/common/services/logger.service.ts",
+    "doc": "/**\n   * Attach buffer.\n   * Turns on initialization logs buffering.\n   */",
+    "code": "static attachBuffer() {\n    this.isBufferAttached = true;\n  }",
+    "old_id": 17,
+    "id": 17
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/common/services/logger.service.ts",
+    "doc": "/**\n   * Detach buffer.\n   * Turns off initialization logs buffering.\n   */",
+    "code": "static detachBuffer() {\n    this.isBufferAttached = false;\n  }",
+    "old_id": 18,
+    "id": 18
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/discovery/discovery-service.ts",
+    "doc": "/**\n   * Creates a decorator that can be used to decorate classes and methods with metadata.\n   * The decorator will also add the class to the collection of discoverable classes (by metadata key).\n   * Decorated classes can be discovered using the `getProviders` and `getControllers` methods.\n   * @returns A decorator function.\n   */",
+    "code": "static createDecorator<T>(): DiscoverableDecorator<T> {\n    const metadataKey = uid(21);\n    const decoratorFn =\n      (opts: T) =>\n      (target: object | Function, key?: string | symbol, descriptor?: any) => {\n        if (!descriptor) {\n          DiscoverableMetaHostCollection.addClassMetaHostLink(\n            target as Function,\n            metadataKey,\n          );\n        }\n        SetMetadata(metadataKey, opts ?? {})(target, key!, descriptor);\n      };\n\n    decoratorFn.KEY = metadataKey;\n    return decoratorFn as DiscoverableDecorator<T>;\n  }",
+    "old_id": 19,
+    "id": 19
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/discovery/discovery-service.ts",
+    "doc": "/**\n   * Returns a list of modules to be used for discovery.\n   */",
+    "code": "protected getModules(options: DiscoveryOptions = {}): Module[] {\n    const includeInOpts = 'include' in options;\n    if (!includeInOpts) {\n      const moduleRefs = [...this.modulesContainer.values()];\n      return moduleRefs;\n    }\n    const whitelisted = this.includeWhitelisted(options.include!);\n    return whitelisted;\n  }",
+    "old_id": 20,
+    "id": 20
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/exceptions/base-exception-filter.ts",
+    "doc": "/**\n   * Checks if the thrown error comes from the \"http-errors\" library.\n   * @param err error object\n   */",
+    "code": "public isHttpError(err: any): err is { statusCode: number; message: string } {\n    return err?.statusCode && err?.message;\n  }",
+    "old_id": 21,
+    "id": 21
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/helpers/context-id-factory.ts",
+    "doc": "/**\n   * Generates a context identifier based on the request object.\n   */",
+    "code": "public static create(): ContextId {\n    return createContextId();\n  }",
+    "old_id": 22,
+    "id": 22
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/helpers/context-id-factory.ts",
+    "doc": "/**\n   * Registers a custom context id strategy that lets you attach\n   * a parent context id to the existing context id object.\n   * @param strategy strategy instance\n   */",
+    "code": "public static apply(strategy: ContextIdStrategy) {\n    this.strategy = strategy;\n  }",
+    "old_id": 23,
+    "id": 23
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/helpers/http-adapter-host.ts",
+    "doc": "/**\n   * Accessor for the underlying `HttpAdapter`\n   *\n   * @param httpAdapter reference to the `HttpAdapter` to be set\n   */",
+    "code": "set httpAdapter(httpAdapter: T) {\n    this._httpAdapter = httpAdapter;\n  }",
+    "old_id": 24,
+    "id": 24
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/helpers/http-adapter-host.ts",
+    "doc": "/**\n   * Accessor for the underlying `HttpAdapter`\n   *\n   * @example\n   * `const httpAdapter = adapterHost.httpAdapter;`\n   */",
+    "code": "get httpAdapter(): T {\n    return this._httpAdapter as T;\n  }",
+    "old_id": 25,
+    "id": 25
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/helpers/http-adapter-host.ts",
+    "doc": "/**\n   * Observable that allows to subscribe to the `listen` event.\n   * This event is emitted when the HTTP application is listening for incoming requests.\n   */",
+    "code": "get listen$(): Observable<void> {\n    return this._listen$.asObservable();\n  }",
+    "old_id": 26,
+    "id": 26
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/helpers/http-adapter-host.ts",
+    "doc": "/**\n   * Sets the listening state of the application.\n   */",
+    "code": "set listening(listening: boolean) {\n    this.isListening = listening;\n\n    if (listening) {\n      this._listen$.next();\n      this._listen$.complete();\n    }\n  }",
+    "old_id": 27,
+    "id": 27
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/helpers/http-adapter-host.ts",
+    "doc": "/**\n   * Returns a boolean indicating whether the application is listening for incoming requests.\n   */",
+    "code": "get listening(): boolean {\n    return this.isListening;\n  }",
+    "old_id": 28,
+    "id": 28
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/hooks/on-module-destroy.hook.ts",
+    "doc": "/**\n * Calls the given instances onModuleDestroy hook\n */",
+    "code": "function callOperator(instances: InstanceWrapper[]): Promise<any>[] {\n  return iterate(instances)\n    .filter(instance => !isNil(instance))\n    .filter(hasOnModuleDestroyHook)\n    .map(async instance =>\n      (instance as any as OnModuleDestroy).onModuleDestroy(),\n    )\n    .toArray();\n}",
+    "old_id": 29,
+    "id": 29
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/hooks/on-module-init.hook.ts",
+    "doc": "/**\n * Returns true or false if the given instance has a `onModuleInit` function\n *\n * @param instance The instance which should be checked\n */",
+    "code": "function hasOnModuleInitHook(instance: unknown): instance is OnModuleInit {\n  return isFunction((instance as OnModuleInit).onModuleInit);\n}",
+    "old_id": 30,
+    "id": 30
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/injector/injector.ts",
+    "doc": "/**\n     * Same as the internal utility function `isOptionalFactoryDependency` from `@nestjs/common`.\n     * We are duplicating it here because that one is not supposed to be exported.\n     */",
+    "code": "function isOptionalFactoryDependency(\n      value: InjectionToken | OptionalFactoryDependency,\n    ): value is OptionalFactoryDependency {\n      return (\n        !isUndefined((value as OptionalFactoryDependency).token) &&\n        !isUndefined((value as OptionalFactoryDependency).optional) &&\n        !(value as any).prototype\n      );\n    }",
+    "old_id": 31,
+    "id": 31
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/injector/settlement-signal.ts",
+    "doc": "/**\n   * Resolves the promise returned by `asPromise`.\n   */",
+    "code": "public complete() {\n    this.completed = true;\n    this.settleFn();\n  }",
+    "old_id": 32,
+    "id": 32
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/injector/settlement-signal.ts",
+    "doc": "/**\n   * Rejects the promise returned by `asPromise` with the given error.\n   * @param err Error to reject the promise returned by `asPromise` with.\n   */",
+    "code": "public error(err: unknown) {\n    this.completed = true;\n    this.settleFn(err);\n  }",
+    "old_id": 33,
+    "id": 33
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/injector/settlement-signal.ts",
+    "doc": "/**\n   * Returns a promise that will be resolved when `complete` or `error` is called.\n   * @returns Promise that will be resolved when `complete` or `error` is called.\n   */",
+    "code": "public asPromise() {\n    return this.settledPromise;\n  }",
+    "old_id": 34,
+    "id": 34
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/injector/settlement-signal.ts",
+    "doc": "/**\n   * Inserts a wrapper id that the host of this signal depends on.\n   * @param wrapperId Wrapper id to insert.\n   */",
+    "code": "public insertRef(wrapperId: string) {\n    this._refs.add(wrapperId);\n  }",
+    "old_id": 35,
+    "id": 35
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/injector/settlement-signal.ts",
+    "doc": "/**\n   * Check if relationship is circular.\n   * @param wrapperId Wrapper id to check.\n   * @returns True if relationship is circular, false otherwise.\n   */",
+    "code": "public isCycle(wrapperId: string) {\n    return !this.completed && this._refs.has(wrapperId);\n  }",
+    "old_id": 36,
+    "id": 36
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/nest-application-context.ts",
+    "doc": "/**\n   * Registers the request/context object for a given context ID (DI container sub-tree).\n   * @returns {void}\n   */",
+    "code": "public registerRequestByContextId<T = any>(request: T, contextId: ContextId) {\n    this.container.registerRequestProvider(request, contextId);\n  }",
+    "old_id": 37,
+    "id": 37
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/nest-application-context.ts",
+    "doc": "/**\n   * Initializes the Nest application.\n   * Calls the Nest lifecycle events.\n   *\n   * @returns {Promise<this>} The NestApplicationContext instance as Promise\n   */",
+    "code": "public async init(): Promise<this> {\n    if (this.isInitialized) {\n      return this;\n    }\n    /* eslint-disable-next-line no-async-promise-executor */\n    this.initializationPromise = new Promise(async (resolve, reject) => {\n      try {\n        await this.callInitHook();\n        await this.callBootstrapHook();\n        resolve();\n      } catch (err) {\n        reject(err);\n      }\n    });\n    await this.initializationPromise;\n\n    this.isInitialized = true;\n    return this;\n  }",
+    "old_id": 38,
+    "id": 38
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/nest-application-context.ts",
+    "doc": "/**\n   * Terminates the application\n   * @returns {Promise<void>}\n   */",
+    "code": "public async close(signal?: string): Promise<void> {\n    await this.initializationPromise;\n    await this.callDestroyHook();\n    await this.callBeforeShutdownHook(signal);\n    await this.dispose();\n    await this.callShutdownHook(signal);\n    this.unsubscribeFromProcessSignals();\n  }",
+    "old_id": 39,
+    "id": 39
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/nest-application-context.ts",
+    "doc": "/**\n   * Sets custom logger service.\n   * Flushes buffered logs if auto flush is on.\n   * @returns {void}\n   */",
+    "code": "public useLogger(logger: LoggerService | LogLevel[] | false) {\n    Logger.overrideLogger(logger);\n\n    if (this.shouldFlushLogsOnOverride) {\n      this.flushLogs();\n    }\n  }",
+    "old_id": 40,
+    "id": 40
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/nest-application-context.ts",
+    "doc": "/**\n   * Prints buffered logs and detaches buffer.\n   * @returns {void}\n   */",
+    "code": "public flushLogs() {\n    Logger.flush();\n  }",
+    "old_id": 41,
+    "id": 41
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/nest-application-context.ts",
+    "doc": "/**\n   * Define that it must flush logs right after defining a custom logger.\n   */",
+    "code": "public flushLogsOnOverride() {\n    this.shouldFlushLogsOnOverride = true;\n  }",
+    "old_id": 42,
+    "id": 42
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/nest-application-context.ts",
+    "doc": "/**\n   * Enables the usage of shutdown hooks. Will call the\n   * `onApplicationShutdown` function of a provider if the\n   * process receives a shutdown signal.\n   *\n   * @param {ShutdownSignal[]} [signals=[]] The system signals it should listen to\n   *\n   * @returns {this} The Nest application context instance\n   */",
+    "code": "public enableShutdownHooks(signals: (ShutdownSignal | string)[] = []): this {\n    if (isEmpty(signals)) {\n      signals = Object.keys(ShutdownSignal).map(\n        (key: string) => ShutdownSignal[key],\n      );\n    } else {\n      // given signals array should be unique because\n      // process shouldn't listen to the same signal more than once.\n      signals = Array.from(new Set(signals));\n    }\n\n    signals = iterate(signals)\n      .map((signal: string) => signal.toString().toUpperCase().trim())\n      // filter out the signals which is already listening to\n      .filter(signal => !this.activeShutdownSignals.includes(signal))\n      .toArray();\n\n    this.listenToShutdownSignals(signals);\n    return this;\n  }",
+    "old_id": 43,
+    "id": 43
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/nest-application-context.ts",
+    "doc": "/**\n   * Listens to shutdown signals by listening to\n   * process events\n   *\n   * @param {string[]} signals The system signals it should listen to\n   */",
+    "code": "protected listenToShutdownSignals(signals: string[]) {\n    let receivedSignal = false;\n    const cleanup = async (signal: string) => {\n      try {\n        if (receivedSignal) {\n          // If we receive another signal while we're waiting\n          // for the server to stop, just ignore it.\n          return;\n        }\n        receivedSignal = true;\n        await this.initializationPromise;\n        await this.callDestroyHook();\n        await this.callBeforeShutdownHook(signal);\n        await this.dispose();\n        await this.callShutdownHook(signal);\n        signals.forEach(sig => process.removeListener(sig, cleanup));\n        process.kill(process.pid, signal);\n      } catch (err) {\n        Logger.error(\n          MESSAGES.ERROR_DURING_SHUTDOWN,\n          (err as Error)?.stack,\n          NestApplicationContext.name,\n        );\n        process.exit(1);\n      }\n    };\n    this.shutdownCleanupRef = cleanup as (...args: unknown[]) => unknown;\n\n    signals.forEach((signal: string) => {\n      this.activeShutdownSignals.push(signal);\n      process.on(signal as any, cleanup);\n    });\n  }",
+    "old_id": 44,
+    "id": 44
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/nest-application-context.ts",
+    "doc": "/**\n   * Unsubscribes from shutdown signals (process events)\n   */",
+    "code": "protected unsubscribeFromProcessSignals() {\n    if (!this.shutdownCleanupRef) {\n      return;\n    }\n    this.activeShutdownSignals.forEach(signal => {\n      process.removeListener(signal, this.shutdownCleanupRef!);\n    });\n  }",
+    "old_id": 45,
+    "id": 45
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/nest-application-context.ts",
+    "doc": "/**\n   * Calls the `onModuleInit` function on the registered\n   * modules and its children.\n   */",
+    "code": "protected async callInitHook(): Promise<void> {\n    const modulesSortedByDistance = this.getModulesToTriggerHooksOn();\n    for (const module of modulesSortedByDistance) {\n      await callModuleInitHook(module);\n    }\n  }",
+    "old_id": 46,
+    "id": 46
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/nest-application-context.ts",
+    "doc": "/**\n   * Calls the `onModuleDestroy` function on the registered\n   * modules and its children.\n   */",
+    "code": "protected async callDestroyHook(): Promise<void> {\n    const modulesSortedByDistance = [\n      ...this.getModulesToTriggerHooksOn(),\n    ].reverse();\n\n    for (const module of modulesSortedByDistance) {\n      await callModuleDestroyHook(module);\n    }\n  }",
+    "old_id": 47,
+    "id": 47
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/nest-application-context.ts",
+    "doc": "/**\n   * Calls the `onApplicationBootstrap` function on the registered\n   * modules and its children.\n   */",
+    "code": "protected async callBootstrapHook(): Promise<void> {\n    const modulesSortedByDistance = this.getModulesToTriggerHooksOn();\n    for (const module of modulesSortedByDistance) {\n      await callModuleBootstrapHook(module);\n    }\n  }",
+    "old_id": 48,
+    "id": 48
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/nest-application-context.ts",
+    "doc": "/**\n   * Calls the `onApplicationShutdown` function on the registered\n   * modules and children.\n   */",
+    "code": "protected async callShutdownHook(signal?: string): Promise<void> {\n    const modulesSortedByDistance = [\n      ...this.getModulesToTriggerHooksOn(),\n    ].reverse();\n\n    for (const module of modulesSortedByDistance) {\n      await callAppShutdownHook(module, signal);\n    }\n  }",
+    "old_id": 49,
+    "id": 49
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/nest-application-context.ts",
+    "doc": "/**\n   * Calls the `beforeApplicationShutdown` function on the registered\n   * modules and children.\n   */",
+    "code": "protected async callBeforeShutdownHook(signal?: string): Promise<void> {\n    const modulesSortedByDistance = [\n      ...this.getModulesToTriggerHooksOn(),\n    ].reverse();\n\n    for (const module of modulesSortedByDistance) {\n      await callBeforeAppShutdownHook(module, signal);\n    }\n  }",
+    "old_id": 50,
+    "id": 50
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/repl/repl-function.ts",
+    "doc": "/**\n   * @returns A message displayed by calling `<fnName>.help`\n   */",
+    "code": "public makeHelpMessage(): string {\n    const { description, name, signature } = this.fnDefinition;\n\n    const fnSignatureWithName = `${name}${signature}`;\n\n    return `${clc.yellow(description)}\\n${clc.magentaBright(\n      'Interface:',\n    )} ${clc.bold(fnSignatureWithName)}\\n`;\n  }",
+    "old_id": 51,
+    "id": 51
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/repl/repl-native-commands.ts",
+    "doc": "/**\n * Displays a list of available commands in the REPL alongside with their\n * descriptions.\n * (c) This code was inspired by the 'help' command from Node.js core:\n * {@link https://github.com/nodejs/node/blob/58b60c1393dd65cd228a8b0084a19acd2c1d16aa/lib/repl.js#L1741-L1759}\n */",
+    "code": "function listAllCommands(replServer: REPLServer) {\n  Object.keys(replServer.commands)\n    .sort()\n    .forEach(name => {\n      const cmd = replServer.commands[name];\n      if (cmd) {\n        replServer.output.write(`${name}\\t${cmd.help || ''}\\n`);\n      }\n    });\n}",
+    "old_id": 52,
+    "id": 52
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/scanner.ts",
+    "doc": "/**\n   * Add either request or transient globally scoped enhancers\n   * to all controllers metadata storage\n   */",
+    "code": "public addScopedEnhancersMetadata() {\n    iterate(this.applicationProvidersApplyMap)\n      .filter(wrapper => this.isRequestOrTransient(wrapper.scope!))\n      .forEach(({ moduleKey, providerKey }) => {\n        const modulesContainer = this.container.getModules();\n        const { injectables } = modulesContainer.get(moduleKey)!;\n        const instanceWrapper = injectables.get(providerKey);\n\n        const iterableIterator = modulesContainer.values();\n        iterate(iterableIterator)\n          .map(moduleRef =>\n            Array.from<InstanceWrapper>(moduleRef.controllers.values()).concat(\n              moduleRef.entryProviders,\n            ),\n          )\n          .flatten()\n          .forEach(controllerOrEntryProvider =>\n            controllerOrEntryProvider.addEnhancerMetadata(instanceWrapper!),\n          );\n      });\n  }",
+    "old_id": 53,
+    "id": 53
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/scanner.ts",
+    "doc": "/**\n   * @param metatype\n   * @returns `true` if `metatype` is annotated with the `@Injectable()` decorator.\n   */",
+    "code": "private isInjectable(metatype: Type<any>): boolean {\n    return !!Reflect.getMetadata(INJECTABLE_WATERMARK, metatype);\n  }",
+    "old_id": 54,
+    "id": 54
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/scanner.ts",
+    "doc": "/**\n   * @param metatype\n   * @returns `true` if `metatype` is annotated with the `@Controller()` decorator.\n   */",
+    "code": "private isController(metatype: Type<any>): boolean {\n    return !!Reflect.getMetadata(CONTROLLER_WATERMARK, metatype);\n  }",
+    "old_id": 55,
+    "id": 55
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/core/scanner.ts",
+    "doc": "/**\n   * @param metatype\n   * @returns `true` if `metatype` is annotated with the `@Catch()` decorator.\n   */",
+    "code": "private isExceptionFilter(metatype: Type<any>): boolean {\n    return !!Reflect.getMetadata(CATCH_WATERMARK, metatype);\n  }",
+    "old_id": 56,
+    "id": 56
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/client/client-proxy.ts",
+    "doc": "/**\n   * Returns an observable that emits status changes.\n   */",
+    "code": "public get status(): Observable<Status> {\n    return this._status$.asObservable().pipe(distinctUntilChanged());\n  }",
+    "old_id": 57,
+    "id": 57
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/ctx-host/base-rpc.context.ts",
+    "doc": "/**\n   * Returns the array of arguments being passed to the handler.\n   */",
+    "code": "getArgs(): T {\n    return this.args;\n  }",
+    "old_id": 58,
+    "id": 58
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/ctx-host/base-rpc.context.ts",
+    "doc": "/**\n   * Returns a particular argument by index.\n   * @param index index of argument to retrieve\n   */",
+    "code": "getArgByIndex(index: number) {\n    return this.args[index];\n  }",
+    "old_id": 59,
+    "id": 59
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/ctx-host/kafka.context.ts",
+    "doc": "/**\n   * Returns the reference to the original message.\n   */",
+    "code": "getMessage() {\n    return this.args[0];\n  }",
+    "old_id": 60,
+    "id": 60
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/ctx-host/kafka.context.ts",
+    "doc": "/**\n   * Returns the name of the topic.\n   */",
+    "code": "getTopic() {\n    return this.args[2];\n  }",
+    "old_id": 61,
+    "id": 61
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/ctx-host/kafka.context.ts",
+    "doc": "/**\n   * Returns the Kafka consumer reference.\n   */",
+    "code": "getConsumer() {\n    return this.args[3];\n  }",
+    "old_id": 62,
+    "id": 62
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/ctx-host/kafka.context.ts",
+    "doc": "/**\n   * Returns the Kafka heartbeat callback.\n   */",
+    "code": "getHeartbeat() {\n    return this.args[4];\n  }",
+    "old_id": 63,
+    "id": 63
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/ctx-host/kafka.context.ts",
+    "doc": "/**\n   * Returns the Kafka producer reference,\n   */",
+    "code": "getProducer() {\n    return this.args[5];\n  }",
+    "old_id": 64,
+    "id": 64
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/ctx-host/mqtt.context.ts",
+    "doc": "/**\n   * Returns the name of the topic.\n   */",
+    "code": "getTopic() {\n    return this.args[0];\n  }",
+    "old_id": 65,
+    "id": 65
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/ctx-host/mqtt.context.ts",
+    "doc": "/**\n   * Returns the reference to the original MQTT packet.\n   */",
+    "code": "getPacket() {\n    return this.args[1];\n  }",
+    "old_id": 66,
+    "id": 66
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/ctx-host/nats.context.ts",
+    "doc": "/**\n   * Returns the name of the subject.\n   */",
+    "code": "getSubject() {\n    return this.args[0];\n  }",
+    "old_id": 67,
+    "id": 67
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/ctx-host/nats.context.ts",
+    "doc": "/**\n   * Returns message headers (if exist).\n   */",
+    "code": "getHeaders() {\n    return this.args[1];\n  }",
+    "old_id": 68,
+    "id": 68
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/ctx-host/redis.context.ts",
+    "doc": "/**\n   * Returns the name of the channel.\n   */",
+    "code": "getChannel() {\n    return this.args[0];\n  }",
+    "old_id": 69,
+    "id": 69
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/ctx-host/rmq.context.ts",
+    "doc": "/**\n   * Returns the original message (with properties, fields, and content).\n   */",
+    "code": "getMessage() {\n    return this.args[0];\n  }",
+    "old_id": 70,
+    "id": 70
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/ctx-host/rmq.context.ts",
+    "doc": "/**\n   * Returns the reference to the original RMQ channel.\n   */",
+    "code": "getChannelRef() {\n    return this.args[1];\n  }",
+    "old_id": 71,
+    "id": 71
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/ctx-host/rmq.context.ts",
+    "doc": "/**\n   * Returns the name of the pattern.\n   */",
+    "code": "getPattern() {\n    return this.args[2];\n  }",
+    "old_id": 72,
+    "id": 72
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/ctx-host/tcp.context.ts",
+    "doc": "/**\n   * Returns the underlying JSON socket.\n   */",
+    "code": "getSocketRef() {\n    return this.args[0];\n  }",
+    "old_id": 73,
+    "id": 73
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/ctx-host/tcp.context.ts",
+    "doc": "/**\n   * Returns the name of the pattern.\n   */",
+    "code": "getPattern() {\n    return this.args[1];\n  }",
+    "old_id": 74,
+    "id": 74
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/nest-microservice.ts",
+    "doc": "/**\n   * Returns an observable that emits status changes.\n   */",
+    "code": "get status() {\n    return this.serverInstance.status;\n  }",
+    "old_id": 75,
+    "id": 75
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/nest-microservice.ts",
+    "doc": "/**\n   * Registers a web socket adapter that will be used for Gateways.\n   * Use to override the default `socket.io` library.\n   *\n   * @param {WebSocketAdapter} adapter\n   * @returns {this}\n   */",
+    "code": "public useWebSocketAdapter(adapter: WebSocketAdapter): this {\n    this.applicationConfig.setIoAdapter(adapter);\n    return this;\n  }",
+    "old_id": 76,
+    "id": 76
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/nest-microservice.ts",
+    "doc": "/**\n   * Registers global exception filters (will be used for every pattern handler).\n   *\n   * @param {...ExceptionFilter} filters\n   */",
+    "code": "public useGlobalFilters(...filters: ExceptionFilter[]): this {\n    this.applicationConfig.useGlobalFilters(...filters);\n    filters.forEach(item =>\n      this.graphInspector.insertOrphanedEnhancer({\n        subtype: 'filter',\n        ref: item,\n      }),\n    );\n    return this;\n  }",
+    "old_id": 77,
+    "id": 77
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/nest-microservice.ts",
+    "doc": "/**\n   * Registers global pipes (will be used for every pattern handler).\n   *\n   * @param {...PipeTransform} pipes\n   */",
+    "code": "public useGlobalPipes(...pipes: PipeTransform<any>[]): this {\n    this.applicationConfig.useGlobalPipes(...pipes);\n    pipes.forEach(item =>\n      this.graphInspector.insertOrphanedEnhancer({\n        subtype: 'pipe',\n        ref: item,\n      }),\n    );\n    return this;\n  }",
+    "old_id": 78,
+    "id": 78
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/nest-microservice.ts",
+    "doc": "/**\n   * Registers global interceptors (will be used for every pattern handler).\n   *\n   * @param {...NestInterceptor} interceptors\n   */",
+    "code": "public useGlobalInterceptors(...interceptors: NestInterceptor[]): this {\n    this.applicationConfig.useGlobalInterceptors(...interceptors);\n    interceptors.forEach(item =>\n      this.graphInspector.insertOrphanedEnhancer({\n        subtype: 'interceptor',\n        ref: item,\n      }),\n    );\n    return this;\n  }",
+    "old_id": 79,
+    "id": 79
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/nest-microservice.ts",
+    "doc": "/**\n   * Starts the microservice.\n   *\n   * @returns {void}\n   */",
+    "code": "public async listen(): Promise<any> {\n    this.assertNotInPreviewMode('listen');\n    !this.isInitialized && (await this.registerModules());\n\n    return new Promise<any>((resolve, reject) => {\n      this.serverInstance.listen((err, info) => {\n        if (this.microserviceConfig?.autoFlushLogs ?? true) {\n          this.flushLogs();\n        }\n        if (err) {\n          return reject(err as Error);\n        }\n        this.logger.log(MESSAGES.MICROSERVICE_READY);\n        resolve(info);\n      });\n    });\n  }",
+    "old_id": 80,
+    "id": 80
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/nest-microservice.ts",
+    "doc": "/**\n   * Terminates the application.\n   *\n   * @returns {Promise<void>}\n   */",
+    "code": "public async close(): Promise<any> {\n    await this.serverInstance.close();\n    if (this.isTerminated) {\n      return;\n    }\n    this.setIsTerminated(true);\n    await this.closeApplication();\n  }",
+    "old_id": 81,
+    "id": 81
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/nest-microservice.ts",
+    "doc": "/**\n   * Sets the flag indicating that the application is initialized.\n   * @param isInitialized Value to set\n   */",
+    "code": "public setIsInitialized(isInitialized: boolean) {\n    this.isInitialized = isInitialized;\n  }",
+    "old_id": 82,
+    "id": 82
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/nest-microservice.ts",
+    "doc": "/**\n   * Sets the flag indicating that the application is terminated.\n   * @param isTerminated Value to set\n   */",
+    "code": "public setIsTerminated(isTerminated: boolean) {\n    this.isTerminated = isTerminated;\n  }",
+    "old_id": 83,
+    "id": 83
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/nest-microservice.ts",
+    "doc": "/**\n   * Sets the flag indicating that the init hook was called.\n   * @param isInitHookCalled Value to set\n   */",
+    "code": "public setIsInitHookCalled(isInitHookCalled: boolean) {\n    this.wasInitHookCalled = isInitHookCalled;\n  }",
+    "old_id": 84,
+    "id": 84
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/nest-microservice.ts",
+    "doc": "/**\n   * Registers an event listener for the given event.\n   * @param event Event name\n   * @param callback Callback to be executed when the event is emitted\n   */",
+    "code": "public on(event: string | number | symbol, callback: Function) {\n    if ('on' in this.serverInstance) {\n      return this.serverInstance.on(event as string, callback);\n    }\n    throw new Error('\"on\" method not supported by the underlying server');\n  }",
+    "old_id": 85,
+    "id": 85
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/nest-microservice.ts",
+    "doc": "/**\n   * Returns an instance of the underlying server/broker instance,\n   * or a group of servers if there are more than one.\n   */",
+    "code": "public unwrap<T>(): T {\n    if ('unwrap' in this.serverInstance) {\n      return this.serverInstance.unwrap();\n    }\n    throw new Error('\"unwrap\" method not supported by the underlying server');\n  }",
+    "old_id": 86,
+    "id": 86
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/server/server-grpc.ts",
+    "doc": "/**\n   * Will return all of the services along with their fully namespaced\n   * names as an array of objects.\n   * This method initiates recursive scan of grpcPkg object\n   */",
+    "code": "public getServiceNames(grpcPkg: any): { name: string; service: any }[] {\n    // Define accumulator to collect all of the services available to load\n    const services: { name: string; service: any }[] = [];\n    // Initiate recursive services collector starting with empty name\n    this.collectDeepServices('', grpcPkg, services);\n    return services;\n  }",
+    "old_id": 87,
+    "id": 87
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/server/server-grpc.ts",
+    "doc": "/**\n   * Will create service mapping from gRPC generated Object to handlers\n   * defined with @GrpcMethod or @GrpcStreamMethod annotations\n   *\n   * @param grpcService\n   * @param name\n   */",
+    "code": "public async createService(grpcService: any, name: string) {\n    const service = {};\n\n    for (const methodName in grpcService.prototype) {\n      let methodHandler: MessageHandler | null = null;\n      let streamingType = GrpcMethodStreamingType.NO_STREAMING;\n\n      const methodFunction = grpcService.prototype[methodName];\n      const methodReqStreaming = methodFunction.requestStream;\n\n      if (!isUndefined(methodReqStreaming) && methodReqStreaming) {\n        // Try first pattern to be presented, RX streaming pattern would be\n        // a preferable pattern to select among a few defined\n        methodHandler = this.getMessageHandler(\n          name,\n          methodName,\n          GrpcMethodStreamingType.RX_STREAMING,\n          methodFunction,\n        );\n        streamingType = GrpcMethodStreamingType.RX_STREAMING;\n        // If first pattern didn't match to any of handlers then try\n        // pass-through handler to be presented\n        if (!methodHandler) {\n          methodHandler = this.getMessageHandler(\n            name,\n            methodName,\n            GrpcMethodStreamingType.PT_STREAMING,\n            methodFunction,\n          );\n          streamingType = GrpcMethodStreamingType.PT_STREAMING;\n        }\n      } else {\n        // Select handler if any presented for No-Streaming pattern\n        methodHandler = this.getMessageHandler(\n          name,\n          methodName,\n          GrpcMethodStreamingType.NO_STREAMING,\n          methodFunction,\n        );\n        streamingType = GrpcMethodStreamingType.NO_STREAMING;\n      }\n      if (!methodHandler) {\n        continue;\n      }\n      service[methodName] = this.createServiceMethod(\n        methodHandler,\n        grpcService.prototype[methodName],\n        streamingType,\n      );\n    }\n    return service;\n  }",
+    "old_id": 88,
+    "id": 88
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/packages/microservices/server/server.ts",
+    "doc": "/**\n   * Transforms the server Pattern to valid type and returns a route for him.\n   *\n   * @param  {string} pattern - server pattern\n   * @returns string\n   */",
+    "code": "protected getRouteFromPattern(pattern: string): string {\n    let validPattern: MsPattern;\n\n    try {\n      validPattern = JSON.parse(pattern);\n    } catch (error) {\n      // Uses a fundamental object (`pattern` variable without any conversion)\n      validPattern = pattern;\n    }\n    return this.normalizePattern(validPattern);\n  }",
+    "old_id": 89,
+    "id": 89
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/sample/23-graphql-code-first/src/recipes/recipes.service.ts",
+    "doc": "/**\n   * MOCK\n   * Put some real business logic here\n   * Left for demonstration purposes\n   */",
+    "code": "async create(data: NewRecipeInput): Promise<Recipe> {\n    return {} as any;\n  }",
+    "old_id": 90,
+    "id": 90
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/tools/gulp/tasks/clean.ts",
+    "doc": "/**\n * Cleans the build output assets from the packages folders\n */",
+    "code": "function cleanOutput() {\n  return src(\n    [\n      `${source}/**/*.js`,\n      `${source}/**/*.d.ts`,\n      `${source}/**/*.js.map`,\n      `${source}/**/*.d.ts.map`,\n    ],\n    {\n      read: false,\n    },\n  ).pipe(clean());\n}",
+    "old_id": 91,
+    "id": 91
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/tools/gulp/tasks/copy-misc.ts",
+    "doc": "/**\n * Copies assets like Readme.md or LICENSE from the project base path\n * to all the packages.\n */",
+    "code": "function copyMisc(): NodeJS.ReadWriteStream {\n  const miscFiles = src(['Readme.md', 'LICENSE', '.npmignore']);\n  // Since `dest()` does not take a string-array, we have to append it\n  // ourselves\n  return packagePaths.reduce(\n    (stream, packagePath) => stream.pipe(dest(packagePath)),\n    miscFiles,\n  );\n}",
+    "old_id": 92,
+    "id": 92
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/tools/gulp/tasks/move.ts",
+    "doc": "/**\n * Moves the compiled nest files into \"node_module\" folder.\n */",
+    "code": "function moveToNodeModules() {\n  return distFiles.pipe(dest('node_modules/@nestjs'));\n}",
+    "old_id": 93,
+    "id": 93
+  },
+  {
+    "filename": "/Users/kyle/Documents/ubc/research/data/ts/nest/tools/gulp/tasks/move.ts",
+    "doc": "/**\n * Moves the compiled nest files into the `samples/*` dirs.\n */",
+    "code": "function moveToSamples() {\n  const samplesDirs = getDirs(samplePath);\n\n  /**\n   * Flatten the sampleDirs\n   * If a sample dir contains does not contain a package.json\n   * Push the subDirs into the destinations instead\n   */\n  const flattenedSampleDirs: string[] = [];\n\n  for (const sampleDir of samplesDirs) {\n    if (containsPackageJson(sampleDir)) {\n      flattenedSampleDirs.push(sampleDir);\n    } else {\n      flattenedSampleDirs.push(...getDirs(sampleDir));\n    }\n  }\n\n  return flattenedSampleDirs.reduce(\n    (distFile, dir) => distFile.pipe(dest(join(dir, '/node_modules/@nestjs'))),\n    distFiles,\n  );\n}",
+    "old_id": 94,
+    "id": 94
+  }
+]
